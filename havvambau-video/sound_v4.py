@@ -25,7 +25,7 @@ N = int(DUR * SR)
 XF = int(.012 * SR)                           # crossfade length
 
 
-def extend(src):
+def extend(src, repeats=REPEATS, n=N):
     a, b = int(DROP_A * SR), int(DROP_B * SR)
     bar = src[a:b].copy()
     # undo the clip's fade across the drop bar: fit the RMS decay per eighth, flatten it
@@ -37,15 +37,15 @@ def extend(src):
     bar *= (icpt / (icpt + slope * tt))[:, None]
     tail = src[b:int(SRC_END * SR)].copy()
     tail *= (icpt / (icpt + slope * (DROP_B - DROP_A)))   # continue at the compensated level
-    parts = [src[:a]] + [bar] * REPEATS + [tail]
+    parts = [src[:a]] + [bar] * repeats + [tail]
     out = parts[0]
     fade_in = np.sin(np.linspace(0, np.pi / 2, XF))[:, None]
     fade_out = np.cos(np.linspace(0, np.pi / 2, XF))[:, None]
     for nxt in parts[1:]:
         # equal-power crossfade: last XF samples of `out` into the first XF of `nxt`
         out = np.concatenate([out[:-XF], out[-XF:] * fade_out + nxt[:XF] * fade_in, nxt[XF:]])
-    res = np.zeros((N, 2))
-    res[:min(N, len(out))] = out[:N]
+    res = np.zeros((n, 2))
+    res[:min(n, len(out))] = out[:n]
     return res
 
 

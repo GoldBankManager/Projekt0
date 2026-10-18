@@ -106,3 +106,26 @@ Takte: **0,00 · 2,85 · 5,74 (DROP) · 8,63 (Ausklang)**. Starke Achtel-Hits: 0
 | 5,7–8,6 | DROP | Linse mit Logo + umlaufendem Slogan · „Wir schaffen die **Grundlage.**“ · „Erdarbeiten · Fundamente · Außenanlagen“ |
 | 8,6–14,4 | Leistungen (je 1,45 s) | **Aushub.** (Bagger gräbt) · **Fundament.** (Kiesbett, Platte, Wärmepumpe setzt auf) · **Pflaster.** (Steine ploppen ein) · **Gartenbau.** (Baum wächst, Hecken) · Schwarz/Weiß wechselt per Panel |
 | 14,4–18,5 | CTA | Punkt rollt → „Jetzt Projekt **anfragen.**“ · Telefon-Icon + **0174 5652015** · havvambau.de · Logo · „Augsburg & Umgebung“ (4 s stehen lassen) |
+
+---
+
+# Version 5: Mehrwert-Checkliste (`video_v5.html`, `sound_v5.py`)
+
+**Feedback:** „Mehr Informationen, was der Zuschauer rausnehmen soll, damit er dranbleibt.“
+
+**Retention-Mechanik:** Das Video verspricht früh einen konkreten Nutzen („4 Dinge, die das Fundament Ihrer Wärmepumpe können muss“) und löst ihn sichtbar ein: Zähler *Checkliste 1/4 … 4/4*, Fortschrittsbalken oben, ein roter Haken pro Punkt. Erst nach Punkt 4 kommen Marke und CTA.
+**Inhalt:** allgemeines Fachwissen ohne konkrete Zahlen oder Leistungsversprechen. Dazu ein ehrlicher Hinweis, dass die Anlagentechnik der Fachbetrieb setzt (laut Website).
+**Musik:** Drop-Takt 6× → 24,3 s.
+
+| Zeit | Szene | Inhalt |
+|---|---|---|
+| 0–2,9 | Hook | „Ihre **Wärmepumpe** ist bestellt?“ + Illustration |
+| 2,9–4,3 | Versprechen | Große Outline-„4“, Box „Checkliste“: „Dinge, die das **Fundament** Ihrer Wärmepumpe können **muss.**“ |
+| 4,3–5,7 | Problem | „Sonst **kippt sie** oder sackt ab.“ Die Pumpe kippt, der Boden reißt. Stille → roter Punkt |
+| 5,7 DROP | | Roter Flash |
+| 5,7–8,6 | 1/4 **Tragfähig.** | „Verdichtetes Kiesbett, frostfrei gegründet.“ Kiesbett füllt sich, Platte fällt ein, Last-Pfeile, Bemaßung „frostfrei“ |
+| 8,6–11,5 | 2/4 **Waagerecht.** | „Exakt ausgerichtet, so wie es der Hersteller verlangt.“ Platte + Wasserwaage richten sich aus, die Libelle wandert in die Mitte |
+| 11,5–14,4 | 3/4 **Kondenswasser.** | „Muss ablaufen können, sonst bildet sich im Winter Eis.“ Tropfen fallen ins Kiesbett |
+| 14,4–17,3 | 4/4 **Leitungsweg.** | „Graben zum Haus einplanen, danach die Fläche wiederherstellen.“ Graben öffnet sich, Leitungen laufen, Pflaster schließt ihn |
+| 17,3–20,2 | Marke | Linse mit Logo + Slogan · „Aushub · Fundament · Leitungsweg · Pflaster“ · „Wir schaffen die **Grundlage.**“ · „Die Anlagentechnik setzt Ihr Fachbetrieb.“ |
+| 20,2–24,3 | CTA | „Jetzt Projekt **anfragen.**“ · 0174 5652015 · havvambau.de · Logo · Augsburg & Umgebung |
