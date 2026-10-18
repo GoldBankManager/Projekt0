@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>HavvamBau Reel</title>
+<style>
+@font-face{font-family:Outfit;src:url(assets/fonts/outfit-latin.woff2) format('woff2');font-weight:100 900;font-display:block}
+:root{--paper:#ede8df;--white:#f7f5ef;--ink:#221f1b;--muted:#716e63;--green:#1e4a4d;--deep:#1b2e2e;--line:#d2cec2;--sage:#b5c4ac}
+html,body{margin:0;background:#000}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--deep);font-family:Outfit,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.full{position:absolute;inset:0}
+.t{position:absolute;left:0;width:1080px;white-space:nowrap}
+.c{text-align:center}
+.m{overflow:hidden;padding:.08em 0 .26em;margin:-.08em 0 -.26em}
+.i{will-change:transform}
+.up{text-transform:uppercase}
+.label{font-weight:600;letter-spacing:.2em;text-transform:uppercase}
+
+/* illustrated world */
+#sky{background:linear-gradient(180deg,#162626 0%,#1b2e2e 45%,#24403f 100%)}
+#world{position:absolute;inset:0;width:1080px;height:1920px}
+#dim{background:rgba(22,38,38,.62);opacity:0}
+
+/* hook */
+#hook .big{font-weight:800;color:var(--white);letter-spacing:-.01em;line-height:1}
+#hook .mid{font-size:78px;font-weight:500;color:var(--white);line-height:1.1}
+#hl{position:absolute;left:0;top:0;height:100%;background:var(--green);transform-origin:0 50%}
+#grund{position:relative;display:inline-block;padding:0 .14em}
+#grund span{position:relative}
+
+/* process ui */
+#bar{position:absolute;left:70px;right:70px;top:150px;height:8px;display:flex;gap:12px}
+#bar div{flex:1;background:rgba(247,245,239,.25);border-radius:4px;overflow:hidden}
+#bar div i{display:block;height:100%;background:var(--white);transform-origin:0 50%;transform:scaleX(0)}
+.stepNum{font-size:40px;font-weight:700;color:var(--sage);letter-spacing:.12em}
+.stepTitle{font-size:150px;font-weight:800;color:var(--white);line-height:1;letter-spacing:-.01em}
+.stepSub{font-size:52px;font-weight:400;color:rgba(247,245,239,.88)}
+
+/* burst */
+.burstWord{font-size:170px;font-weight:800;color:var(--white);line-height:1;letter-spacing:-.01em}
+
+/* paper scenes */
+#paper{background:var(--paper)}
+#wipeA,#wipeB{background:var(--green)}
+.h1{font-size:120px;font-weight:800;line-height:1.02;letter-spacing:-.015em}
+.h2{font-size:84px;font-weight:800;line-height:1.05;letter-spacing:-.01em}
+.sub{font-size:60px;font-weight:400;color:var(--muted)}
+.svc{position:absolute;left:0;width:1080px;text-align:center;font-size:118px;font-weight:800;line-height:1;white-space:nowrap;top:0}
+.dot{position:absolute;width:96px;height:96px;border-radius:50%;background:var(--green);color:var(--paper);font-size:46px;font-weight:700;display:flex;align-items:center;justify-content:center}
+#cta{position:absolute;left:50%;top:1050px;transform-origin:50% 50%}
+#ctaBtn{position:relative;display:flex;align-items:center;gap:22px;background:var(--green);color:var(--white);font-size:54px;font-weight:700;padding:38px 66px;border-radius:999px;white-space:nowrap;overflow:hidden}
+#ctaShine{position:absolute;top:-20%;bottom:-20%;width:140px;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.35),rgba(255,255,255,0));transform:skewX(-20deg)}
+.ring{position:absolute;inset:0;border:5px solid var(--green);border-radius:999px}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- ===== ILLUSTRATED WORLD (pure SVG, no photos) ===== -->
+  <div id="sky" class="full"></div>
+  <svg id="world" viewBox="0 0 1080 1920">
+    <defs>
+      <pattern id="gravel" width="44" height="34" patternUnits="userSpaceOnUse">
+        <rect width="44" height="34" fill="#b1ab9d"/>
+        <ellipse cx="9" cy="8" rx="7" ry="5" fill="#968f81"/><ellipse cx="29" cy="11" rx="8" ry="6" fill="#c9c3b6"/>
+        <ellipse cx="18" cy="25" rx="7" ry="5" fill="#8a8477"/><ellipse cx="38" cy="28" rx="5" ry="4" fill="#a39d90"/>
+      </pattern>
+      <pattern id="stones" width="160" height="130" patternUnits="userSpaceOnUse">
+        <ellipse cx="30" cy="40" rx="14" ry="8" fill="rgba(255,255,255,.07)"/>
+        <ellipse cx="110" cy="90" rx="10" ry="6" fill="rgba(255,255,255,.06)"/>
+        <ellipse cx="135" cy="25" rx="6" ry="4" fill="rgba(0,0,0,.12)"/>
+        <ellipse cx="70" cy="110" rx="8" ry="5" fill="rgba(0,0,0,.1)"/>
+      </pattern>
+      <pattern id="ticks" width="20" height="18" patternUnits="userSpaceOnUse">
+        <rect width="20" height="18" fill="#e6c55e"/><rect x="0" y="0" width="2.5" height="8" fill="#3b3833"/>
+        <rect x="10" y="0" width="2" height="5" fill="#3b3833"/>
+      </pattern>
+      <linearGradient id="holeG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f1914"/><stop offset="1" stop-color="#30271f"/></linearGradient>
+      <linearGradient id="slabG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9d5ca"/><stop offset="1" stop-color="#bdb8ab"/></linearGradient>
+    </defs>
+    <g id="cam">
+      <!-- soil -->
+      <rect x="-300" y="1250" width="1680" height="1000" fill="#6b5848"/>
+      <rect x="-300" y="1250" width="1680" height="95" fill="#56463a"/>
+      <rect x="-300" y="1590" width="1680" height="700" fill="#7a6654"/>
+      <rect x="-300" y="1250" width="1680" height="1000" fill="url(#stones)"/>
+      <!-- pit -->
+      <rect id="hole" x="470" y="1226" width="400" height="0" fill="url(#holeG)"/>
+      <rect id="gravelFill" x="470" y="1490" width="400" height="0" fill="url(#gravel)"/>
+      <rect id="slab" x="470" y="1330" width="400" height="0" fill="url(#slabG)"/>
+      <rect id="slabShine" x="470" y="1226" width="400" height="6" fill="#ebe8e0" opacity="0"/>
+      <!-- house -->
+      <g id="house">
+        <rect x="-60" y="700" width="320" height="552" fill="#e9e4da"/>
+        <rect x="-60" y="684" width="340" height="22" fill="#3a3530"/>
+        <rect x="40" y="800" width="150" height="190" rx="6" fill="#2c3b3b"/>
+        <rect x="40" y="800" width="150" height="190" rx="6" fill="none" stroke="#cfc9bd" stroke-width="12"/>
+        <rect x="113" y="800" width="6" height="190" fill="#cfc9bd"/>
+        <rect x="28" y="990" width="174" height="14" rx="3" fill="#cfc9bd"/>
+        <rect x="-60" y="1168" width="320" height="84" fill="#c7c0b2"/>
+        <rect x="236" y="706" width="14" height="520" fill="#8a857a"/>
+      </g>
+      <!-- lawn -->
+      <rect id="lawnL" x="250" y="1226" width="220" height="26" fill="#9fb495"/>
+      <rect id="lawnM" x="470" y="1226" width="400" height="26" fill="#9fb495"/>
+      <rect id="lawnR" x="870" y="1226" width="300" height="26" fill="#9fb495"/>
+      <g id="tuftsL"></g><g id="tuftsM"></g><g id="tuftsR"></g>
+      <path id="crack" d="M512 1230 l-26 9 l-22 -6 l-30 11 l-26 -5 l-28 8 M828 1230 l26 8 l22 -6 l30 10 l26 -5 l28 7" fill="none" stroke="#2b231c" stroke-width="5" stroke-linejoin="round" opacity="0"/>
+      <!-- dirt pile -->
+      <g id="pileG" transform="translate(985 1228) scale(0)">
+        <path d="M-120 0 Q-95 -8 -70 -42 Q-30 -118 18 -96 Q48 -84 72 -40 Q92 -10 120 0 Z" fill="#5c4b3b"/>
+        <path d="M-70 -42 Q-30 -118 18 -96 Q-10 -80 -40 -40 Z" fill="#6f5c4a"/>
+        <ellipse cx="40" cy="-30" rx="10" ry="6" fill="#4a3c30"/><ellipse cx="-50" cy="-20" rx="8" ry="5" fill="#7d6956"/>
+      </g>
+      <!-- pavers -->
+      <g id="pavers"></g>
+      <!-- measuring -->
+      <g id="tape" opacity="0">
+        <rect id="tapeBody" x="476" y="1180" width="0" height="18" fill="url(#ticks)"/>
+        <rect id="tapeEnd" x="476" y="1172" width="8" height="34" rx="2" fill="#3b3833"/>
+        <rect x="414" y="1152" width="68" height="68" rx="14" fill="#d8b24c"/>
+        <circle cx="448" cy="1186" r="18" fill="#3b3833"/><circle cx="448" cy="1186" r="7" fill="#d8b24c"/>
+      </g>
+      <g id="depth" opacity="0">
+        <g id="depthLine">
+          <rect x="826" y="1240" width="5" height="236" fill="#f7f5ef"/>
+          <path d="M828.5 1236 l-16 26 h32 Z M828.5 1482 l-16 -26 h32 Z" fill="#f7f5ef"/>
+          <rect x="806" y="1232" width="45" height="4" fill="#f7f5ef"/><rect x="806" y="1482" width="45" height="4" fill="#f7f5ef"/>
+        </g>
+        <g id="pill" transform="translate(650 1358)">
+          <rect x="-120" y="-38" width="240" height="76" rx="38" fill="#1e4a4d"/>
+          <text x="-14" y="13" text-anchor="middle" font-family="Outfit" font-weight="700" font-size="38" fill="#f7f5ef">passt</text>
+          <path d="M52 0 l12 12 l24 -26" fill="none" stroke="#b5c4ac" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+      </g>
+      <!-- screed -->
+      <g id="screed" opacity="0">
+        <rect x="-8" y="-30" width="16" height="40" rx="4" fill="#3b3833"/>
+        <rect x="-4" y="-150" width="8" height="125" rx="4" fill="#3b3833" transform="rotate(28 0 -30)"/>
+      </g>
+      <!-- flying dirt -->
+      <g id="chunks"></g>
+      <!-- heat pump -->
+      <ellipse id="pumpShadow" cx="670" cy="1230" rx="165" ry="12" fill="rgba(0,0,0,.35)" opacity="0"/>
+      <g id="pump">
+        <rect x="0" y="0" width="300" height="236" rx="18" fill="#f1ede5"/>
+        <path d="M226 0 H282 Q300 0 300 18 V218 Q300 236 282 236 H226 Z" fill="#dcd7cc"/>
+        <circle cx="114" cy="118" r="90" fill="#dcd7cc"/>
+        <circle cx="114" cy="118" r="80" fill="#34312c"/>
+        <g id="fan">
+          <path d="M114 118 C 104 78, 128 50, 150 52 C 150 80, 136 104, 114 118 Z" fill="#6d6960"/>
+          <path d="M114 118 C 104 78, 128 50, 150 52 C 150 80, 136 104, 114 118 Z" fill="#6d6960" transform="rotate(120 114 118)"/>
+          <path d="M114 118 C 104 78, 128 50, 150 52 C 150 80, 136 104, 114 118 Z" fill="#6d6960" transform="rotate(240 114 118)"/>
+        </g>
+        <g fill="none" stroke="#8f8a80" stroke-width="3">
+          <circle cx="114" cy="118" r="30"/><circle cx="114" cy="118" r="52"/><circle cx="114" cy="118" r="72"/>
+          <path d="M34 118 H194 M114 38 V198"/>
+        </g>
+        <circle cx="114" cy="118" r="13" fill="#cfcabf"/>
+        <g stroke="#bbb5a9" stroke-width="7" stroke-linecap="round">
+          <path d="M244 44 H284 M244 66 H284 M244 88 H284 M244 110 H284 M244 132 H284 M244 154 H284 M244 176 H284 M244 198 H284"/>
+        </g>
+        <rect x="22" y="236" width="56" height="14" rx="3" fill="#34312c"/>
+        <rect x="222" y="236" width="56" height="14" rx="3" fill="#34312c"/>
+      </g>
+      <g id="dust"></g>
+      <g id="check" transform="translate(880 950) scale(0)">
+        <circle r="46" fill="#1e4a4d"/><circle r="46" fill="none" stroke="#f7f5ef" stroke-width="5"/>
+        <path d="M-20 0 l13 14 l28 -30" fill="none" stroke="#f7f5ef" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
+    </g>
+  </svg>
+  <div id="dim" class="full"></div>
+
+  <!-- ===== HOOK ===== -->
+  <div id="hook" class="full">
+    <div id="hookLogo" style="position:absolute;left:330px;top:175px;width:420px"></div>
+    <div class="t c" style="top:330px"><div class="big" id="w1" data-fit="930" style="font-size:160px">WÄRMEPUMPE</div></div>
+    <div class="t c" style="top:505px"><div class="big" id="w2" data-fit="930" style="font-size:160px;color:var(--sage)">BESTELLT?</div></div>
+    <div class="t c m" style="top:340px"><div class="i mid" id="l3">Dann braucht sie</div></div>
+    <div class="t c m" style="top:435px"><div class="i mid" id="l4">zuerst eine</div></div>
+    <div class="t c m" style="top:548px;padding-bottom:.25em"><div class="i big" id="l5" style="font-size:150px"><span id="grund"><i id="hl"></i><span>Grundlage.</span></span></div></div>
+  </div>
+
+  <!-- ===== PROCESS UI ===== -->
+  <div id="proj" class="full" style="visibility:hidden">
+    <div id="bar"><div><i></i></div><div><i></i></div><div><i></i></div><div><i></i></div></div>
+    <div class="t label" style="top:186px;left:70px;font-size:30px;color:rgba(247,245,239,.8)">So entsteht ein Aufstellplatz</div>
+    <div id="steps"></div>
+  </div>
+
+  <!-- ===== BURST ===== -->
+  <div id="burst" class="full" style="visibility:hidden">
+    <div class="t c label" id="burstTag" style="top:470px;font-size:36px;color:var(--sage)">Unser Anspruch</div>
+    <div class="t c burstWord" data-fit="940" id="b0" style="top:540px">SAUBER.</div>
+    <div class="t c burstWord" data-fit="940" id="b1" style="top:540px">PRÄZISE.</div>
+    <div class="t c burstWord" data-fit="940" id="b2" style="top:540px">VERLÄSSLICH.</div>
+  </div>
+
+  <!-- ===== PAPER WORLD ===== -->
+  <div id="wipeA" class="full" style="visibility:hidden"></div>
+  <div id="paper" class="full" style="visibility:hidden">
+    <svg class="full" width="1080" height="1920" style="position:absolute">
+      <path id="brTL" d="M84 404 V150 H338" fill="none" stroke="#1e4a4d" stroke-width="8"/>
+      <path id="brBR" d="M996 1516 V1770 H742" fill="none" stroke="#1e4a4d" stroke-width="8"/>
+    </svg>
+
+    <!-- Punchline -->
+    <div id="sPunch" class="full">
+      <div class="t m" style="top:520px;left:110px"><div class="i h1" id="pA1">Die Technik?</div></div>
+      <div class="t m" style="top:665px;left:110px"><div class="i sub" id="pA2">Macht der Fachbetrieb.</div></div>
+      <div class="t m" style="top:900px;left:110px"><div class="i h1" id="pB1" data-fit="880">Alles drumherum?</div></div>
+      <div class="t m" id="pB2w" style="top:1030px;left:96px;transform-origin:120px 60%"><div class="i" id="pB2" style="font-size:330px;font-weight:800;color:var(--green);line-height:1;letter-spacing:-.03em;transform-origin:0 70%">Wir.</div></div>
+    </div>
+
+    <!-- Services -->
+    <div id="sServ" class="full" style="visibility:hidden">
+      <div class="t c m" style="top:330px"><div class="i label" id="svL" style="font-size:34px;color:var(--green)">Leistungen</div></div>
+      <div class="t c m" style="top:395px"><div class="i h2" id="svH">Was wir noch machen:</div></div>
+      <div id="wheel" class="full"></div>
+      <div class="t c" id="svCount" style="top:1440px;font-size:40px;font-weight:600;color:var(--muted);letter-spacing:.1em">01 / 08</div>
+    </div>
+
+    <!-- Steps -->
+    <div id="sSteps" class="full" style="visibility:hidden">
+      <div class="t m" style="top:330px;left:110px"><div class="i label" id="stL" style="font-size:34px;color:var(--green)">So arbeiten wir</div></div>
+      <div class="t m" style="top:395px;left:110px"><div class="i h2" id="stH">So einfach geht's.</div></div>
+      <div id="stLine" style="position:absolute;left:156px;top:700px;width:4px;height:620px;background:var(--line);transform-origin:50% 0"></div>
+      <div id="stLineG" style="position:absolute;left:156px;top:700px;width:4px;height:620px;background:var(--green);transform-origin:50% 0"></div>
+    </div>
+
+    <!-- End -->
+    <div id="sEnd" class="full" style="visibility:hidden">
+      <div id="endLogo" style="position:absolute;left:100px;top:600px;width:880px"></div>
+      <div id="endLine" style="position:absolute;left:100px;top:790px;width:880px;height:3px;background:var(--line);transform-origin:50% 50%"></div>
+      <div class="t c" id="slogan" style="top:830px;font-size:66px;font-weight:500"></div>
+      <div id="cta"><div class="ring" id="ring1"></div><div class="ring" id="ring2"></div><div id="ctaBtn"><span>Jetzt Projekt anfragen</span><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#f7f5ef" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg><i id="ctaShine"></i></div></div>
+      <div class="t c m" style="top:1270px"><div class="i" id="ePhone" style="font-size:84px;font-weight:800;letter-spacing:.01em;display:inline-flex;align-items:center;gap:26px"><svg width="70" height="70" viewBox="0 0 24 24" fill="#1e4a4d"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>0174 5652015</div></div>
+      <div class="t c m" style="top:1395px"><div class="i" id="eWeb" style="font-size:54px;font-weight:600;color:var(--green)">havvambau.de</div></div>
+      <div class="t c m" style="top:1480px"><div class="i label" id="eReg" style="font-size:34px;color:var(--muted)">Augsburg &amp; Umgebung</div></div>
+    </div>
+  </div>
+  <div id="wipeB" class="full" style="visibility:hidden"></div>
+</div>
+
+<script>
+// ---------- timeline constants (seconds) ----------
+const T = {proj:4.0, burst:12.0, punch:14.0, serv:17.0, steps:22.0, end:26.0, total:32.5};
+const STEP = 2.0; // duration of each process step
+window.DURATION = T.total;
+
+// ---------- math ----------
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const p=(t,s,d)=>clamp((t-s)/d);
+const lerp=(a,b,x)=>a+(b-a)*x;
+const E={
+  out:x=>1-Math.pow(1-x,3),
+  in:x=>x*x*x,
+  io:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,
+  sine:x=>-(Math.cos(Math.PI*x)-1)/2,
+  expo:x=>x>=1?1:1-Math.pow(2,-10*x),
+  quart:x=>1-Math.pow(1-x,4),
+  back:x=>{const c1=1.5,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)},
+};
+const $=id=>document.getElementById(id);
+const vis=(el,on)=>{el.style.display=on?'block':'none';el.style.visibility='inherit'};
+
+// masked rise in / out (el = inner .i)
+function rise(el,t,s,d=.65,es=null,ed=.32){
+  let y=(1-E.expo(p(t,s,d)))*118;
+  if(es!==null) y-=E.in(p(t,es,ed))*118;
+  el.style.transform=`translate3d(0,${y}%,0)`;
+}
+
+// ---------- logo ----------
+const LOGO=[
+ [0,'M71.75 0V703H208V0ZM513 0V703H649.25V0ZM158.25 302.5V422.75H551.25V302.5Z',0],
+ [696,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [1386,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2066,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2746,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [3436,'M71.75 0V703H168L452.5 246.75H397.75L682 703H778.25V0H642.5V469.5L669.25 462.25L471 144H379L181 462.25L207.5 469.5V0Z',0],
+ [4261,'M171.5 0V111H355Q404.25 111 431.75 140.875Q459.25 170.75 459.25 212Q459.25 239.75 446.875 262.875Q434.5 286 411.125 299.5Q387.75 313 355 313H171.5V422.5H340Q381.75 422.5 407.25 443.75Q432.75 465 432.75 507.25Q432.75 549.5 407.25 570.75Q381.75 592 340 592H171.5V703H356.25Q425.75 703 473.125 677.375Q520.5 651.75 544.5 610.375Q568.5 569 568.5 520Q568.5 459.75 532.125 416.25Q495.75 372.75 425.5 351.5L431.75 395.75Q509.5 373.75 552.25 323.25Q595 272.75 595 201.75Q595 145.75 567.375 100.125Q539.75 54.5 487.25 27.25Q434.75 0 360 0ZM71.75 0V703H207V0Z',1],
+ [4867,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',1],
+ [5557,'M349.237 -10.5Q265.974 -10.5 201.27 26.087Q136.566 62.674 99.533 126.641Q62.5 190.607 62.5 271.75V703H198.75V268Q198.75 221.278 218.601 187.053Q238.453 152.827 272.639 134.414Q306.825 116 349.12 116Q392.25 116 425.345 134.394Q458.44 152.788 477.72 186.851Q497 220.915 497 267V703H633.5V270.75Q633.5 189.573 596.953 126.139Q560.407 62.706 496.453 26.103Q432.5 -10.5 349.237 -10.5Z',1],
+];
+function makeLogo(host,cA,cB){
+  const ns='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox','40 -720 6180 750');svg.style.width='100%';svg.style.display='block';svg.style.overflow='hidden';
+  const g=document.createElementNS(ns,'g');g.setAttribute('transform','scale(1 -1)');svg.appendChild(g);
+  const paths=LOGO.map(([x,d,b])=>{const el=document.createElementNS(ns,'path');el.setAttribute('d',d);el.setAttribute('fill',b?cB:cA);el.dataset.x=x;el.setAttribute('transform',`translate(${x} 0)`);g.appendChild(el);return el;});
+  host.appendChild(svg);return paths;
+}
+const hookLogo=makeLogo($('hookLogo'),'#f7f5ef','#b5c4ac');
+const endLogo=makeLogo($('endLogo'),'#221f1b','#1e4a4d');
+function animLogo(paths,t,s,stag=.055,d=.75){
+  paths.forEach((el,i)=>{const k=E.expo(p(t,s+i*stag,d));el.setAttribute('transform',`translate(${el.dataset.x} ${-(1-k)*760})`);});
+}
+
+// ---------- illustrated world ----------
+const NS='http://www.w3.org/2000/svg';
+const svgEl=(tag,attrs,parent)=>{const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);parent&&parent.appendChild(e);return e;};
+let seed=11;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+
+const PIT={x0:470,x1:870,top:1226,bottom:1490,cx:670};
+const PUMP_Y=976;            // pump top when its feet stand at ground level
+const S0=T.proj;             // process start
+const STEP_T=[S0,S0+STEP,S0+2*STEP,S0+3*STEP];
+
+// grass tufts
+[['tuftsL',250,470],['tuftsM',470,870],['tuftsR',870,1080]].forEach(([id,a,b])=>{
+  const g=$(id);
+  for(let x=a+6;x<b-4;x+=17){const h=10+rnd()*10;svgEl('path',{d:`M${x-6} 1228 L${x+rnd()*4-2} ${1228-h} L${x+6} 1228 Z`,fill:rnd()>.5?'#8ea683':'#a9bd9f'},g);}
+});
+// pavers (left of pit and right after the pile is gone)
+const paverEls=[];
+for(let x=254;x<466;x+=43) paverEls.push(svgEl('rect',{x,y:1214,width:39,height:16,rx:3,fill:paverEls.length%2?'#aaa395':'#bab3a5'},$('pavers')));
+for(let x=874;x<1080;x+=43) paverEls.push(svgEl('rect',{x,y:1214,width:39,height:16,rx:3,fill:paverEls.length%2?'#aaa395':'#bab3a5'},$('pavers')));
+
+// flying dirt chunks: 3 scoops x 6 chunks
+const SCOOPS=[S0+.3,S0+.85,S0+1.4];
+const chunks=[];
+SCOOPS.forEach(s=>{for(let k=0;k<6;k++){
+  chunks.push({s:s+.12+k*.035,x0:500+rnd()*340,y0:1250+rnd()*40,x1:920+rnd()*130,y1:1150+rnd()*60,h:180+rnd()*140,
+    el:svgEl('ellipse',{rx:9+rnd()*9,ry:7+rnd()*6,fill:rnd()>.5?'#5c4b3b':'#6f5c4a'},$('chunks'))});
+}});
+// dust puffs
+function makeDust(t0,cx,n,spread,power){
+  const arr=[];for(let k=0;k<n;k++){const dir=k%2?1:-1;
+    arr.push({t0,x:cx+dir*(spread*.3+rnd()*spread*.7),y:1226,vx:dir*(60+rnd()*220)*power,vy:-(40+rnd()*170)*power,r:6+rnd()*12,
+      el:svgEl('circle',{r:1,fill:'#d6d1c6'},$('dust'))});}
+  return arr;
+}
+const dust=[...makeDust(.5,670,18,160,1),...makeDust(S0+3*STEP+.95,670,10,160,.6)];
+
+function setAttr(el,o){for(const k in o)el.setAttribute(k,o[k]);}
+function pumpTransform(x,y,rot,sx,sy){
+  return `translate(${x} ${y}) rotate(${rot} 150 250) translate(150 250) scale(${sx} ${sy}) translate(-150 -250)`;
+}
+
+// camera impulses (impact shake) – [time, amplitude px]
+const IMPULSES=[[0.06,10],[0.5,22],[T.burst,9],[T.burst+.5,9],[T.burst+1,11],[S0+3*STEP+.95,8]];
+function shake(t){
+  let x=0,y=0;
+  for(const [s,a] of IMPULSES){const dt=t-s;if(dt<0||dt>.5)continue;const env=a*Math.exp(-dt*11);x+=env*Math.sin(dt*70);y+=env*Math.cos(dt*55);}
+  return [x,y];
+}
+
+function renderWorld(t){
+  const on=t<T.punch+.8; vis($('world'),on); vis($('sky'),on); vis($('dim'),on);
+  if(!on) return;
+  // camera: slow push-in during the process, pull back for the burst
+  let z= t<S0 ? 1.12 : lerp(1.12,1.22,E.sine(p(t,S0,4*STEP)));
+  if(t>=T.burst) z=lerp(1.22,1.06,E.expo(p(t,T.burst,1.2)));
+  const [sx,sy]=shake(t);
+  $('cam').setAttribute('transform',`translate(${640+sx} ${1400+sy}) scale(${z}) translate(-670 -1300)`);
+  $('dim').style.opacity=E.out(p(t,T.burst,.3))*.62;
+
+  // ---- 01 Aushub: sod off, three scoops, pile grows
+  const sod=E.io(p(t,S0+.12,.25));
+  $('lawnM').setAttribute('transform',`translate(0 ${1226*sod}) scale(1 ${1-sod})`);
+  $('tuftsM').style.opacity=1-sod;
+  let depth=0; SCOOPS.forEach(s=>{depth+=E.out(p(t,s,.35))*(PIT.bottom-PIT.top)/3;});
+  $('hole').setAttribute('height',depth);
+  let pile=0; SCOOPS.forEach(s=>{pile+=E.back(p(t,s+.45,.35))/3;});
+  pile*=1-E.in(p(t,STEP_T[3],.4));
+  $('pileG').setAttribute('transform',`translate(985 1228) scale(${Math.max(0,pile)})`);
+  chunks.forEach(c=>{
+    const k=(t-c.s)/.5; if(k<0||k>1){c.el.style.display='none';return;}
+    c.el.style.display='';
+    setAttr(c.el,{cx:lerp(c.x0,c.x1,k),cy:lerp(c.y0,c.y1,k)-c.h*4*k*(1-k),transform:`rotate(${k*200} ${lerp(c.x0,c.x1,k)} ${lerp(c.y0,c.y1,k)-c.h*4*k*(1-k)})`});
+  });
+
+  // ---- 02 Aufmass: tape runs across, depth arrows, "passt" pill
+  const m0=STEP_T[1];
+  const tapeOn=E.out(p(t,m0+.05,.2))*(1-E.in(p(t,STEP_T[2]-.15,.3)));
+  $('tape').setAttribute('opacity',tapeOn);
+  const tw=E.io(p(t,m0+.15,.6))*390;
+  $('tapeBody').setAttribute('width',tw); $('tapeEnd').setAttribute('x',476+tw-4);
+  $('depth').setAttribute('opacity',E.out(p(t,m0+.55,.2))*(1-E.in(p(t,STEP_T[2]-.15,.3))));
+  const dk=E.io(p(t,m0+.55,.5));
+  $('depthLine').setAttribute('transform',`translate(0 ${1236*(1-dk)}) scale(1 ${Math.max(dk,.001)})`);
+  const pk=E.back(p(t,m0+1.05,.45));
+  $('pill').setAttribute('transform',`translate(650 1358) scale(${pk})`);
+
+  // ---- 03 Fundament: gravel bed, concrete slab, screed sweep
+  const f0=STEP_T[2];
+  const gh=E.io(p(t,f0+.12,.75))*160;
+  setAttr($('gravelFill'),{y:PIT.bottom-gh,height:gh});
+  const sh=E.io(p(t,f0+.95,.5))*104;
+  setAttr($('slab'),{y:1330-sh,height:sh});
+  const sw=p(t,f0+1.35,.5);
+  $('screed').setAttribute('opacity',sw>0&&sw<1?1:0);
+  $('screed').setAttribute('transform',`translate(${lerp(466,874,E.io(sw))} 1226)`);
+  $('slabShine').setAttribute('opacity',sw>=1?.9:0);
+  $('slabShine').setAttribute('width',400*E.io(sw));
+
+  // ---- 04 Fertig: pile gone, pavers, pump lowered, fan on, check
+  const e0=STEP_T[3];
+  paverEls.forEach((el,i)=>{
+    const s=i<5? e0+.1+i*.07 : e0+.45+(i-5)*.07;
+    const k=E.back(p(t,s,.4));
+    el.setAttribute('transform',`translate(0 ${1230*(1-k)}) scale(1 ${k})`);
+  });
+
+  // pump: hook drop -> tilt -> lift off ... lowered onto slab in step 04
+  let px=520,py=-600,rot=0,psx=1,psy=1,shadow=0;
+  if(t<S0){
+    const fall=p(t,.04,.46); py=lerp(-420,PUMP_Y,fall*fall);
+    if(t>=.5){const d=t-.5,b=Math.exp(-d*9)*Math.cos(d*28);psx=1+.07*b;psy=1-.1*b;}
+    const tilt=E.io(p(t,1.15,.7)); rot=tilt*6; py+=tilt*18;
+    const lift=E.in(p(t,S0-.75,.55)); py-=lift*1500; rot*=1-lift;
+    shadow=fall*(1-lift);
+  }else if(t>=e0){
+    const d=E.out(p(t,e0+.25,.7)); py=lerp(-350,PUMP_Y,d);
+    if(t>=e0+.95){const dd=t-(e0+.95),b=Math.exp(-dd*10)*Math.cos(dd*30);psx=1+.03*b;psy=1-.045*b;}
+    shadow=d;
+  }
+  $('pump').setAttribute('transform',pumpTransform(px,py,rot,psx,psy));
+  $('pumpShadow').setAttribute('opacity',shadow*.9);
+  $('pumpShadow').setAttribute('rx',165*(.5+.5*shadow));
+  const fd=Math.max(0,t-(e0+1.0)); const ang=fd>0?720*fd*fd/(fd+.5):0;
+  $('fan').setAttribute('transform',`rotate(${ang} 114 118)`);
+  $('crack').setAttribute('opacity',p(t,1.2,.05)*(1-p(t,S0-.4,.3)));
+  const cl=$('crack').getTotalLength();$('crack').style.strokeDasharray=cl;$('crack').style.strokeDashoffset=cl*(1-E.out(p(t,1.2,.45)));
+  const ck=E.back(p(t,e0+1.15,.5));
+  $('check').setAttribute('transform',`translate(880 950) scale(${ck})`);
+
+  dust.forEach(d=>{
+    const dt=t-d.t0; if(dt<0||dt>.9){d.el.style.display='none';return;}
+    d.el.style.display='';
+    setAttr(d.el,{cx:d.x+d.vx*dt,cy:d.y+d.vy*dt+260*dt*dt,r:d.r*(1+dt*1.5)});
+    d.el.setAttribute('opacity',(1-dt/.9)*.75);
+  });
+}
+
+// ---------- hook ----------
+function slam(el,t,s,es){
+  const k=E.expo(p(t,s,.42));
+  const o=p(t,s,.12)*(1-E.in(p(t,es,.3)));
+  el.style.opacity=o;
+  el.style.transform=`translate3d(0,${-E.in(p(t,es,.3))*90}px,0) scale(${lerp(1.7,1,k)})`;
+  el.style.filter=`blur(${(1-k)*16}px)`;
+}
+function renderHook(t){
+  const on=t<T.proj+.1; vis($('hook'),on); if(!on) return;
+  slam($('w1'),t,.04,1.85);
+  slam($('w2'),t,.5,1.9);
+  const ex=T.proj-.45;
+  rise($('l3'),t,2.0,.65,ex,.35);
+  rise($('l4'),t,2.12,.65,ex+.04,.35);
+  rise($('l5'),t,2.26,.7,ex+.08,.35);
+  $('hl').style.width='100%';
+  $('hl').style.transform=`scaleX(${E.quart(p(t,2.55,.45))})`;
+  $('hookLogo').style.opacity=E.out(p(t,0,.5))*(1-p(t,T.proj-.4,.3));
+  animLogo(hookLogo,t,0.0,.04,.6);
+}
+
+// ---------- process labels ----------
+const STEPS=[
+  ['01 / 04','Aushub','Boden sauber ausheben'],
+  ['02 / 04','Aufmaß','Exakt vermessen'],
+  ['03 / 04','Fundament','Tragfähig und eben'],
+  ['04 / 04','Fertig','Fläche wiederhergestellt'],
+];
+const stepEls=STEPS.map(([n,ti,su])=>{
+  const g=document.createElement('div');g.className='full';
+  g.innerHTML=`<div class="t m" style="top:285px;left:70px"><div class="i stepNum">${n}</div></div>
+  <div class="t m" style="top:345px;left:62px"><div class="i stepTitle up" data-fit="950">${ti}</div></div>
+  <div class="t m" style="top:510px;left:70px"><div class="i stepSub">${su}</div></div>`;
+  $('steps').appendChild(g);return [...g.querySelectorAll('.i')];
+});
+function renderProj(t){
+  const on=t>=T.proj&&t<T.burst; vis($('proj'),on);
+  if(!on) return;
+  document.querySelectorAll('#bar i').forEach((b,i)=>{
+    b.style.transform=`scaleX(${p(t,T.proj+i*STEP,STEP)})`;
+  });
+  stepEls.forEach((els,i)=>{
+    const s=T.proj+i*STEP+.08;
+    const es=T.proj+(i+1)*STEP-.12;
+    els.forEach((el,j)=>rise(el,t,s+j*.07,.7,es+j*.03,.28));
+  });
+}
+
+// ---------- burst ----------
+function renderBurst(t){
+  const on=t>=T.burst&&t<T.punch+.5; vis($('burst'),on);
+  if(!on) return;
+  ['b0','b1','b2'].forEach((id,i)=>{
+    const s=T.burst+i*.5, e= i<2 ? s+.5 : 99;
+    const el=$(id); const shown=t>=s&&t<e;
+    el.style.visibility=shown?'visible':'hidden';
+    const k=E.expo(p(t,s,.35));
+    el.style.transform=`scale(${lerp(1.35,1,k)})`;
+    el.style.opacity=p(t,s,.06);
+  });
+  $('burstTag').style.opacity=E.out(p(t,T.burst,.3));
+}
+
+// ---------- paper world ----------
+function bracket(el,k){const L=el.getTotalLength();el.style.strokeDasharray=L;el.style.strokeDashoffset=L*(1-k);}
+function renderPaper(t){
+  // first wipe: green then paper, bottom-up
+  const wa=t>=T.punch&&t<T.punch+.7; vis($('wipeA'),wa);
+  $('wipeA').style.clipPath=`inset(${(1-E.io(p(t,T.punch,.42)))*100}% 0 0 0)`;
+  const pon=t>=T.punch+.1; vis($('paper'),pon);
+  if(!pon) return;
+  $('paper').style.clipPath=`inset(${(1-E.io(p(t,T.punch+.12,.42)))*100}% 0 0 0)`;
+
+  // brackets
+  const bk= t<T.end ? E.quart(p(t,T.punch+.45,.8)) : E.quart(p(t,T.end+.35,.9));
+  bracket($('brTL'),bk);bracket($('brBR'),bk);
+
+  // punchline
+  const P=T.punch, pOn=t<T.serv+.4; vis($('sPunch'),pOn);
+  if(pOn){
+    const ex=T.serv-.05;
+    rise($('pA1'),t,P+.42,.7,ex,.3);
+    rise($('pA2'),t,P+.72,.7,ex+.03,.3);
+    rise($('pB1'),t,P+1.35,.7,ex+.06,.3);
+    rise($('pB2'),t,P+1.85,.75,ex+.09,.3);
+    const pop=E.back(p(t,P+1.85,.6));
+    $('pB2w').style.transform=`scale(${lerp(.75,1,pop)})`;
+  }
+
+  // services
+  const S=T.serv, sOn=t>=S&&t<T.steps+.4; vis($('sServ'),sOn);
+  if(sOn){
+    const ex=T.steps-.05;
+    rise($('svL'),t,S+.05,.65,ex,.3);
+    rise($('svH'),t,S+.12,.65,ex+.03,.3);
+    let s=0; for(let j=0;j<SVC.length-1;j++) s+=E.io(p(t,S+.6+j*.5,.4));
+    const wIn=E.out(p(t,S+.15,.5)), wOut=E.in(p(t,ex,.3));
+    svcEls.forEach((el,i)=>{
+      const d=i-s, ad=Math.abs(d);
+      const y=1000+d*170 - wOut*120 + (1-wIn)*120;
+      const sc=(1-Math.min(ad,2.5)*.26)*el._fit;
+      const o=clamp(1-ad*.42)*wIn*(1-wOut);
+      const c=clamp(ad);
+      el.style.transform=`translate3d(0,${y-60}px,0) scale(${sc})`;
+      el.style.opacity=o;
+      el.style.color=`rgb(${lerp(34,150,c)},${lerp(31,146,c)},${lerp(27,134,c)})`;
+    });
+    $('svCount').style.opacity=wIn*(1-wOut);
+    const idx=Math.min(SVC.length,Math.round(s)+1);
+    $('svCount').textContent=String(idx).padStart(2,'0')+' / '+String(SVC.length).padStart(2,'0');
+  }
+
+  // steps
+  const St=T.steps, stOn=t>=St&&t<T.end+.5; vis($('sSteps'),stOn);
+  if(stOn){
+    rise($('stL'),t,St+.05);
+    rise($('stH'),t,St+.12);
+    $('stLine').style.transform=`scaleY(${E.io(p(t,St+.3,.6))})`;
+    $('stLineG').style.transform=`scaleY(${E.io(p(t,St+.5,2.0))})`;
+    stepRows.forEach((r,i)=>{
+      const s=St+.5+i*.62;
+      const k=E.back(p(t,s,.55));
+      r.dot.style.transform=`scale(${k})`;
+      rise(r.t,t,s+.08,.7); rise(r.s,t,s+.16,.7);
+    });
+    rise($('stQ'),t,St+2.5,.8);
+  }
+
+  // second wipe (green) – into end card
+  const E0=T.end, wb=t>=E0&&t<E0+1; vis($('wipeB'),wb);
+  const inK=E.io(p(t,E0,.38)), outK=E.io(p(t,E0+.45,.42));
+  $('wipeB').style.clipPath=`inset(${(1-inK)*100}% 0 ${outK*100}% 0)`;
+
+  // end card
+  const eOn=t>=E0+.38; vis($('sEnd'),eOn);
+  if(eOn){
+    animLogo(endLogo,t,E0+.55,.06,.8);
+    $('endLine').style.transform=`scaleX(${E.io(p(t,E0+1.15,.7))})`;
+    sloganWords.forEach((w,i)=>rise(w,t,E0+1.35+i*.1,.7));
+    const ck=E.back(p(t,E0+2.05,.6));
+    const cta=$('cta');
+    cta.style.opacity=p(t,E0+2.05,.15);
+    // gentle breathing after it lands
+    const br=1+.025*Math.sin(Math.max(0,t-(E0+2.8))*Math.PI*2/1.2)*p(t,E0+2.8,.4);
+    cta.style.transform=`translate(-50%,0) scale(${lerp(.6,1,ck)*br})`;
+    ['ring1','ring2'].forEach((id,i)=>{
+      const st=E0+2.7+i*.6, ph=t<st?-1:((t-st)%1.2)/1.2;
+      const r=$(id);
+      if(ph<0){r.style.opacity=0;return;}
+      r.style.opacity=(1-ph)*.55; r.style.transform=`scale(${1+ph*.18},${1+ph*.55})`;
+    });
+    const shineCycle=(t-(E0+3.1))%2.2, sk=t<E0+3.1?-1:shineCycle/.7;
+    $('ctaShine').style.left=(sk<0||sk>1?-300:lerp(-200,900,E.io(sk)))+'px';
+    rise($('ePhone'),t,E0+2.45,.7);
+    rise($('eWeb'),t,E0+2.6,.7);
+    rise($('eReg'),t,E0+2.75,.7);
+  }
+}
+
+// build services wheel
+const SVC=['Erdarbeiten','Baggerarbeiten','Pflaster','Gartenbau','Renovierung','Umbau','Abbruch','Montage'];
+const svcEls=SVC.map(s=>{const d=document.createElement('div');d.className='svc';d.textContent=s;$('wheel').appendChild(d);return d;});
+$('wheel').style.webkitMaskImage='linear-gradient(180deg,transparent 30%,#000 44%,#000 68%,transparent 80%)';
+
+// build steps rows
+const ROWS=[['1','Anfragen','Vorhaben kurz schildern.'],['2','Abstimmen','Details persönlich klären.'],['3','Umsetzen','Sauber und verlässlich.']];
+const stepRows=ROWS.map(([n,ti,su],i)=>{
+  const y=700+i*300;
+  const g=document.createElement('div');
+  g.innerHTML=`<div class="dot" style="left:110px;top:${y-48}px">${n}</div>
+   <div class="t m" style="top:${y-70}px;left:250px"><div class="i h2">${ti}</div></div>
+   <div class="t m" style="top:${y+30}px;left:250px"><div class="i" style="font-size:48px;color:var(--muted)">${su}</div></div>`;
+  $('sSteps').appendChild(g);
+  const [t1,s1]=g.querySelectorAll('.i');
+  return {dot:g.querySelector('.dot'),t:t1,s:s1};
+});
+{
+  const q=document.createElement('div');
+  q.innerHTML=`<div class="t m" style="top:1540px;left:110px"><div class="i" id="stQ" style="font-size:50px;font-weight:600;color:var(--green)">Keine großen Versprechen.<br>Solide Arbeit.</div></div>`;
+  $('sSteps').appendChild(q.firstElementChild);
+  $('stQ').style.whiteSpace='normal';$('stQ').style.lineHeight='1.2';
+}
+
+// slogan words
+const sloganWords='Wir schaffen die Grundlage.'.split(' ').map((w,i)=>{
+  const m=document.createElement('span');m.className='m';m.style.display='inline-block';m.style.marginRight='.25em';
+  const s=document.createElement('span');s.className='i';s.style.display='inline-block';s.textContent=w;
+  if(w.startsWith('Grundlage')){s.style.color='var(--green)';s.style.fontWeight='700';}
+  m.appendChild(s);$('slogan').appendChild(m);return s;
+});
+
+// ---------- fitting ----------
+function fitAll(){
+  document.querySelectorAll('[data-fit]').forEach(el=>{
+    const max=+el.dataset.fit;
+    const prevVis=el.style.visibility;
+    const r=document.createRange();r.selectNodeContents(el);
+    const w=r.getBoundingClientRect().width/ (el.getBoundingClientRect().width? 1:1);
+    if(w>max){const fs=parseFloat(getComputedStyle(el).fontSize);el.style.fontSize=(fs*max/w)+'px';}
+  });
+  svcEls.forEach(el=>{
+    const r=document.createRange();r.selectNodeContents(el);const w=r.getBoundingClientRect().width;
+    el._fit=Math.min(1,900/w);
+  });
+}
+
+// ---------- main ----------
+window.renderFrame=function(t){
+  renderWorld(t);renderHook(t);renderProj(t);renderBurst(t);renderPaper(t);
+};
+window.ready=(async()=>{
+  await document.fonts.load('800 100px Outfit');await document.fonts.load('400 100px Outfit');
+  await document.fonts.load('600 100px Outfit');await document.fonts.load('500 100px Outfit');await document.fonts.load('700 100px Outfit');
+  await document.fonts.ready;
+  await Promise.all([...document.images].map(im=>im.decode().catch(()=>{})));
+  fitAll();
+  const q=new URLSearchParams(location.search);
+  renderFrame(q.has('t')?+q.get('t'):0);
+  return true;
+})();
+</script>
+</body>
+</html>
