@@ -141,6 +141,7 @@ html,body{margin:0;background:#000}
       <!-- flying dirt -->
       <g id="chunks"></g>
       <!-- heat pump -->
+      <line id="rope" x1="670" y1="-1200" x2="670" y2="-1200" stroke="#8f8a80" stroke-width="5"/>
       <ellipse id="pumpShadow" cx="670" cy="1230" rx="165" ry="12" fill="rgba(0,0,0,.35)" opacity="0"/>
       <g id="pump">
         <rect x="0" y="0" width="300" height="236" rx="18" fill="#f1ede5"/>
@@ -413,11 +414,16 @@ function renderWorld(t){
     const lift=E.in(p(t,S0-.75,.55)); py-=lift*1500; rot*=1-lift;
     shadow=fall*(1-lift);
   }else if(t>=e0){
-    const d=E.out(p(t,e0+.25,.7)); py=lerp(-350,PUMP_Y,d);
+    const d=E.out(p(t,e0+.25,.7)); py=lerp(720,PUMP_Y,d);
     if(t>=e0+.95){const dd=t-(e0+.95),b=Math.exp(-dd*10)*Math.cos(dd*30);psx=1+.03*b;psy=1-.045*b;}
     shadow=d;
   }
   $('pump').setAttribute('transform',pumpTransform(px,py,rot,psx,psy));
+  // crane rope in step 04: fades in with the pump, retracts after set-down
+  const ropeOn=t>=e0&&t<T.burst; $('rope').style.display=ropeOn?'':'none';
+  if(ropeOn) $('rope').setAttribute('y2',py-lerp(0,700,E.in(p(t,e0+1.05,.45))));
+  $('pump').setAttribute('opacity',t>=e0?E.out(p(t,e0+.2,.25)):1);
+  $('rope').setAttribute('opacity',E.out(p(t,e0+.2,.25)));
   $('pumpShadow').setAttribute('opacity',shadow*.9);
   $('pumpShadow').setAttribute('rx',165*(.5+.5*shadow));
   const fd=Math.max(0,t-(e0+1.0)); const ang=fd>0?720*fd*fd/(fd+.5):0;
