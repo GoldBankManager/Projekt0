@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>HavvamBau Reel v4</title>
+<style>
+@font-face{font-family:Inter;src:url(assets/fonts/inter-latin-600-normal.woff2) format('woff2');font-weight:600}
+@font-face{font-family:Inter;src:url(assets/fonts/inter-latin-800-normal.woff2) format('woff2');font-weight:800}
+/* --accent is the only colour; --accentInv is its inverse for shapes that sit under the black (difference) panel */
+:root{--accent:#e3120b;--accentInv:#1cedf4;--ink:#0d0d0d;--sage:#b5c4ac;--green:#1e4a4d}
+html,body{margin:0;background:#000}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#fff;font-family:Inter,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#cam{position:absolute;inset:0;background:#fff;transform-origin:540px 960px;isolation:isolate}
+.sc{position:absolute;inset:0;display:none}
+.row{position:absolute;left:0;width:1080px;text-align:center;white-space:nowrap}
+.k{font-weight:800;letter-spacing:-.05em;line-height:1}
+.s{font-weight:600;letter-spacing:-.02em;line-height:1}
+.c{display:inline-block;will-change:transform,opacity,filter}
+.red{color:var(--accent)}
+.img{position:absolute;overflow:visible}
+.box{display:inline-block;background:var(--ink);color:#fff;padding:10px 26px 16px;border-radius:10px}
+#panel{position:absolute;top:-300px;bottom:-300px;left:0;width:0;background:#fff;mix-blend-mode:difference;pointer-events:none}
+#acc{position:absolute;inset:0;pointer-events:none}
+#dot{position:absolute;left:0;top:0;width:100px;height:100px;margin:-50px 0 0 -50px;border-radius:50%;background:var(--accent);display:none}
+#line{position:absolute;height:7px;background:var(--ink);display:none}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <defs>
+  <pattern id="dots" width="34" height="30" patternUnits="userSpaceOnUse"><rect width="34" height="30" fill="#fff"/>
+    <circle cx="8" cy="8" r="6" fill="#0d0d0d"/><circle cx="25" cy="21" r="7" fill="#0d0d0d"/><circle cx="27" cy="5" r="3" fill="#0d0d0d"/><circle cx="9" cy="24" r="3" fill="#0d0d0d"/></pattern>
+  <pattern id="hatch" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="22" height="22" fill="#fff"/><rect width="7" height="22" fill="#0d0d0d"/></pattern>
+
+  <!-- heat pump -->
+  <symbol id="pumpI" viewBox="0 0 600 500">
+    <rect x="60" y="50" width="480" height="370" rx="34" fill="#fff" stroke="#0d0d0d" stroke-width="18"/>
+    <circle cx="230" cy="235" r="136" fill="#0d0d0d"/>
+    <g fill="none" stroke="#fff" stroke-width="7"><circle cx="230" cy="235" r="104"/><circle cx="230" cy="235" r="66"/></g>
+    <g class="fan" fill="#fff">
+      <path d="M230 235 C 214 170, 250 120, 288 124 C 290 168, 266 208, 230 235 Z"/>
+      <path d="M230 235 C 214 170, 250 120, 288 124 C 290 168, 266 208, 230 235 Z" transform="rotate(120 230 235)"/>
+      <path d="M230 235 C 214 170, 250 120, 288 124 C 290 168, 266 208, 230 235 Z" transform="rotate(240 230 235)"/>
+    </g>
+    <circle cx="230" cy="235" r="20" fill="#fff" stroke="#0d0d0d" stroke-width="7"/>
+    <g stroke="#0d0d0d" stroke-width="16" stroke-linecap="round"><path d="M410 130 H500 M410 175 H500 M410 220 H500 M410 265 H500 M410 310 H500 M410 355 H500"/></g>
+    <circle class="led" cx="505" cy="88" r="13" fill="#e3120b"/>
+    <rect x="110" y="420" width="90" height="40" rx="6" fill="#0d0d0d"/><rect x="400" y="420" width="90" height="40" rx="6" fill="#0d0d0d"/>
+  </symbol>
+
+  <!-- excavator (arm parts are animated by id inside the instance) -->
+  <symbol id="digI" viewBox="0 0 760 520">
+    <path d="M520 470 Q600 380 700 470 Z" fill="#0d0d0d"/>
+    <rect x="40" y="380" width="380" height="96" rx="48" fill="#0d0d0d"/>
+    <g fill="#fff"><circle cx="92" cy="428" r="28"/><circle cx="178" cy="428" r="28"/><circle cx="264" cy="428" r="28"/><circle cx="350" cy="428" r="28"/></g>
+    <rect x="70" y="250" width="320" height="138" rx="18" fill="#0d0d0d"/>
+    <rect x="220" y="130" width="160" height="140" rx="16" fill="#0d0d0d"/>
+    <rect x="242" y="152" width="116" height="74" rx="8" fill="#fff"/>
+    <rect x="60" y="226" width="80" height="40" rx="8" fill="#0d0d0d"/>
+    <path d="M10 488 H750" stroke="#0d0d0d" stroke-width="12" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- foundation section -->
+  <symbol id="foundI" viewBox="0 0 640 560">
+    <rect x="0" y="250" width="110" height="300" fill="url(#hatch)"/><rect x="530" y="250" width="110" height="300" fill="url(#hatch)"/>
+    <path d="M0 250 H110 M530 250 H640" stroke="#0d0d0d" stroke-width="14"/>
+  </symbol>
+ </defs>
+</svg>
+
+<div id="stage">
+ <div id="cam">
+
+  <!-- A: Ihre Wärmepumpe ist bestellt? -->
+  <div class="sc" id="A">
+    <div id="aTop" class="sc" style="display:block">
+      <div class="row s" id="aS" style="top:770px;font-size:80px">Ihre</div>
+      <div class="row k" id="aW" data-fit="980" style="top:870px;font-size:150px">Wärmepumpe</div>
+    </div>
+    <div class="row k" id="aB" data-fit="860" style="top:800px;font-size:150px">ist bestellt?</div>
+    <svg class="img" id="aImg" style="left:210px;top:1070px;width:660px;height:550px" viewBox="0 0 600 500"><use href="#pumpI"/></svg>
+  </div>
+
+  <!-- B: Und wer macht das Fundament? -->
+  <div class="sc" id="B">
+    <div id="bStack" style="position:absolute;left:0;top:-41px;width:1080px"></div>
+    <div class="row s" id="bS" style="top:236px"><span id="bSb" class="box" style="font-size:66px">Und wer macht das</span></div>
+  </div>
+
+  <!-- C: Ohne Grundlage steht nichts. -->
+  <div class="sc" id="C">
+    <div class="row s" id="cO" style="top:430px;font-size:110px">Ohne</div>
+    <div class="row k" id="cG" data-fit="980" style="top:560px;font-size:170px">Grundlage</div>
+    <div class="row k" id="cN" data-fit="900" style="top:780px;font-size:140px">steht nichts<span id="cDot" class="red">.</span></div>
+    <svg class="img" id="cCrack" style="left:0;top:1560px;width:1080px;height:200px" viewBox="0 0 1080 200">
+      <path d="M40 40 H1040" stroke="#0d0d0d" stroke-width="14" stroke-linecap="round"/>
+      <path id="crk1" d="M330 40 l40 30 l-20 28 l46 34 l-14 30" fill="none" stroke="#0d0d0d" stroke-width="10" stroke-linejoin="round" pathLength="1"/>
+      <path id="crk2" d="M610 40 l-30 34 l34 26 l-26 40" fill="none" stroke="#0d0d0d" stroke-width="10" stroke-linejoin="round" pathLength="1"/>
+      <path id="crk3" d="M760 40 l24 22 l-12 24" fill="none" stroke="#0d0d0d" stroke-width="8" stroke-linejoin="round" pathLength="1"/>
+    </svg>
+    <svg class="img" id="cImg" style="left:250px;top:1130px;width:580px;height:483px" viewBox="0 0 600 500"><use href="#pumpI"/></svg>
+  </div>
+
+  <!-- S: services (one card per two beats of the drop) -->
+  <div class="sc" id="S">
+    <div class="row s" id="sHead" style="top:250px;font-size:44px;letter-spacing:.02em">Das machen wir · <span id="sCnt">01</span>/04</div>
+    <div class="sc" id="s0">
+      <div class="row k" id="s0w" data-fit="900" data-max="230" style="top:350px;font-size:200px">Aushub.</div>
+      <div class="row s" id="s0s" style="top:600px;font-size:54px">Erd- &amp; Baggerarbeiten</div>
+      <svg class="img" id="s0i" style="left:70px;top:860px;width:940px;height:643px" viewBox="0 0 760 520">
+        <use href="#digI"/>
+        <g id="boom">
+          <path d="M380 270 L560 110" stroke="#0d0d0d" stroke-width="46" stroke-linecap="round"/>
+          <g id="stick">
+            <path d="M560 110 L640 300" stroke="#0d0d0d" stroke-width="36" stroke-linecap="round"/>
+            <path d="M600 290 L690 280 L680 350 Q640 372 600 330 Z" fill="#e3120b"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <div class="sc" id="s1">
+      <div class="row k" id="s1w" data-fit="980" data-max="230" style="top:350px;font-size:200px">Fundament.</div>
+      <div class="row s" id="s1s" style="top:600px;font-size:54px">für Ihre Wärmepumpe</div>
+      <svg class="img" id="s1i" style="left:130px;top:760px;width:820px;height:718px" viewBox="0 0 640 560">
+        <use href="#foundI"/>
+        <rect id="grav" x="110" y="330" width="420" height="200" fill="url(#dots)" stroke="#0d0d0d" stroke-width="14"/>
+        <rect id="slab" x="110" y="236" width="420" height="94" fill="#fff" stroke="#0d0d0d" stroke-width="14"/>
+        <svg id="s1p" x="190" y="20" width="260" height="217" viewBox="0 0 600 500"><use href="#pumpI"/></svg>
+      </svg>
+    </div>
+    <div class="sc" id="s2">
+      <div class="row k" id="s2w" data-fit="900" data-max="230" style="top:350px;font-size:200px">Pflaster.</div>
+      <div class="row s" id="s2s" style="top:600px;font-size:54px">Pflaster &amp; Außenflächen</div>
+      <svg class="img" id="s2i" style="left:90px;top:800px;width:900px;height:660px" viewBox="0 0 660 484"><g id="pav"></g></svg>
+    </div>
+    <div class="sc" id="s3">
+      <div class="row k" id="s3w" data-fit="900" data-max="230" style="top:350px;font-size:200px">Gartenbau.</div>
+      <div class="row s" id="s3s" style="top:600px;font-size:54px">Garten- &amp; Landschaftsbau</div>
+      <svg class="img" id="s3i" style="left:90px;top:760px;width:900px;height:760px" viewBox="0 0 640 540">
+        <path d="M10 500 H630" stroke="#0d0d0d" stroke-width="12" stroke-linecap="round"/>
+        <rect id="trunk" x="296" y="290" width="48" height="210" fill="#0d0d0d"/>
+        <g id="crown"><circle cx="320" cy="210" r="130" fill="#0d0d0d"/><circle cx="215" cy="260" r="90" fill="#0d0d0d"/><circle cx="425" cy="260" r="90" fill="#0d0d0d"/>
+          <g fill="var(--accentInv)"><circle cx="270" cy="170" r="16"/><circle cx="380" cy="230" r="16"/><circle cx="330" cy="120" r="14"/><circle cx="230" cy="280" r="14"/></g></g>
+        <rect id="hedge1" x="30" y="410" width="190" height="90" rx="45" fill="#0d0d0d"/>
+        <rect id="hedge2" x="420" y="410" width="190" height="90" rx="45" fill="#0d0d0d"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- H: CTA -->
+  <div class="sc" id="H">
+    <div class="row s" id="hT" style="top:420px;font-size:92px">Jetzt Projekt</div>
+    <div class="row k" id="hB" data-fit="980" data-max="230" style="top:530px;font-size:170px">anfragen<span class="red">.</span></div>
+    <svg class="img" id="hIcon" style="left:480px;top:800px;width:120px;height:120px" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="12" fill="#e3120b"/>
+      <path transform="translate(5.2 5.2) scale(.57)" fill="#fff" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/>
+    </svg>
+    <div class="row k" id="hP" data-fit="990" style="top:960px;font-size:126px">0174 5652015</div>
+    <div class="row k" id="hW" data-fit="780" style="top:1160px;font-size:96px">havvambau<span class="red">.</span>de</div>
+    <div id="hL" style="position:absolute;left:200px;top:1390px;width:680px"></div>
+    <div class="row s" id="hR" style="top:1510px;font-size:34px;letter-spacing:.32em;color:#555">AUGSBURG &amp; UMGEBUNG</div>
+  </div>
+
+  <div id="panel"></div>
+
+  <!-- accent layer (never inverted) -->
+  <div id="acc">
+    <svg id="lensSvg" width="1080" height="1920" viewBox="0 0 1080 1920" style="position:absolute;left:0;top:0;display:none;overflow:visible">
+      <defs><path id="lensTxt" d="M60 900 Q540 500 1020 900 Q540 1300 60 900 Z"/></defs>
+      <g id="lensG">
+        <path d="M110 900 Q540 580 970 900 Q540 1220 110 900 Z" fill="#0d0d0d"/>
+        <path d="M110 900 L40 890 L40 910 Z M970 900 L1040 890 L1040 910 Z" fill="#0d0d0d"/>
+        <text id="lensT" font-family="Inter" font-weight="800" font-size="50" letter-spacing="-1" fill="#0d0d0d"><textPath href="#lensTxt" id="lensTP" startOffset="0">WIR SCHAFFEN DIE GRUNDLAGE • WIR SCHAFFEN DIE GRUNDLAGE • WIR SCHAFFEN DIE GRUNDLAGE • WIR SCHAFFEN DIE GRUNDLAGE • WIR SCHAFFEN DIE GRUNDLAGE •</textPath></text>
+      </g>
+    </svg>
+    <div id="lensLogo" style="position:absolute;left:250px;top:855px;width:580px;display:none"></div>
+    <div class="row s" id="fTop" style="top:420px;font-size:44px;letter-spacing:.04em;display:none">Erdarbeiten · Fundamente · Außenanlagen</div>
+    <div class="row k" id="fSub" data-fit="940" style="top:1330px;font-size:100px;display:none">Wir schaffen die <span class="red">Grundlage.</span></div>
+    <div id="line"></div>
+    <div id="dot"></div>
+  </div>
+ </div>
+</div>
+
+<script>
+// ===== music grid: 166 BPM, eighth = 0.3615 s. The track is extended on this grid (see sound_v4.py):
+// intro/build-up eighths 0–15, drop bar ×4 (eighths 16–47), fade-out from eighth 48.
+const B0=-0.04,E8=0.3615,k=n=>B0+E8*n,DROP=k(16);
+window.DURATION=18.47;
+
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const p=(t,s,d)=>clamp((t-s)/d);
+const lerp=(a,b,x)=>a+(b-a)*x;
+const E={
+  out:x=>1-Math.pow(1-x,3), in:x=>x*x*x, io:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,
+  expo:x=>x>=1?1:1-Math.pow(2,-10*x), expoIn:x=>x<=0?0:Math.pow(2,10*x-10),
+  quint:x=>x<.5?16*x*x*x*x*x:1-Math.pow(-2*x+2,5)/2,
+  back:x=>{const c1=1.7,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)},
+};
+const $=id=>document.getElementById(id);
+let seed=21;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+const show=(el,on)=>{el.style.display=on?'block':'none';};
+const st=(el,o)=>Object.assign(el.style,o);
+
+// ===== logo =====
+const LOGO=[
+ [0,'M71.75 0V703H208V0ZM513 0V703H649.25V0ZM158.25 302.5V422.75H551.25V302.5Z',0],
+ [696,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [1386,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2066,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2746,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [3436,'M71.75 0V703H168L452.5 246.75H397.75L682 703H778.25V0H642.5V469.5L669.25 462.25L471 144H379L181 462.25L207.5 469.5V0Z',0],
+ [4261,'M171.5 0V111H355Q404.25 111 431.75 140.875Q459.25 170.75 459.25 212Q459.25 239.75 446.875 262.875Q434.5 286 411.125 299.5Q387.75 313 355 313H171.5V422.5H340Q381.75 422.5 407.25 443.75Q432.75 465 432.75 507.25Q432.75 549.5 407.25 570.75Q381.75 592 340 592H171.5V703H356.25Q425.75 703 473.125 677.375Q520.5 651.75 544.5 610.375Q568.5 569 568.5 520Q568.5 459.75 532.125 416.25Q495.75 372.75 425.5 351.5L431.75 395.75Q509.5 373.75 552.25 323.25Q595 272.75 595 201.75Q595 145.75 567.375 100.125Q539.75 54.5 487.25 27.25Q434.75 0 360 0ZM71.75 0V703H207V0Z',1],
+ [4867,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',1],
+ [5557,'M349.237 -10.5Q265.974 -10.5 201.27 26.087Q136.566 62.674 99.533 126.641Q62.5 190.607 62.5 271.75V703H198.75V268Q198.75 221.278 218.601 187.053Q238.453 152.827 272.639 134.414Q306.825 116 349.12 116Q392.25 116 425.345 134.394Q458.44 152.788 477.72 186.851Q497 220.915 497 267V703H633.5V270.75Q633.5 189.573 596.953 126.139Q560.407 62.706 496.453 26.103Q432.5 -10.5 349.237 -10.5Z',1],
+];
+function makeLogo(host,cA,cB){
+  const ns='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox','40 -720 6180 750');svg.style.width='100%';svg.style.display='block';svg.style.overflow='hidden';
+  const g=document.createElementNS(ns,'g');g.setAttribute('transform','scale(1 -1)');svg.appendChild(g);
+  const paths=LOGO.map(([x,d,b])=>{const el=document.createElementNS(ns,'path');el.setAttribute('d',d);el.setAttribute('fill',b?cB:cA);el.dataset.x=x;el.setAttribute('transform',`translate(${x} 0)`);g.appendChild(el);return el;});
+  host.appendChild(svg);return paths;
+}
+const lensLogo=makeLogo($('lensLogo'),'#ffffff','#b5c4ac');
+const endLogo=makeLogo($('hL'),'#0d0d0d','#1e4a4d');
+function animLogo(paths,t,s,stag=.035,d=.5){paths.forEach((el,i)=>{const q=E.expo(p(t,s+i*stag,d));el.setAttribute('transform',`translate(${el.dataset.x} ${-(1-q)*760})`);});}
+
+// ===== per-letter helpers =====
+function prep(el){
+  const cs=[];
+  const walk=n=>{
+    if(n.nodeType===3){
+      const f=document.createDocumentFragment();
+      for(const ch of n.textContent){
+        if(ch===' '){f.appendChild(document.createTextNode(' '));continue;}
+        const s=document.createElement('span');s.className='c';s.textContent=ch;s._r=rnd();cs.push(s);f.appendChild(s);
+      }
+      n.parentNode.replaceChild(f,n);
+    }else if(n.nodeType===1&&n.classList.contains('red')&&n.textContent.length===1){n.classList.add('c');n._r=rnd();cs.push(n);}
+    else [...n.childNodes].forEach(walk);
+  };
+  [...el.childNodes].forEach(walk);el._c=cs;return el;
+}
+function setC(c,q,tr,blur){c.style.opacity=clamp(q*2.5);c.style.transform=tr;c.style.filter=blur>.3?`blur(${blur}px)`:'none';}
+function fly(el,t,s,o={}){
+  const {stag=.03,dur=.5,dx=280,dy=0,rot=0,blur=16}=o;
+  el._c.forEach((c,i)=>{const q=E.expo(p(t,s+i*stag,dur));
+    setC(c,q,`translate(${(1-q)*dx}px,${(1-q)*dy}px) rotate(${(1-q)*rot}deg) scaleX(${1+(1-q)*.7})`,(1-q)*blur);});
+}
+// whole-element exit: blur + drift (keeps letters readable until the very end)
+function exitEl(el,t,s,dur=.28,dy=-160){const q=E.in(p(t,s,dur));if(q<=0){if(el._ex){el.style.opacity='';el.style.filter='';el._ex=0;}return;}
+  el._ex=1;el.style.opacity=1-q;el.style.filter=`blur(${q*22}px)`;el.style.translate=`0 ${q*dy}px`;}
+function popIn(el,t,s,d=.5,from=.3){const q=E.back(p(t,s,d));el.style.opacity=p(t,s,.06);el.style.scale=lerp(from,1,q);}
+function draw(el,t,s,d){el.style.strokeDasharray=1;el.style.strokeDashoffset=1-E.io(p(t,s,d));el.style.opacity=t>=s?1:0;}
+function absPos(el){let x=0,y=0,n=el;while(n&&n.id!=='cam'){x+=n.offsetLeft;y+=n.offsetTop;n=n.offsetParent;}return {x,y,w:el.offsetWidth,h:el.offsetHeight};}
+function fit(){
+  document.querySelectorAll('[data-fit]').forEach(el=>{
+    const r=document.createRange();r.selectNodeContents(el);const w=r.getBoundingClientRect().width;
+    const fs=parseFloat(getComputedStyle(el).fontSize);
+    el.style.fontSize=Math.min(+el.dataset.max||400,fs*(+el.dataset.fit)/w)+'px';
+  });
+}
+
+// ===== build =====
+const STACK_N=11,STACK_MID=5,LH=182,STACK_FS=175;
+const SCENES=['A','B','C','S','s0','s1','s2','s3','H'];
+let stackLines=[],stackA,cA,paverEls=[];
+function build(){
+  SCENES.forEach(id=>show($(id),true)); ['fTop','fSub'].forEach(id=>show($(id),true));
+  fit();
+  SCENES.forEach(id=>show($(id),false)); ['fTop','fSub'].forEach(id=>show($(id),false));
+  ['aS','aW','aB','cO','cG','cN','s0w','s0s','s1w','s1s','s2w','s2s','s3w','s3s','fSub','hT','hB','hP','hW','hR'].forEach(id=>prep($(id)));
+  for(let i=0;i<STACK_N;i++){
+    const d=document.createElement('div');d.className='row k';d.style.cssText=`top:${i*LH}px;font-size:${STACK_FS}px`;d.textContent='Fundament?';
+    $('bStack').appendChild(d);stackLines.push(d);
+  }
+  prep(stackLines[STACK_MID]);
+  stackA=stackLines[STACK_MID]._c[4];
+  cA=$('cG')._c[6];
+  // paving: running bond, one red stone
+  const ns='http://www.w3.org/2000/svg';
+  for(let r=0;r<6;r++)for(let c=-1;c<6;c++){
+    const x=c*120+(r%2?60:0)+10, y=r*76+10; if(x<-100||x>650) continue;
+    const el=document.createElementNS(ns,'rect');
+    const cx=Math.max(10,x), w=Math.min(x+112,650)-cx; if(w<20) continue;
+    el.setAttribute('x',cx);el.setAttribute('y',y);el.setAttribute('width',w);el.setAttribute('height',68);el.setAttribute('rx',6);
+    el.setAttribute('fill',(r===2&&c===2)?'#e3120b':'#fff');el.setAttribute('stroke','#0d0d0d');el.setAttribute('stroke-width',10);
+    el.style.transformBox='fill-box';el.style.transformOrigin='50% 50%';
+    el._d=Math.hypot(cx+w/2-330,y+34-240);
+    $('pav').appendChild(el);paverEls.push(el);
+  }
+}
+let A_FROM=null,DOT_FROM=null;
+function measure(){
+  ['A','B','C'].forEach(id=>show($(id),true));
+  const a=absPos(stackA), target=absPos(cA);
+  A_FROM={x:a.x-target.x,y:a.y+BSCROLL(k(12))-target.y,s:STACK_FS/parseFloat($('cG').style.fontSize)};
+  const d=absPos($('cDot'));DOT_FROM={x:d.x+d.w*.5,y:d.y+d.h*.78};
+  ['A','B','C'].forEach(id=>show($(id),false));
+}
+
+// ===== timeline (eighth notes) =====
+const BSCROLL=t=>{const q=E.expo(p(t,k(8)-.04,.5));return lerp(2000,0,q)-90*Math.max(0,t-k(8));};
+
+function panel(t){
+  let x0=0,x1=0;
+  if(t<k(4)+.4){
+    x1=lerp(0,760,E.expo(p(t,0,.5))); x1=lerp(x1,1080,E.expo(p(t,k(2),.3)));
+    x0=1080*E.quint(p(t,k(4),.32));
+  }else if(t>=k(28)-.2&&t<k(40)+.5){
+    // services: card 2 and 4 sit on black
+    const a=E.quint(p(t,k(28)-.2,.4)), b=E.quint(p(t,k(32)-.2,.4)), c=E.quint(p(t,k(36)-.2,.4)), d=E.quint(p(t,k(40)-.25,.4));
+    x0=lerp(1080,0,a); x1=1080;                 // sweep in from the right
+    x1=lerp(x1,0,b);                             // sweep out to the left
+    if(t>=k(36)-.2){x0=0;x1=1080*c;}             // sweep in from the left
+    if(t>=k(40)-.25){x0=1080*d;x1=1080;}         // sweep out to the right
+  }
+  $('panel').style.left=x0+'px';$('panel').style.width=Math.max(0,x1-x0)+'px';
+}
+
+const KICK=[[k(2),.035],[k(5),.03],[k(8),.03],[k(10),.04],[k(12),.035],[k(13),.035],[k(14),.045],[DROP,.09],[k(18),.03],[k(20),.03],[k(22),.03],
+  [k(24),.04],[k(28),.04],[k(32),.04],[k(36),.04],[k(40),.035],[k(42),.03],[k(44),.03],[k(46),.03]];
+const SCN=[0,k(8),k(12),DROP,k(24),k(28),k(32),k(36),k(40),18.5];
+function camera(t){
+  let i=0;while(i<SCN.length-2&&t>=SCN[i+1])i++;
+  const f=p(t,SCN[i],SCN[i+1]-SCN[i]);
+  let z=1+.04*E.io(f), r=(i%2?-1:1)*.45*(f-.5);
+  for(const [s,a] of KICK){const dt=t-s;if(dt>=0&&dt<.8)z+=a*Math.exp(-dt*9);}
+  let sx=0,sy=0;
+  for(const [s,a] of [[DROP,16],[k(14)+.25,9]]){const dd=t-s;if(dd>=0&&dd<.5){const e=a*Math.exp(-dd*10);sx+=e*Math.sin(dd*70);sy+=e*Math.cos(dd*57);}}
+  $('cam').style.transform=`translate(${sx}px,${sy}px) scale(${z}) rotate(${r}deg)`;
+}
+
+// ---- A: "Ihre Wärmepumpe ist bestellt?" + heat pump
+function sceneA(t){
+  const on=t<k(8)+.3; show($('A'),on); if(!on) return;
+  fly($('aS'),t,.02,{dx:-200,stag:.04,dur:.45});
+  fly($('aW'),t,.06,{dx:340,stag:.035,dur:.5});
+  const up=E.expo(p(t,k(4),.45)); $('aTop').style.transform=`translateY(${-up*330}px)`;
+  fly($('aB'),t,k(4)+.12,{dx:300,stag:.03,dur:.45});
+  const dq=E.out(p(t,k(5)-.25,.25)); const land=t>=k(5)?Math.exp(-(t-k(5))*9)*Math.cos((t-k(5))*28):0;
+  st($('aImg'),{opacity:p(t,k(5)-.25,.05),transform:`translateY(${(1-dq)*-900}px) scale(${1+land*.06},${1-land*.08})`,transformOrigin:'50% 100%'});
+  ['aTop','aB','aImg'].forEach(id=>exitEl($(id),t,k(8)-.3,.3));
+}
+// ---- B: stack "Fundament?"
+function sceneB(t){
+  const on=t>=k(8)-.2&&t<k(12)+.02; show($('B'),on); if(!on) return;
+  const sc=BSCROLL(t); $('bStack').style.transform=`translateY(${sc}px)`;
+  {const q=E.back(p(t,k(9),.4));$('bSb').style.transform=`scale(${lerp(.4,1,q)})`;$('bSb').style.opacity=p(t,k(9),.06);}
+  const rk=t>=k(10);
+  stackA.style.color=rk?'var(--accent)':''; stackA.style.transform=`scale(${1+.35*Math.exp(-Math.max(0,t-k(10))*10)*(rk?1:0)})`;
+  const dk=E.in(p(t,k(11),.33));
+  stackLines.forEach((l,i)=>{if(i===STACK_MID)return;l.style.opacity=1-dk;l.style.filter=dk>0?`blur(${dk*24}px)`:'none';});
+  stackLines[STACK_MID]._c.forEach(c=>{if(c===stackA)return;c.style.opacity=1-dk;c.style.filter=dk>0?`blur(${dk*24}px)`:'none';});
+  $('bS').style.opacity=1-dk;
+  stackA.style.visibility=t>=k(12)?'hidden':'visible';
+}
+// ---- C: "Ohne Grundlage steht nichts." – the heat pump tips over
+function sceneC(t){
+  const on=t>=k(12)&&t<DROP; show($('C'),on); if(!on) return;
+  fly($('cO'),t,k(12)-.05,{dx:-300,stag:.04,dur:.45});
+  $('cG')._c.forEach((c,i)=>{
+    if(c===cA){const q=E.io(p(t,k(12),.5));setC(c,1,`translate(${(1-q)*A_FROM.x}px,${(1-q)*A_FROM.y}px) scale(${lerp(A_FROM.s,1,q)})`,0);c.style.color='var(--accent)';return;}
+    const q=E.expo(p(t,k(13)-.1+i*.025,.45));setC(c,q,`translate(${(1-q)*320}px,0) scaleX(${1+(1-q)*.7})`,(1-q)*16);
+  });
+  fly($('cN'),t,k(14)-.1,{dx:-300,stag:.03,dur:.45});
+  // heat pump stands, then tips and sinks when "nichts" lands
+  const inq=E.out(p(t,k(12),.4)); const tip=E.back(p(t,k(14)+.12,.55));
+  st($('cImg'),{opacity:p(t,k(12),.08),transformOrigin:'15% 100%',
+    transform:`translateY(${(1-inq)*500+tip*40}px) rotate(${-tip*17}deg)`});
+  draw($('crk1'),t,k(14)+.15,.25);draw($('crk2'),t,k(14)+.2,.25);draw($('crk3'),t,k(14)+.26,.2);
+  $('cCrack').style.opacity=E.out(p(t,k(12),.3));
+  // silence before the drop: everything falls away, the red full stop remains
+  const ex=E.expoIn(p(t,k(15),.25));
+  ['cO','cG','cImg','cCrack'].forEach(id=>{$(id).style.opacity=(id==='cImg'||id==='cCrack'?$(id).style.opacity:1)*(1-ex);$(id).style.filter=ex>0?`blur(${ex*20}px)`:'none';});
+  $('cN')._c.forEach(c=>{if(c.id==='cDot')return;const o=parseFloat(c.style.opacity);c.style.opacity=Math.min(isNaN(o)?1:o,1-ex);});
+  $('cDot').style.visibility=t>=k(15)?'hidden':'visible';
+}
+// ---- dot → lens (drop) → services
+function sceneF(t){
+  const dot=$('dot');
+  if(t>=k(15)&&t<DROP+.05){
+    const q=E.io(p(t,k(15),.3)), g=lerp(.3,1.3,E.out(p(t,k(15),.3)))*(1-.35*E.in(p(t,DROP-.08,.08)));
+    show(dot,true);st(dot,{left:lerp(DOT_FROM.x,540,q)+'px',top:lerp(DOT_FROM.y,900,q)+'px',transform:`scale(${g})`});
+  }else if(t<k(40)) show(dot,false);
+  const on=t>=DROP&&t<k(24)+.1;
+  $('lensSvg').style.display=on?'block':'none'; show($('lensLogo'),on); show($('fTop'),on); show($('fSub'),on);
+  if(!on) return;
+  const q=E.back(p(t,DROP,.45));
+  let pulse=1;for(const b of [k(17),k(18),k(20),k(22)]){const dt=t-b;if(dt>=0)pulse+=.05*Math.exp(-dt*9);}
+  const ex=E.expoIn(p(t,k(24)-.25,.3));
+  $('lensG').style.transformOrigin='540px 900px';
+  $('lensG').style.transform=`translateY(${-ex*1500}px) rotate(${(1-E.expo(p(t,DROP,.6)))*-8}deg) scale(${Math.max(.001,q)*pulse})`;
+  $('lensT').style.opacity=E.out(p(t,DROP+.08,.3));
+  $('lensTP').setAttribute('startOffset',-(t-DROP)*170);
+  const lk=E.expo(p(t,DROP+.06,.45));
+  st($('lensLogo'),{transformOrigin:'290px 45px',transform:`translateY(${-ex*1500}px) scale(${lerp(1.6,1,lk)*pulse})`,filter:lk<1?`blur(${(1-lk)*16}px)`:'none',opacity:lk});
+  fly($('fSub'),t,k(18)-.1,{dx:300,stag:.025,dur:.45});
+  {const q2=E.out(p(t,k(20)-.1,.4));st($('fTop'),{opacity:q2,transform:`translateY(${(1-q2)*40}px)`});}
+  exitEl($('fSub'),t,k(24)-.25);exitEl($('fTop'),t,k(24)-.25);
+}
+// ---- services: one card per half drop bar (4 eighths = 1.45 s)
+function sceneS(t){
+  const on=t>=k(24)-.05&&t<k(40)+.1; show($('S'),on); if(!on) return;
+  const idx=clamp(Math.floor((t-k(24))/(4*E8)),0,3);
+  $('sCnt').textContent='0'+(idx+1);
+  {const q=E.out(p(t,k(24)-.05,.35));st($('sHead'),{opacity:q*(1-E.in(p(t,k(40)-.25,.25))),transform:`translateY(${(1-q)*-40}px)`});}
+  for(let i=0;i<4;i++){
+    const s=k(24+4*i), e=s+4*E8, el=$('s'+i), cardOn=t>=s-.05&&t<e+.05; show(el,cardOn); if(!cardOn) continue;
+    fly($(`s${i}w`),t,s,{dx:i%2?-340:340,stag:.03,dur:.45});
+    fly($(`s${i}s`),t,s+.18,{dx:0,dy:40,stag:.012,dur:.45,blur:10});
+    popIn($(`s${i}i`),t,s+.1,.55,.6);
+    [`s${i}w`,`s${i}s`,`s${i}i`].forEach(id=>exitEl($(id),t,e-.22,.24,-120));
+  }
+  // excavator digs
+  {const s=k(24);const dig=Math.sin(Math.max(0,t-s-.3)*2*Math.PI/0.72);
+   $('boom').setAttribute('transform',`rotate(${-6+6*dig} 380 270)`);$('stick').setAttribute('transform',`rotate(${10+14*dig} 560 110)`);}
+  // foundation: gravel fills, slab drops, heat pump lands
+  {const s=k(28);const g=E.out(p(t,s+.1,.45)), sl=E.back(p(t,s+.45,.4)), pu=E.out(p(t,s+.6,.35));
+   $('grav').setAttribute('transform',`translate(0 ${530*(1-g)}) scale(1 ${Math.max(.001,g)})`);$('grav').style.opacity=g>0?1:0;
+   $('slab').setAttribute('transform',`translate(0 ${(1-sl)*-260})`);$('slab').style.opacity=p(t,s+.45,.05);
+   $('s1p').setAttribute('y',lerp(-420,20,pu));$('s1p').style.opacity=p(t,s+.6,.05);}
+  // pavers click in from the centre
+  {const s=k(32)+.25;paverEls.forEach(el=>{const q=E.back(p(t,s+el._d*.0016,.3));el.style.scale=q;el.style.opacity=q>0?1:0;});}
+  // tree grows
+  {const s=k(36)+.15;const tr=E.out(p(t,s,.35)), cr=E.back(p(t,s+.25,.45)), h=E.back(p(t,s+.45,.4));
+   $('trunk').setAttribute('transform',`translate(0 ${500*(1-tr)}) scale(1 ${Math.max(.001,tr)})`);
+   $('crown').style.transformOrigin='320px 290px';$('crown').style.transformBox='view-box';$('crown').style.scale=cr;
+   ['hedge1','hedge2'].forEach(id=>{$(id).style.transformOrigin='center bottom';$(id).style.transformBox='fill-box';$(id).style.scale=h;});}
+}
+// ---- CTA: dot bounces in, rolls and draws the line that reveals "anfragen."
+function sceneH(t){
+  const on=t>=k(40)-.3; show($('H'),on); if(!on) return;
+  const dot=$('dot'), LAND=k(40), ROLL1=k(41)+.1;
+  if(t<ROLL1+.45){
+    show(dot,true);let x,y,sq=1;
+    if(t<LAND){const q=p(t,LAND-.3,.3);x=130;y=lerp(-80,750,q*q);}
+    else{const q=E.io(p(t,LAND+.04,ROLL1-LAND-.04));x=lerp(130,1180,q);y=750;const dt=t-LAND;sq=1-.3*Math.exp(-dt*14)*Math.cos(dt*30);}
+    st(dot,{left:x+'px',top:y+'px',transform:`scale(${.8/sq},${.8*sq})`});
+    const ln=$('line');show(ln,t>=LAND);st(ln,{left:'130px',top:'784px',width:Math.max(0,x-130)+'px',opacity:1-p(t,ROLL1+.1,.3)});
+    $('hB').style.clipPath=`inset(-60px ${Math.max(0,1080-x+40)}px -60px 0)`;
+  }else{show(dot,false);show($('line'),false);$('hB').style.clipPath='none';}
+  fly($('hT'),t,LAND+.15,{dx:-260,stag:.03,dur:.45});
+  popIn($('hIcon'),t,k(42)-.12,.5,.2);
+  const amp=120*(1-E.io(p(t,k(42)-.05,.7)));
+  $('hP')._c.forEach((c,i)=>{const q=E.out(p(t,k(42)-.25+i*.025,.45)),ph=i*.75-t*8;
+    setC(c,q,`translate(${(1-q)*700}px,${amp*Math.sin(ph)}px) rotate(${amp*.2*Math.cos(ph)}deg)`,(1-q)*10);});
+  fly($('hW'),t,k(44)-.18,{dx:300,stag:.025,dur:.42});
+  animLogo(endLogo,t,k(46)-.1,.03,.5);
+  fly($('hR'),t,k(46)+.15,{dx:0,dy:30,stag:.015,dur:.45,blur:8});
+}
+
+window.renderFrame=function(t){
+  camera(t); panel(t);
+  sceneA(t); sceneB(t); sceneC(t); sceneF(t); sceneS(t); sceneH(t);
+};
+window.ready=(async()=>{
+  await document.fonts.load('800 50px Inter');await document.fonts.load('600 50px Inter');
+  await document.fonts.ready;
+  build(); measure();
+  const q=new URLSearchParams(location.search);
+  renderFrame(q.has('t')?+q.get('t'):0);
+  return true;
+})();
+</script>
+</body>
+</html>

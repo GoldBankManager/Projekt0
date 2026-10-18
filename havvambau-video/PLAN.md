@@ -89,3 +89,20 @@ Takte: **0,00 · 2,85 · 5,74 (DROP) · 8,63 (Ausklang)**. Starke Achtel-Hits: 0
 
 **Kamera:** Durchgehender leichter Push-in mit Mikro-Rotation, Kicks auf den Hits, Whip-Zooms an den Szenengrenzen.
 **Sound:** Musik + SFX (Whooshes bei Buchstaben-Flügen, Klicks, Pop beim roten Punkt, Rollgeräusch, Riser in den Drop, Impact auf dem Drop).
+
+---
+
+# Version 4: langsamer, neue Texte, mehr Bilder (`video_v4.html`, `sound_v4.py`)
+
+**Feedback:** „Zu schnell, man kann nichts lesen. Texte und Visuelles anpassen. Mehr Bilder.“
+
+**Musik verlängert (18,5 s statt 9,8 s):** Intro + Build-up unverändert · der Drop-Takt (5,74–8,63 s) läuft **4×**, jeweils mit Lautstärke-Ausgleich (der Clip fadet im Original schon ab dem Drop aus) und 12-ms-Crossfade genau auf dem Downbeat · danach der originale Ausklang. Gleiches Beat-Raster wie vorher, also bleibt alles synchron.
+
+| Zeit | Szene | Bild / Text |
+|---|---|---|
+| 0–2,9 | Hook | „Ihre **Wärmepumpe**“ → „ist bestellt?“ · Wärmepumpen-Illustration fällt ins Bild |
+| 2,9–4,3 | Frage | Stapel „Fundament?“ · Box „Und wer macht das“ · rotes „a“ |
+| 4,3–5,7 | Problem | „Ohne **Grundlage** steht nichts.“ · Wärmepumpe kippt um, Boden reißt · Stille: roter Punkt |
+| 5,7–8,6 | DROP | Linse mit Logo + umlaufendem Slogan · „Wir schaffen die **Grundlage.**“ · „Erdarbeiten · Fundamente · Außenanlagen“ |
+| 8,6–14,4 | Leistungen (je 1,45 s) | **Aushub.** (Bagger gräbt) · **Fundament.** (Kiesbett, Platte, Wärmepumpe setzt auf) · **Pflaster.** (Steine ploppen ein) · **Gartenbau.** (Baum wächst, Hecken) · Schwarz/Weiß wechselt per Panel |
+| 14,4–18,5 | CTA | Punkt rollt → „Jetzt Projekt **anfragen.**“ · Telefon-Icon + **0174 5652015** · havvambau.de · Logo · „Augsburg & Umgebung“ (4 s stehen lassen) |
