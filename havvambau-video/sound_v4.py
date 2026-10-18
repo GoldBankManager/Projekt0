@@ -22,28 +22,46 @@ REPEATS = 4
 SRC_END = 9.8
 DUR = DROP_A + REPEATS * (DROP_B - DROP_A) + (SRC_END - DROP_B)
 N = int(DUR * SR)
-XF = int(.012 * SR)                           # crossfade length
+XF = int(.150 * SR)                           # beat-matched crossfade length
+
+
+def downbeat(src, guess, search=.04):
+    """Sample index where the kick's click starts near `guess` (rise of high-band energy)."""
+    a, b = int((guess - search) * SR), int((guess + search) * SR)
+    hi = np.abs(np.diff(src[a:b].mean(1)))
+    k = int(.002 * SR)
+    env = np.convolve(hi, np.ones(k) / k, 'same')
+    return a + int(np.argmax(env > .5 * env.max()))
 
 
 def extend(src, repeats=REPEATS, n=N):
-    a, b = int(DROP_A * SR), int(DROP_B * SR)
+    # splice 30 ms before the kick click (measured, not the rounded grid). Both cut points sit at
+    # the same spot relative to their downbeat, so the crossfade is beat-matched: the original
+    # next kick plays while the repeated bar fades in underneath
+    pre = int(.030 * SR)
+    a = downbeat(src, DROP_A) - pre
+    b = downbeat(src, DROP_B) - pre
     bar = src[a:b].copy()
     # undo the clip's fade across the drop bar: fit the RMS decay per eighth, flatten it
     e8 = int(E8 * SR)
     t = np.array([(k + .5) * E8 for k in range(8)])
     r = np.array([np.sqrt((bar[k * e8:(k + 1) * e8] ** 2).mean()) for k in range(8)])
     slope, icpt = np.polyfit(t, r, 1)
-    tt = np.arange(len(bar)) / SR
-    bar *= (icpt / (icpt + slope * tt))[:, None]
-    tail = src[b:int(SRC_END * SR)].copy()
-    tail *= (icpt / (icpt + slope * (DROP_B - DROP_A)))   # continue at the compensated level
-    parts = [src[:a]] + [bar] * repeats + [tail]
-    out = parts[0]
+    comp = lambda sec: icpt / (icpt + slope * sec)
+    bar *= comp(np.arange(len(bar)) / SR)[:, None]
+    end_gain = comp((b - a) / SR)
+    tail = src[b:int(SRC_END * SR)] * end_gain             # continue at the compensated level
+    # each part carries the XF samples that follow it in the source, so crossfades overlap into
+    # real continuation and the total length (and beat grid) is preserved exactly
+    parts = [(src[:a], src[a:a + XF])] + [(bar, src[b:b + XF] * end_gain)] * repeats + [(tail, None)]
     fade_in = np.sin(np.linspace(0, np.pi / 2, XF))[:, None]
     fade_out = np.cos(np.linspace(0, np.pi / 2, XF))[:, None]
-    for nxt in parts[1:]:
-        # equal-power crossfade: last XF samples of `out` into the first XF of `nxt`
-        out = np.concatenate([out[:-XF], out[-XF:] * fade_out + nxt[:XF] * fade_in, nxt[XF:]])
+    chunks, ext = [parts[0][0]], parts[0][1]
+    for body, nxt_ext in parts[1:]:
+        chunks.append(ext * fade_out + body[:XF] * fade_in)
+        chunks.append(body[XF:])
+        ext = nxt_ext
+    out = np.concatenate(chunks)
     res = np.zeros((n, 2))
     res[:min(n, len(out))] = out[:n]
     return res

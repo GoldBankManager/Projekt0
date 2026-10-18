@@ -129,3 +129,19 @@ Takte: **0,00 · 2,85 · 5,74 (DROP) · 8,63 (Ausklang)**. Starke Achtel-Hits: 0
 | 14,4–17,3 | 4/4 **Leitungsweg.** | „Graben zum Haus einplanen, danach die Fläche wiederherstellen.“ Graben öffnet sich, Leitungen laufen, Pflaster schließt ihn |
 | 17,3–20,2 | Marke | Linse mit Logo + Slogan · „Aushub · Fundament · Leitungsweg · Pflaster“ · „Wir schaffen die **Grundlage.**“ · „Die Anlagentechnik setzt Ihr Fachbetrieb.“ |
 | 20,2–24,3 | CTA | „Jetzt Projekt **anfragen.**“ · 0174 5652015 · havvambau.de · Logo · Augsburg & Umgebung |
+
+---
+
+# Version 6: saubere Musik, leisere SFX, bessere Texte (`video_v6.html`, `sound_v6.py`)
+
+**Feedback:** „Die Musik spackt. Musik lauter, SFX leichter. Die Texte sind ein bisschen dumm.“
+
+**Musik-Fix (in `sound_v4.extend`, gilt für alle verlängerten Versionen):**
+- Die Kicks liegen im Audio bei 5,739 s / 8,632 s, also nicht auf dem gerundeten Raster (5,744 / 8,636). Bisher wurde 5–10 ms *nach* dem Anschlag geschnitten, dadurch fehlte jedem wiederholten Takt die Kick-Attacke → Stolpern. Jetzt wird der Anschlag im Audio gesucht und 30 ms davor geschnitten.
+- Der Crossfade hat die Teile überlappt und jede Wiederholung um 12 ms verkürzt (Drift gegenüber dem Bild). Jetzt blendet jeder Teil in seine echte Fortsetzung aus, die Länge bleibt exakt.
+- Crossfade 150 ms beat-matched: Beide Schnittpunkte liegen gleich weit vor ihrem Kick, also spielt der echte nächste Kick, während der wiederholte Takt darunter einblendet. Gemessen: Alle 7 Kicks liegen auf ±0,5 ms auf dem Raster, kein Pegeleinbruch an den Schnittstellen.
+
+**Mix:** SFX-Gain 0,55 → 0,30 und nur noch ein Effekt pro Ereignis (keine Flatter-/Tipp-Teppiche mehr). Gesamt −13 LUFS.
+
+**Texte (wie ein Profi, der einen Tipp gibt):**
+„Wärmepumpe bestellt?“ → **4** (groß, rot) „Vor dem Liefertermin klären: Punkte für den Aufstellplatz.“ → „Sie steht dort viele Jahre. Also: einmal richtig.“ → Check 1/4 **Fester Grund.** „Verdichteter Kies, frostfrei gegründet. Da sackt nichts nach.“ · 2/4 **Exakt in Waage.** „Genau so, wie es der Hersteller vorgibt.“ · 3/4 **Wasser muss weg.** „Die Anlage tropft. Ohne Ablauf wird’s im Winter glatt.“ · 4/4 **Leitungsweg.** „Graben zum Haus gleich mit einplanen. Danach wird alles wieder sauber geschlossen.“ → **„Das alles machen wir.“** + Linse/Logo + „Wir schaffen die Grundlage.“ + „Die Wärmepumpe selbst installiert Ihr Fachbetrieb.“ → „Liefertermin steht? **Rufen Sie an.**“ 0174 5652015 · havvambau.de

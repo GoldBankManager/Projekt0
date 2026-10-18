@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>HavvamBau Reel v6</title>
+<style>
+@font-face{font-family:Inter;src:url(assets/fonts/inter-latin-600-normal.woff2) format('woff2');font-weight:600}
+@font-face{font-family:Inter;src:url(assets/fonts/inter-latin-800-normal.woff2) format('woff2');font-weight:800}
+/* --accent is the only colour; --accentInv is its inverse for shapes that sit under the black (difference) panel */
+:root{--accent:#e3120b;--accentInv:#1cedf4;--ink:#0d0d0d}
+html,body{margin:0;background:#000}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#fff;font-family:Inter,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#cam{position:absolute;inset:0;background:#fff;transform-origin:540px 960px;isolation:isolate}
+.sc{position:absolute;inset:0;display:none}
+.row{position:absolute;left:0;width:1080px;text-align:center;white-space:nowrap}
+.k{font-weight:800;letter-spacing:-.05em;line-height:1}
+.s{font-weight:600;letter-spacing:-.02em;line-height:1}
+.wrap{white-space:normal;left:80px;width:920px;line-height:1.18}
+.c{display:inline-block;will-change:transform,opacity,filter}
+.red{color:var(--accent)}
+.img{position:absolute;overflow:visible}
+.box{display:inline-block;background:var(--ink);color:#fff;padding:10px 26px 16px;border-radius:10px}
+#panel{position:absolute;top:-300px;bottom:-300px;left:0;width:0;background:#fff;mix-blend-mode:difference;pointer-events:none}
+#acc{position:absolute;inset:0;pointer-events:none}
+#dot{position:absolute;left:0;top:0;width:100px;height:100px;margin:-50px 0 0 -50px;border-radius:50%;background:var(--accent);display:none}
+#line{position:absolute;height:7px;background:var(--ink);display:none}
+#prog{position:absolute;left:240px;top:300px;width:600px;height:12px;display:none;gap:14px}
+#prog div{flex:1;border-radius:6px;background:#9a9a9a;overflow:hidden}
+#prog i{display:block;height:100%;background:var(--accent);transform-origin:0 50%;transform:scaleX(0)}
+.check{position:absolute;width:150px;height:150px;display:none}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <defs>
+  <pattern id="dots" width="34" height="30" patternUnits="userSpaceOnUse"><rect width="34" height="30" fill="#fff"/>
+    <circle cx="8" cy="8" r="6" fill="#0d0d0d"/><circle cx="25" cy="21" r="7" fill="#0d0d0d"/><circle cx="27" cy="5" r="3" fill="#0d0d0d"/><circle cx="9" cy="24" r="3" fill="#0d0d0d"/></pattern>
+  <pattern id="hatch" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="22" height="22" fill="#fff"/><rect width="7" height="22" fill="#0d0d0d"/></pattern>
+  <symbol id="pumpI" viewBox="0 0 600 500">
+    <rect x="60" y="50" width="480" height="370" rx="34" fill="#fff" stroke="#0d0d0d" stroke-width="18"/>
+    <circle cx="230" cy="235" r="136" fill="#0d0d0d"/>
+    <g fill="none" stroke="#fff" stroke-width="7"><circle cx="230" cy="235" r="104"/><circle cx="230" cy="235" r="66"/></g>
+    <g fill="#fff">
+      <path d="M230 235 C 214 170, 250 120, 288 124 C 290 168, 266 208, 230 235 Z"/>
+      <path d="M230 235 C 214 170, 250 120, 288 124 C 290 168, 266 208, 230 235 Z" transform="rotate(120 230 235)"/>
+      <path d="M230 235 C 214 170, 250 120, 288 124 C 290 168, 266 208, 230 235 Z" transform="rotate(240 230 235)"/>
+    </g>
+    <circle cx="230" cy="235" r="20" fill="#fff" stroke="#0d0d0d" stroke-width="7"/>
+    <g stroke="#0d0d0d" stroke-width="16" stroke-linecap="round"><path d="M410 130 H500 M410 175 H500 M410 220 H500 M410 265 H500 M410 310 H500 M410 355 H500"/></g>
+    <circle cx="505" cy="88" r="13" fill="currentColor"/>
+    <rect x="110" y="420" width="90" height="40" rx="6" fill="#0d0d0d"/><rect x="400" y="420" width="90" height="40" rx="6" fill="#0d0d0d"/>
+  </symbol>
+  <!-- ground section: hatched soil left/right of a 420-wide pit, ground line at y=250 -->
+  <symbol id="soilI" viewBox="0 0 640 560">
+    <rect x="0" y="250" width="110" height="300" fill="url(#hatch)"/><rect x="530" y="250" width="110" height="300" fill="url(#hatch)"/>
+    <path d="M0 250 H110 M530 250 H640" stroke="#0d0d0d" stroke-width="14"/>
+  </symbol>
+  <symbol id="checkI" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#e3120b"/><path d="M28 52 l15 15 l30 -34" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+ </defs>
+</svg>
+
+<div id="stage">
+ <div id="cam">
+
+  <!-- A: Ihre Wärmepumpe ist bestellt? -->
+  <div class="sc" id="A">
+    <div id="aTop" class="sc" style="display:block">
+      <div class="row k" id="aW" data-fit="980" style="top:840px;font-size:150px">Wärmepumpe</div>
+    </div>
+    <div class="row k" id="aB" data-fit="760" data-max="200" style="top:730px;font-size:150px">bestellt?</div>
+    <svg class="img" id="aImg" style="left:210px;top:1070px;width:660px;height:550px;color:#e3120b" viewBox="0 0 600 500"><use href="#pumpI"/></svg>
+  </div>
+
+  <!-- B: 4 Dinge, die das Fundament können muss -->
+  <div class="sc" id="B">
+    <div class="row k" id="b4" style="top:250px;font-size:760px;letter-spacing:0;color:var(--accent)">4</div>
+    <div class="row s" id="bBox" style="top:1050px"><span class="box" id="bBoxI" style="font-size:56px">Vor dem Liefertermin klären</span></div>
+    <div class="row s" id="b1" style="top:1190px;font-size:92px">Punkte für den</div>
+    <div class="row k" id="b2" data-fit="980" style="top:1300px;font-size:180px">Aufstellplatz<span class="red">.</span></div>
+  </div>
+
+  <!-- C: Sonst kippt sie. -->
+  <div class="sc" id="C">
+    <div class="row s" id="cO" style="top:430px;font-size:96px">Sie steht dort</div>
+    <div class="row k" id="cG" data-fit="900" data-max="240" style="top:560px;font-size:200px">viele Jahre.</div>
+    <div class="row s" id="cN" style="top:860px;font-size:84px">Also: einmal richtig<span id="cDot" class="red">.</span></div>
+    <svg class="img" id="cCrack" style="left:0;top:1560px;width:1080px;height:200px" viewBox="0 0 1080 200">
+      <path d="M40 40 H1040" stroke="#0d0d0d" stroke-width="14" stroke-linecap="round"/>
+    </svg>
+    <svg class="img" id="cImg" style="left:250px;top:1130px;width:580px;height:483px;color:#e3120b" viewBox="0 0 600 500"><use href="#pumpI"/></svg>
+  </div>
+
+  <!-- T: four tips, one drop bar each -->
+  <div class="sc" id="T">
+    <div class="row s" id="tHead" style="top:220px;font-size:42px;letter-spacing:.06em">AUFSTELLPLATZ-CHECK · <span id="tCnt">1</span>/4</div>
+
+    <div class="sc" id="t0">
+      <div class="row k" id="t0w" data-fit="900" data-max="220" style="top:380px;font-size:200px">Fester Grund.</div>
+      <div class="row s wrap" id="t0s" style="top:610px;font-size:56px">Verdichteter Kies, frostfrei gegründet. Da sackt nichts nach.</div>
+      <svg class="img" id="t0i" style="left:130px;top:830px;width:820px;height:718px" viewBox="0 0 640 560">
+        <use href="#soilI"/>
+        <rect id="t0g" x="110" y="330" width="420" height="200" fill="url(#dots)" stroke="#0d0d0d" stroke-width="14"/>
+        <rect id="t0s2" x="110" y="236" width="420" height="94" fill="#fff" stroke="#0d0d0d" stroke-width="14"/>
+        <g id="t0a" fill="#e3120b"><path d="M200 60 h30 v80 h26 l-41 50 l-41 -50 h26 Z"/><path d="M305 40 h30 v100 h26 l-41 50 l-41 -50 h26 Z"/><path d="M410 60 h30 v80 h26 l-41 50 l-41 -50 h26 Z"/></g>
+        <g id="t0d" stroke="#0d0d0d" stroke-width="6" fill="#0d0d0d"><path d="M598 256 V524"/><path d="M584 256 H612 M584 524 H612"/></g>
+        <text id="t0t" x="574" y="390" font-family="Inter" font-weight="800" font-size="40" text-anchor="middle" transform="rotate(-90 580 400)" fill="#0d0d0d">frostfrei</text>
+      </svg>
+    </div>
+
+    <div class="sc" id="t1">
+      <div class="row k" id="t1w" data-fit="980" data-max="220" style="top:380px;font-size:200px">Exakt in Waage.</div>
+      <div class="row s wrap" id="t1s" style="top:610px;font-size:56px">Genau so, wie es der Hersteller vorgibt.</div>
+      <svg class="img" id="t1i" style="left:130px;top:830px;width:820px;height:718px" viewBox="0 0 640 560">
+        <use href="#soilI"/>
+        <rect x="110" y="330" width="420" height="200" fill="url(#dots)" stroke="#0d0d0d" stroke-width="14"/>
+        <g id="t1tilt">
+          <rect x="110" y="236" width="420" height="94" fill="#fff" stroke="#0d0d0d" stroke-width="14"/>
+          <rect x="140" y="150" width="360" height="74" rx="14" fill="#fff" stroke="#0d0d0d" stroke-width="12"/>
+          <rect x="270" y="166" width="100" height="42" rx="21" fill="#fff" stroke="#0d0d0d" stroke-width="8"/>
+          <path d="M305 166 V208 M335 166 V208" stroke="#0d0d0d" stroke-width="5"/>
+          <circle id="t1b" cx="320" cy="187" r="13" fill="var(--accentInv)"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="sc" id="t2">
+      <div class="row k" id="t2w" data-fit="980" data-max="220" style="top:380px;font-size:200px">Wasser muss weg.</div>
+      <div class="row s wrap" id="t2s" style="top:610px;font-size:56px">Die Anlage tropft. Ohne Ablauf wird’s im Winter glatt.</div>
+      <svg class="img" id="t2i" style="left:130px;top:830px;width:820px;height:718px" viewBox="0 0 640 560">
+        <use href="#soilI"/>
+        <rect x="110" y="330" width="420" height="200" fill="url(#dots)" stroke="#0d0d0d" stroke-width="14"/>
+        <rect x="110" y="236" width="420" height="94" fill="#fff" stroke="#0d0d0d" stroke-width="14"/>
+        <svg x="180" y="0" width="280" height="233" viewBox="0 0 600 500" style="color:#e3120b"><use href="#pumpI"/></svg>
+        <g id="drops"></g>
+      </svg>
+    </div>
+
+    <div class="sc" id="t3">
+      <div class="row k" id="t3w" data-fit="980" data-max="220" style="top:380px;font-size:200px">Leitungsweg.</div>
+      <div class="row s wrap" id="t3s" style="top:610px;font-size:56px">Graben zum Haus gleich mit einplanen. Danach wird alles wieder sauber geschlossen.</div>
+      <svg class="img" id="t3i" style="left:90px;top:840px;width:900px;height:700px" viewBox="0 0 720 560">
+        <rect x="0" y="40" width="150" height="430" fill="#fff" stroke="#0d0d0d" stroke-width="14"/>
+        <rect x="35" y="110" width="80" height="100" rx="6" fill="#0d0d0d"/>
+        <path d="M0 300 H720" stroke="#0d0d0d" stroke-width="14"/>
+        <rect id="t3trench" x="150" y="300" width="0" height="110" fill="url(#hatch)" stroke="#0d0d0d" stroke-width="10"/>
+        <path id="t3p1" d="M150 370 H560 V300" fill="none" stroke="var(--accentInv)" stroke-width="12" pathLength="1"/>
+        <path id="t3p2" d="M150 392 H585 V300" fill="none" stroke="#0d0d0d" stroke-width="12" pathLength="1"/>
+        <svg x="480" y="110" width="220" height="183" viewBox="0 0 600 500" style="color:#1cedf4"><use href="#pumpI"/></svg>
+        <g id="t3pav"></g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- H: CTA -->
+  <div class="sc" id="H">
+    <div class="row s" id="hT" style="top:420px;font-size:92px">Liefertermin steht?</div>
+    <div class="row k" id="hB" data-fit="980" data-max="230" style="top:530px;font-size:170px">Rufen Sie an<span class="red">.</span></div>
+    <svg class="img" id="hIcon" style="left:480px;top:800px;width:120px;height:120px" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="12" fill="#e3120b"/>
+      <path transform="translate(5.2 5.2) scale(.57)" fill="#fff" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/>
+    </svg>
+    <div class="row k" id="hP" data-fit="990" style="top:960px;font-size:126px">0174 5652015</div>
+    <div class="row k" id="hW" data-fit="780" style="top:1160px;font-size:96px">havvambau<span class="red">.</span>de</div>
+    <div id="hL" style="position:absolute;left:200px;top:1390px;width:680px"></div>
+    <div class="row s" id="hR" style="top:1510px;font-size:34px;letter-spacing:.32em;color:#555">AUGSBURG &amp; UMGEBUNG</div>
+  </div>
+
+  <div id="panel"></div>
+
+  <!-- accent layer (never inverted) -->
+  <div id="acc">
+    <div id="prog" style="display:none"><div><i></i></div><div><i></i></div><div><i></i></div><div><i></i></div></div>
+    <svg class="check" id="ck0" viewBox="0 0 100 100" style="left:840px;top:820px"><use href="#checkI"/></svg>
+    <svg class="check" id="ck1" viewBox="0 0 100 100" style="left:840px;top:820px"><use href="#checkI"/></svg>
+    <svg class="check" id="ck2" viewBox="0 0 100 100" style="left:840px;top:820px"><use href="#checkI"/></svg>
+    <svg class="check" id="ck3" viewBox="0 0 100 100" style="left:840px;top:820px"><use href="#checkI"/></svg>
+    <svg id="lensSvg" width="1080" height="1920" viewBox="0 0 1080 1920" style="position:absolute;left:0;top:0;display:none;overflow:visible">
+      <defs><path id="lensTxt" d="M60 900 Q540 500 1020 900 Q540 1300 60 900 Z"/></defs>
+      <g id="lensG">
+        <path d="M110 900 Q540 580 970 900 Q540 1220 110 900 Z" fill="#0d0d0d"/>
+        <path d="M110 900 L40 890 L40 910 Z M970 900 L1040 890 L1040 910 Z" fill="#0d0d0d"/>
+        <text id="lensT" font-family="Inter" font-weight="800" font-size="50" letter-spacing="-1" fill="#0d0d0d"><textPath href="#lensTxt" id="lensTP" startOffset="0">WIR SCHAFFEN DIE GRUNDLAGE • WIR SCHAFFEN DIE GRUNDLAGE • WIR SCHAFFEN DIE GRUNDLAGE • WIR SCHAFFEN DIE GRUNDLAGE • WIR SCHAFFEN DIE GRUNDLAGE •</textPath></text>
+      </g>
+    </svg>
+    <div id="lensLogo" style="position:absolute;left:250px;top:855px;width:580px;display:none"></div>
+    <div class="row k" id="fTop" style="top:440px;font-size:96px;display:none">Das alles machen wir.</div>
+    <div class="row k" id="fSub" data-fit="940" style="top:1330px;font-size:100px;display:none">Wir schaffen die <span class="red">Grundlage.</span></div>
+    <div class="row s" id="fNote" style="top:1480px;font-size:38px;color:#555;display:none">Die Wärmepumpe selbst installiert Ihr Fachbetrieb.</div>
+    <div id="flash" style="position:absolute;inset:0;background:var(--accent);opacity:0"></div>
+    <div id="line"></div>
+    <div id="dot"></div>
+  </div>
+ </div>
+</div>
+
+<script>
+// ===== music grid: 166 BPM, eighth = 0.3615 s. Track extended on this grid (sound_v6.py):
+// intro/build-up eighths 0–15, drop bar ×6 (eighths 16–63), fade-out from eighth 64.
+const B0=-0.04,E8=0.3615,k=n=>B0+E8*n,DROP=k(16);
+const TIP=[k(16),k(24),k(32),k(40)], BRAND=k(48), CTA=k(56);
+window.DURATION=24.26;
+
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const p=(t,s,d)=>clamp((t-s)/d);
+const lerp=(a,b,x)=>a+(b-a)*x;
+const E={
+  out:x=>1-Math.pow(1-x,3), in:x=>x*x*x, io:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,
+  expo:x=>x>=1?1:1-Math.pow(2,-10*x), expoIn:x=>x<=0?0:Math.pow(2,10*x-10),
+  quint:x=>x<.5?16*x*x*x*x*x:1-Math.pow(-2*x+2,5)/2,
+  back:x=>{const c1=1.7,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)},
+};
+const $=id=>document.getElementById(id);
+let seed=21;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+const show=(el,on)=>{el.style.display=on?'block':'none';};
+const st=(el,o)=>Object.assign(el.style,o);
+
+// ===== logo =====
+const LOGO=[
+ [0,'M71.75 0V703H208V0ZM513 0V703H649.25V0ZM158.25 302.5V422.75H551.25V302.5Z',0],
+ [696,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [1386,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2066,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2746,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [3436,'M71.75 0V703H168L452.5 246.75H397.75L682 703H778.25V0H642.5V469.5L669.25 462.25L471 144H379L181 462.25L207.5 469.5V0Z',0],
+ [4261,'M171.5 0V111H355Q404.25 111 431.75 140.875Q459.25 170.75 459.25 212Q459.25 239.75 446.875 262.875Q434.5 286 411.125 299.5Q387.75 313 355 313H171.5V422.5H340Q381.75 422.5 407.25 443.75Q432.75 465 432.75 507.25Q432.75 549.5 407.25 570.75Q381.75 592 340 592H171.5V703H356.25Q425.75 703 473.125 677.375Q520.5 651.75 544.5 610.375Q568.5 569 568.5 520Q568.5 459.75 532.125 416.25Q495.75 372.75 425.5 351.5L431.75 395.75Q509.5 373.75 552.25 323.25Q595 272.75 595 201.75Q595 145.75 567.375 100.125Q539.75 54.5 487.25 27.25Q434.75 0 360 0ZM71.75 0V703H207V0Z',1],
+ [4867,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',1],
+ [5557,'M349.237 -10.5Q265.974 -10.5 201.27 26.087Q136.566 62.674 99.533 126.641Q62.5 190.607 62.5 271.75V703H198.75V268Q198.75 221.278 218.601 187.053Q238.453 152.827 272.639 134.414Q306.825 116 349.12 116Q392.25 116 425.345 134.394Q458.44 152.788 477.72 186.851Q497 220.915 497 267V703H633.5V270.75Q633.5 189.573 596.953 126.139Q560.407 62.706 496.453 26.103Q432.5 -10.5 349.237 -10.5Z',1],
+];
+function makeLogo(host,cA,cB){
+  const ns='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox','40 -720 6180 750');svg.style.width='100%';svg.style.display='block';svg.style.overflow='hidden';
+  const g=document.createElementNS(ns,'g');g.setAttribute('transform','scale(1 -1)');svg.appendChild(g);
+  const paths=LOGO.map(([x,d,b])=>{const el=document.createElementNS(ns,'path');el.setAttribute('d',d);el.setAttribute('fill',b?cB:cA);el.dataset.x=x;el.setAttribute('transform',`translate(${x} 0)`);g.appendChild(el);return el;});
+  host.appendChild(svg);return paths;
+}
+const lensLogo=makeLogo($('lensLogo'),'#ffffff','#b5c4ac');
+const endLogo=makeLogo($('hL'),'#0d0d0d','#1e4a4d');
+function animLogo(paths,t,s,stag=.035,d=.5){paths.forEach((el,i)=>{const q=E.expo(p(t,s+i*stag,d));el.setAttribute('transform',`translate(${el.dataset.x} ${-(1-q)*760})`);});}
+
+// ===== per-letter helpers =====
+function prep(el){
+  const cs=[];
+  const walk=n=>{
+    if(n.nodeType===3){
+      // letters are grouped per word so multi-line rows only break between words
+      const f=document.createDocumentFragment();
+      n.textContent.split(/( )/).forEach(part=>{
+        if(part===' '){f.appendChild(document.createTextNode(' '));return;}
+        if(!part) return;
+        const w=document.createElement('span');w.style.cssText='display:inline-block;white-space:nowrap';
+        for(const ch of part){const s=document.createElement('span');s.className='c';s.textContent=ch;s._r=rnd();cs.push(s);w.appendChild(s);}
+        f.appendChild(w);
+      });
+      n.parentNode.replaceChild(f,n);
+    }else if(n.nodeType===1&&n.classList.contains('red')&&n.textContent.length===1){n.classList.add('c');n._r=rnd();cs.push(n);}
+    else [...n.childNodes].forEach(walk);
+  };
+  [...el.childNodes].forEach(walk);el._c=cs;return el;
+}
+function setC(c,q,tr,blur){c.style.opacity=clamp(q*2.5);c.style.transform=tr;c.style.filter=blur>.3?`blur(${blur}px)`:'none';}
+function fly(el,t,s,o={}){
+  const {stag=.03,dur=.5,dx=280,dy=0,rot=0,blur=16}=o;
+  el._c.forEach((c,i)=>{const q=E.expo(p(t,s+i*stag,dur));
+    setC(c,q,`translate(${(1-q)*dx}px,${(1-q)*dy}px) rotate(${(1-q)*rot}deg) scaleX(${1+(1-q)*.7})`,(1-q)*blur);});
+}
+function exitEl(el,t,s,dur=.28,dy=-160){const q=E.in(p(t,s,dur));if(q<=0){if(el._ex){el.style.opacity='';el.style.filter='';el.style.translate='';el._ex=0;}return;}
+  el._ex=1;el.style.opacity=1-q;el.style.filter=`blur(${q*22}px)`;el.style.translate=`0 ${q*dy}px`;}
+function popIn(el,t,s,d=.5,from=.3){const q=E.back(p(t,s,d));el.style.opacity=p(t,s,.06);el.style.scale=lerp(from,1,q);}
+function draw(el,t,s,d){el.style.strokeDasharray=1;el.style.strokeDashoffset=1-E.io(p(t,s,d));el.style.opacity=t>=s?1:0;}
+function absPos(el){let x=0,y=0,n=el;while(n&&n.id!=='cam'){x+=n.offsetLeft;y+=n.offsetTop;n=n.offsetParent;}return {x,y,w:el.offsetWidth,h:el.offsetHeight};}
+function fit(){
+  document.querySelectorAll('[data-fit]').forEach(el=>{
+    const r=document.createRange();r.selectNodeContents(el);const w=r.getBoundingClientRect().width;
+    const fs=parseFloat(getComputedStyle(el).fontSize);
+    el.style.fontSize=Math.min(+el.dataset.max||400,fs*(+el.dataset.fit)/w)+'px';
+  });
+}
+
+// ===== build =====
+const SCENES=['A','B','C','T','t0','t1','t2','t3','H'], ACC=['fTop','fSub','fNote'];
+const ns='http://www.w3.org/2000/svg';
+let DOT_FROM=null, drops=[], t3pav=[];
+function build(){
+  SCENES.concat(ACC).forEach(id=>show($(id),true));
+  fit();
+  const d=absPos($('cDot'));DOT_FROM={x:d.x+d.w*.5,y:d.y+d.h*.78};
+  SCENES.concat(ACC).forEach(id=>show($(id),false));
+  ['aW','aB','b1','b2','cO','cG','cN','fTop','fSub','hT','hB','hP','hW','hR'].concat([0,1,2,3].flatMap(i=>[`t${i}w`,`t${i}s`])).forEach(id=>prep($(id)));
+  // condensate drops
+  for(let i=0;i<10;i++){const e=document.createElementNS(ns,'path');e.setAttribute('d','M0 -16 C 8 -4, 10 2, 10 6 A10 10 0 0 1 -10 6 C -10 2, -8 -4, 0 -16 Z');e.setAttribute('fill','#0d0d0d');
+    e._x=230+rnd()*180;e._o=rnd();$('drops').appendChild(e);drops.push(e);}
+  // restored paving over the trench
+  for(let x=152;x<470;x+=52){const e=document.createElementNS(ns,'rect');e.setAttribute('x',x);e.setAttribute('y',272);e.setAttribute('width',48);e.setAttribute('height',26);e.setAttribute('rx',4);
+    e.setAttribute('fill','#fff');e.setAttribute('stroke','#0d0d0d');e.setAttribute('stroke-width',7);e.style.transformBox='fill-box';e.style.transformOrigin='50% 100%';$('t3pav').appendChild(e);t3pav.push(e);}
+}
+
+// ===== timeline =====
+function panel(t){
+  let x0=0,x1=0;
+  if(t<k(4)+.4){
+    x1=lerp(0,760,E.expo(p(t,0,.5))); x1=lerp(x1,1080,E.expo(p(t,k(2),.3)));
+    x0=1080*E.quint(p(t,k(4),.32));
+  }else if(t>=TIP[1]-.2&&t<BRAND+.5){
+    // tips 2 and 4 sit on black
+    const a=E.quint(p(t,TIP[1]-.2,.4)), b=E.quint(p(t,TIP[2]-.2,.4)), c=E.quint(p(t,TIP[3]-.2,.4)), d=E.quint(p(t,BRAND-.25,.4));
+    x0=lerp(1080,0,a); x1=1080;
+    x1=lerp(x1,0,b);
+    if(t>=TIP[3]-.2){x0=0;x1=1080*c;}
+    if(t>=BRAND-.25){x0=1080*d;x1=1080;}
+  }
+  $('panel').style.left=x0+'px';$('panel').style.width=Math.max(0,x1-x0)+'px';
+}
+
+const KICK=[[k(2),.035],[k(5),.03],[k(8),.04],[k(9),.03],[k(10),.03],[k(12),.035],[k(13),.035],[k(14),.045],[DROP,.08],
+  ...TIP.flatMap(s=>[[s,.04],[s+6*E8,.03]]),[BRAND,.07],[k(50),.03],[k(52),.03],[CTA,.035],[k(58),.03],[k(60),.03],[k(62),.03]];
+const SCN=[0,k(8),k(12),DROP,TIP[1],TIP[2],TIP[3],BRAND,CTA,24.3];
+function camera(t){
+  let i=0;while(i<SCN.length-2&&t>=SCN[i+1])i++;
+  const f=p(t,SCN[i],SCN[i+1]-SCN[i]);
+  let z=1+.04*E.io(f), r=(i%2?-1:1)*.45*(f-.5);
+  for(const [s,a] of KICK){const dt=t-s;if(dt>=0&&dt<.8)z+=a*Math.exp(-dt*9);}
+  let sx=0,sy=0;
+  for(const [s,a] of [[DROP,16],[k(14)+.25,9],[BRAND,10]]){const dd=t-s;if(dd>=0&&dd<.5){const e=a*Math.exp(-dd*10);sx+=e*Math.sin(dd*70);sy+=e*Math.cos(dd*57);}}
+  $('cam').style.transform=`translate(${sx}px,${sy}px) scale(${z}) rotate(${r}deg)`;
+}
+
+// ---- A: "Ihre Wärmepumpe ist bestellt?"
+function sceneA(t){
+  const on=t<k(8)+.3; show($('A'),on); if(!on) return;
+  fly($('aW'),t,.06,{dx:340,stag:.035,dur:.5});
+  const up=E.expo(p(t,k(4),.45)); $('aTop').style.transform=`translateY(${-up*270}px)`;
+  fly($('aB'),t,k(4)+.12,{dx:300,stag:.03,dur:.45});
+  const dq=E.out(p(t,k(5)-.25,.25)); const land=t>=k(5)?Math.exp(-(t-k(5))*9)*Math.cos((t-k(5))*28):0;
+  st($('aImg'),{opacity:p(t,k(5)-.25,.05),transform:`translateY(${(1-dq)*-900}px) scale(${1+land*.06},${1-land*.08})`,transformOrigin:'50% 100%'});
+  ['aTop','aB','aImg'].forEach(id=>exitEl($(id),t,k(8)-.3,.3));
+}
+// ---- B: "4 Punkte für den Aufstellplatz" (the promise)
+function sceneB(t){
+  const on=t>=k(8)-.05&&t<k(12)+.05; show($('B'),on); if(!on) return;
+  const g=E.expo(p(t,k(8),.6));
+  st($('b4'),{opacity:p(t,k(8),.06),transform:`scale(${lerp(.25,1,g)}) rotate(${(1-g)*-25}deg)`,transformOrigin:'540px 380px'});
+  {const q=E.back(p(t,k(8)+.05,.4));$('bBoxI').style.transform=`scale(${lerp(.4,1,q)})`;$('bBoxI').style.opacity=p(t,k(8)+.05,.06);}
+  fly($('b1'),t,k(8)+.1,{dx:-260,stag:.025,dur:.42});
+  fly($('b2'),t,k(9)-.12,{dx:320,stag:.03,dur:.42});
+  ['b4','bBox','b1','b2'].forEach(id=>exitEl($(id),t,k(12)-.25,.25));
+}
+// ---- C: "Sie steht dort viele Jahre. Also: einmal richtig."
+function sceneC(t){
+  const on=t>=k(12)-.05&&t<DROP; show($('C'),on); if(!on) return;
+  fly($('cO'),t,k(12)-.05,{dx:-300,stag:.04,dur:.45});
+  fly($('cG'),t,k(13)-.12,{dx:320,stag:.03,dur:.42});
+  fly($('cN'),t,k(14)-.1,{dx:-300,stag:.025,dur:.42});
+  const inq=E.out(p(t,k(12),.4)); const land=t>=k(12)+.4?Math.exp(-(t-k(12)-.4)*9)*Math.cos((t-k(12)-.4)*28):0;
+  st($('cImg'),{opacity:p(t,k(12),.08),transformOrigin:'50% 100%',transform:`translateY(${(1-inq)*500}px) scale(${1+land*.05},${1-land*.07})`});
+  $('cCrack').style.opacity=E.out(p(t,k(12),.3));
+  const ex=E.expoIn(p(t,k(15),.25));
+  ['cO','cG','cImg','cCrack'].forEach(id=>{const o=parseFloat($(id).style.opacity);$(id).style.opacity=(isNaN(o)?1:o)*(1-ex);$(id).style.filter=ex>0?`blur(${ex*20}px)`:'none';});
+  $('cN')._c.forEach(c=>{if(c.id==='cDot')return;const o=parseFloat(c.style.opacity);c.style.opacity=Math.min(isNaN(o)?1:o,1-ex);});
+  $('cDot').style.visibility=t>=k(15)?'hidden':'visible';
+}
+// ---- the red full stop becomes the dot, which bursts into a red flash on the drop
+function sceneDot(t){
+  const dot=$('dot');
+  if(t>=k(15)&&t<DROP+.25){
+    const q=E.io(p(t,k(15),.3)), g=lerp(.3,1.3,E.out(p(t,k(15),.3)))*(1-.35*E.in(p(t,DROP-.08,.08)))+E.expoIn(p(t,DROP,.12))*30;
+    show(dot,true);st(dot,{left:lerp(DOT_FROM.x,540,q)+'px',top:lerp(DOT_FROM.y,900,q)+'px',transform:`scale(${g})`});
+  }else if(t<CTA-.4) show(dot,false);
+  $('flash').style.opacity=t>=DROP+.1?1-E.out(p(t,DROP+.1,.35)):0;
+}
+// ---- tips: one card per drop bar; the check stamps on beat 4 of each bar
+function sceneT(t){
+  const on=t>=TIP[0]-.05&&t<BRAND+.1; show($('T'),on); show($('prog'),on); if(!on){[0,1,2,3].forEach(i=>show($('ck'+i),false));return;}
+  $('prog').style.display='flex';
+  const idx=clamp(Math.floor((t-TIP[0])/(8*E8)),0,3);
+  $('tCnt').textContent=idx+1;
+  {const q=E.out(p(t,TIP[0],.35)),x=E.in(p(t,BRAND-.25,.25));
+   st($('tHead'),{opacity:q*(1-x),transform:`translateY(${(1-q)*-40}px)`});$('prog').style.opacity=q*(1-x);}
+  document.querySelectorAll('#prog i').forEach((b,i)=>{b.style.transform=`scaleX(${E.out(p(t,TIP[i]+6*E8,.3))})`;});
+  for(let i=0;i<4;i++){
+    const s=TIP[i], e=s+8*E8, el=$('t'+i), cardOn=t>=s-.05&&t<e+.05; show(el,cardOn);
+    const ck=$('ck'+i); show(ck,t>=s+6*E8-.05&&t<e);
+    if(ck.style.display!=='none'){const q=E.back(p(t,s+6*E8,.4));st(ck,{transform:`scale(${q}) rotate(${(1-q)*-40}deg)`,opacity:1-E.in(p(t,e-.22,.2))});}
+    if(!cardOn) continue;
+    fly($(`t${i}w`),t,s,{dx:i%2?-340:340,stag:.03,dur:.45});
+    fly($(`t${i}s`),t,s+.3,{dx:0,dy:40,stag:.008,dur:.45,blur:10});
+    popIn($(`t${i}i`),t,s+.15,.55,.6);
+    [`t${i}w`,`t${i}s`,`t${i}i`].forEach(id=>exitEl($(id),t,e-.22,.24,-120));
+  }
+  // 1 tragfähig: gravel bed fills, slab drops, load arrows press down
+  {const s=TIP[0];const g=E.out(p(t,s+.35,.5)), sl=E.back(p(t,s+.75,.4)), a=E.out(p(t,s+1.1,.35));
+   $('t0g').setAttribute('transform',`translate(0 ${530*(1-g)}) scale(1 ${Math.max(.001,g)})`);
+   $('t0s2').setAttribute('transform',`translate(0 ${(1-sl)*-260})`);$('t0s2').style.opacity=p(t,s+.75,.05);
+   const bob=Math.max(0,Math.sin((t-s-1.1)*Math.PI*2/(2*E8)))*12;
+   $('t0a').setAttribute('transform',`translate(0 ${(1-a)*-160+bob})`);$('t0a').style.opacity=a;
+   const d=E.out(p(t,s+1.4,.4));$('t0d').style.opacity=d;$('t0t').style.opacity=d;}
+  // 2 waagerecht: slab + level settle from a tilt, bubble centres
+  {const s=TIP[1];const q=E.back(p(t,s+.9,.7));
+   $('t1tilt').setAttribute('transform',`rotate(${lerp(-6,0,q)} 320 330)`);$('t1b').setAttribute('cx',lerp(268,320,q));}
+  // 3 kondenswasser: drops fall from the unit into the gravel bed
+  {const s=TIP[2];drops.forEach(d=>{const ph=((t-s-.6)/.9+d._o)%1;const vis=t>s+.6;
+    d.setAttribute('transform',`translate(${d._x} ${lerp(230,470,ph)}) scale(${ph<.75?1:lerp(1,.2,(ph-.75)/.25)})`);d.style.opacity=vis?(ph<.75?1:lerp(1,0,(ph-.75)/.25)):0;});}
+  // 4 leitungsweg: trench opens from the house, pipes run, paving closes it again
+  {const s=TIP[3];const w=E.io(p(t,s+.5,.6));$('t3trench').setAttribute('width',Math.max(0,410*w));
+   draw($('t3p1'),t,s+.85,.5);draw($('t3p2'),t,s+.95,.5);
+   t3pav.forEach((e,i)=>{const q=E.back(p(t,s+1.55+i*.06,.3));e.style.scale=`1 ${q}`;e.style.opacity=q>0?1:0;});
+   $('t3trench').style.opacity=1-p(t,s+1.9,.25);}
+}
+// ---- brand: lens with logo, slogan, services, honest note
+function sceneBrand(t){
+  const on=t>=BRAND-.05&&t<CTA+.1;
+  $('lensSvg').style.display=on?'block':'none'; ACC.concat(['lensLogo']).forEach(id=>show($(id),on));
+  if(!on) return;
+  const q=E.back(p(t,BRAND,.45));
+  let pulse=1;for(const b of [k(50),k(52),k(54)]){const dt=t-b;if(dt>=0)pulse+=.05*Math.exp(-dt*9);}
+  const ex=E.expoIn(p(t,CTA-.25,.3));
+  $('lensG').style.transformOrigin='540px 900px';
+  $('lensG').style.transform=`translateY(${-ex*1500}px) rotate(${(1-E.expo(p(t,BRAND,.6)))*-8}deg) scale(${Math.max(.001,q)*pulse})`;
+  $('lensT').style.opacity=E.out(p(t,BRAND+.08,.3));
+  $('lensTP').setAttribute('startOffset',-(t-BRAND)*170);
+  const lk=E.expo(p(t,BRAND+.06,.45));
+  st($('lensLogo'),{transformOrigin:'290px 45px',transform:`translateY(${-ex*1500}px) scale(${lerp(1.6,1,lk)*pulse})`,filter:lk<1?`blur(${(1-lk)*16}px)`:'none',opacity:lk});
+  fly($('fSub'),t,k(50)-.1,{dx:300,stag:.025,dur:.45});
+  fly($('fTop'),t,k(49)-.1,{dx:-300,stag:.025,dur:.45});
+  {const q3=E.out(p(t,k(52),.45));st($('fNote'),{opacity:q3,transform:`translateY(${(1-q3)*30}px)`});}
+  ['fSub','fTop','fNote'].forEach(id=>exitEl($(id),t,CTA-.25));
+}
+// ---- CTA
+function sceneH(t){
+  const on=t>=CTA-.3; show($('H'),on); if(!on) return;
+  const dot=$('dot'), LAND=CTA, ROLL1=k(57)+.1;
+  if(t<ROLL1+.45){
+    show(dot,true);let x,y,sq=1;
+    if(t<LAND){const q=p(t,LAND-.3,.3);x=130;y=lerp(-80,750,q*q);}
+    else{const q=E.io(p(t,LAND+.04,ROLL1-LAND-.04));x=lerp(130,1180,q);y=750;const dt=t-LAND;sq=1-.3*Math.exp(-dt*14)*Math.cos(dt*30);}
+    st(dot,{left:x+'px',top:y+'px',transform:`scale(${.8/sq},${.8*sq})`});
+    const ln=$('line');show(ln,t>=LAND);st(ln,{left:'130px',top:'784px',width:Math.max(0,x-130)+'px',opacity:1-p(t,ROLL1+.1,.3)});
+    $('hB').style.clipPath=`inset(-60px ${Math.max(0,1080-x+40)}px -60px 0)`;
+  }else{show(dot,false);show($('line'),false);$('hB').style.clipPath='none';}
+  fly($('hT'),t,LAND+.15,{dx:-260,stag:.03,dur:.45});
+  popIn($('hIcon'),t,k(58)-.12,.5,.2);
+  const amp=120*(1-E.io(p(t,k(58)-.05,.7)));
+  $('hP')._c.forEach((c,i)=>{const q=E.out(p(t,k(58)-.25+i*.025,.45)),ph=i*.75-t*8;
+    setC(c,q,`translate(${(1-q)*700}px,${amp*Math.sin(ph)}px) rotate(${amp*.2*Math.cos(ph)}deg)`,(1-q)*10);});
+  fly($('hW'),t,k(60)-.18,{dx:300,stag:.025,dur:.42});
+  animLogo(endLogo,t,k(62)-.1,.03,.5);
+  fly($('hR'),t,k(62)+.15,{dx:0,dy:30,stag:.015,dur:.45,blur:8});
+}
+
+window.renderFrame=function(t){
+  camera(t); panel(t);
+  sceneA(t); sceneB(t); sceneC(t); sceneDot(t); sceneT(t); sceneBrand(t); sceneH(t);
+};
+window.ready=(async()=>{
+  await document.fonts.load('800 50px Inter');await document.fonts.load('600 50px Inter');
+  await document.fonts.ready;
+  build();
+  const q=new URLSearchParams(location.search);
+  renderFrame(q.has('t')?+q.get('t'):0);
+  return true;
+})();
+</script>
+</body>
+</html>
