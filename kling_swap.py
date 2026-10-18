@@ -24,7 +24,7 @@ import requests
 
 MODELS = {  # $/s Output laut fal-Pricing-API
     "standard": ("fal-ai/kling-video/o3/standard/video-to-video/edit", 0.14),
-    "pro":      ("fal-ai/kling-video/o3/pro/video-to-video/edit", None),
+    "pro":      ("fal-ai/kling-video/o3/pro/video-to-video/edit", 0.168),  # laut Modellseite
 }
 UPSCALER = "fal-ai/bytedance-upscaler/upscale/video"
 UPSCALE = {"1080p": 0.0072, "2k": 0.0144, "4k": 0.0288}  # $/s bei 30fps, Tier "standard"
