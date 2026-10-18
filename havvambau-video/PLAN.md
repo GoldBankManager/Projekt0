@@ -186,3 +186,11 @@ Takte: **0,00 · 2,85 · 5,74 (DROP) · 8,63 (Ausklang)**. Starke Achtel-Hits: 0
 **Neu:** eine Aussage pro Szene · 3,5–4,5 s Standzeit · Zeilen blenden nacheinander weich ein (0,7 s, 0,35 s versetzt) · 0,55 s Überblendung · keine Wisch-Panels, kein Buchstaben-Flug · Markenfarben direkt (Paper, Ink, Green, Sage, Muted, Line) · Markenschrift Outfit · 36,5 s.
 **Szenen:** Hook „Neuer Weg, Terrasse oder Einfahrt geplant?“ · „Für ein Angebot brauchen Sie keinen fertigen Plan. Nur diese 4 Infos.“ · Info 1–4 auf dem Smartphone (Fotos, Maße, PLZ/Ort, Zufahrt) · „Den Rest klären wir persönlich. Eine Anfrage. Kein Auftrag. Unverbindlich. Persönlich. Direkt.“ · CTA mit Logo, „Ihr Projekt. Unser Handwerk.“, havvambau.de, 0174 5652015, Ansprechpartner.
 **Nächster Schritt:** Song analysieren (BPM, Takte, Abschnitte) und die Szenenstarts in `SC` auf Taktanfänge legen.
+
+---
+
+# Version 10: ruhige Version auf dem Song ohne Wiederholung (`video_v10.html`, `sound_v10.py`)
+
+**Musik:** Der Kunde hat zwei Dateien geschickt. `d7191014…u6phlez5dpi2.mp3` ist identisch mit `track.mp3` (9,8 s). Neu ist `track2.mp3` (16,5 s): derselbe Song (83 BPM), der Drop-Groove, beginnt auf einem Taktanfang.
+**Zusammenschnitt ohne Loop:** `track.mp3` bis kurz nach dem Drop-Schlag (5,74 s), danach `track2.mp3` komplett. Die Position kommt aus der Kreuzkorrelation der Onset-Hüllkurven (alt 5,70 s ↔ neu 2,777 s, Versatz 2,923 s, im 2-Takt-Abstand bestätigt). Daraus wird `track2` genau einen Takt später gesetzt, mit 40-ms-Crossfade und Lautheitsangleich. Gemessenes Beat-Raster: Versatz 0,000 s vor dem Übergang, −0,002 s direkt danach, −0,016 s nach 15 s. Am Ende 1,2 s Fade-out, weil `track2` mitten im Takt abbricht. **Gesamt 22,35 s.**
+**Video:** Layout und Markenfarben/-schrift aus V9, eine Szene pro Takt, Wechsel auf den Taktanfängen. Texte auf eine Aussage pro Szene gekürzt, Untertitel höchstens 4 Wörter: „Neuer Weg, Terrasse oder Einfahrt geplant?“ · „Kein fertiger Plan nötig. Für ein Angebot reichen 4 Infos.“ (Drop) · Fotos vom Bereich – Handyfotos reichen. · Ungefähre Maße – Grob geschätzt reicht. · PLZ und Ort – Für Anfahrt und Termin. · Die Zufahrt – Wie breit ist der Weg? · Logo, „Eine Anfrage. Kein Auftrag.“, havvambau.de, 0174 5652015, Augsburg & Umgebung.
