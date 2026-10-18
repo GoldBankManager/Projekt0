@@ -120,7 +120,13 @@ def pick_keys(n_frames, fps, cuts, every, at):
             gaps = math.ceil((b - a) / step)
             for g in range(1, gaps):
                 idx.add(a + round(g * (b - a) / gaps))
-    return sorted(idx)[:64]
+    keys = []
+    for k in sorted(idx):  # Schnitterkennung meldet Übergänge oft doppelt → den späteren Frame behalten
+        if keys and k - keys[-1] < 4 and keys[-1] != 0:
+            keys[-1] = k
+        elif not keys or k - keys[-1] >= 4:
+            keys.append(k)
+    return keys[:64]
 
 
 def load(project):
@@ -151,7 +157,7 @@ def cmd_prep(a):
             sys.exit("Kling braucht mindestens 3 s.")
         length = min(avail, 15.0)
     real = min(avail, length)  # Luma will genau 5/10 s → Rest mit eingefrorenem letzten Frame auffüllen
-    fps = round(fps_of(a.video)) or 30
+    fps = a.fps or round(fps_of(a.video)) or 30
     if min(w, h) < 720 and a.engine == "kling":
         print("Hinweis: Kling will mind. 720 px – Clip wird hochskaliert.")
     scale = "scale=-2:720" if (a.engine == "kling" and min(w, h) < 720 and w >= h) else \
@@ -367,6 +373,7 @@ def main():
     s.add_argument("--start", type=float, default=0.0, help="Startzeit im Video (s)")
     s.add_argument("--every", type=float, default=2.0, help="Max. Abstand zwischen Keyframes (s)")
     s.add_argument("--scene", type=float, default=0.3, help="Schwelle Schnitterkennung (0–1)")
+    s.add_argument("--fps", type=int, help="Clip auf diese FPS bringen (Standard: wie Quelle)")
     s.add_argument("--at", type=lambda v: [float(x) for x in v.split(",")],
                    help='Keyframes manuell setzen, Sekunden im Clip, z. B. "0,1.5,4"')
 
