@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>HavvamBau Reel v3</title>
+<style>
+@font-face{font-family:Inter;src:url(assets/fonts/inter-latin-600-normal.woff2) format('woff2');font-weight:600}
+@font-face{font-family:Inter;src:url(assets/fonts/inter-latin-800-normal.woff2) format('woff2');font-weight:800}
+:root{--accent:#e3120b;--ink:#0d0d0d;--sage:#b5c4ac;--green:#1e4a4d}
+html,body{margin:0;background:#000}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#fff;font-family:Inter,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#cam{position:absolute;inset:0;background:#fff;transform-origin:540px 960px;isolation:isolate}
+.sc{position:absolute;inset:0;display:none}
+.row{position:absolute;left:0;width:1080px;text-align:center;white-space:nowrap}
+.k{font-weight:800;letter-spacing:-.05em;line-height:1}
+.s{font-weight:600;letter-spacing:-.02em;line-height:1}
+.c{display:inline-block;will-change:transform,opacity,filter}
+.ol{color:transparent;-webkit-text-stroke:2.5px var(--ink)}
+.red{color:var(--accent)}
+#panel{position:absolute;top:-200px;bottom:-200px;left:0;width:0;background:#fff;mix-blend-mode:difference;pointer-events:none}
+#grid{position:absolute;left:110px;top:570px;width:860px;height:860px;border-radius:50%;
+  background-image:linear-gradient(to right,rgba(0,0,0,.22) 1.5px,transparent 1.5px),linear-gradient(to bottom,rgba(0,0,0,.22) 1.5px,transparent 1.5px);
+  background-size:26px 26px;background-position:center;-webkit-mask-image:radial-gradient(circle,#000 62%,transparent 71%)}
+#acc{position:absolute;inset:0;pointer-events:none}
+#dot{position:absolute;left:0;top:0;width:100px;height:100px;margin:-50px 0 0 -50px;border-radius:50%;background:var(--accent);display:none}
+#line{position:absolute;height:7px;background:var(--ink);display:none;transform-origin:0 50%}
+</style>
+</head>
+<body>
+<div id="stage">
+ <div id="cam">
+
+  <!-- A: Ihre Wärmepumpe -->
+  <div class="sc" id="A">
+    <div class="row k ol" id="aG1" data-fit="980" style="top:650px;font-size:150px">Wärmepumpe</div>
+    <div class="row k ol" id="aG2" data-fit="980" style="top:1110px;font-size:150px">Wärmepumpe</div>
+    <div class="row s" id="aS" style="top:790px;font-size:76px">Ihre</div>
+    <div class="row k" id="aW" data-fit="980" style="top:880px;font-size:150px">Wärmepumpe</div>
+  </div>
+
+  <!-- B: bestellt? → Fundament? stack -->
+  <div class="sc" id="B">
+    <div class="row k" id="bW" data-fit="900" style="top:870px;font-size:170px">bestellt?</div>
+    <div id="bStack" style="position:absolute;left:0;top:-41px;width:1080px"></div>
+    <div class="row s" id="bS" style="top:236px"><span id="bSb" style="display:inline-block;background:#0d0d0d;color:#fff;font-size:66px;padding:10px 26px 16px;border-radius:10px">Und das</span></div>
+  </div>
+
+  <!-- C: Sie braucht eine Grundlage. -->
+  <div class="sc" id="C">
+    <div class="row k ol" id="cG" style="top:240px;font-size:1500px;-webkit-text-stroke-width:3px;letter-spacing:0">G</div>
+    <div class="row s" id="cS" style="top:770px;font-size:76px">Sie braucht eine</div>
+    <div class="row k" id="cW" data-fit="980" style="top:880px;font-size:170px">Grundlage.</div>
+  </div>
+
+  <!-- D: cumulative stack -->
+  <div class="sc" id="D">
+    <div id="grid"></div>
+    <div class="row k" id="d0" data-fit="980" style="font-size:160px">Wir machen</div>
+    <div class="row k" id="d1" data-fit="980" data-max="250" style="font-size:160px">Aushub.</div>
+    <div class="row k" id="d2" data-fit="980" data-max="250" style="font-size:160px">Aufmaß.</div>
+    <div class="row k" id="d3" data-fit="980" data-max="250" style="font-size:160px">Fundament<span id="dDot" class="red">.</span></div>
+  </div>
+
+  <!-- H: CTA -->
+  <div class="sc" id="H">
+    <div class="row s" id="hT" style="top:520px;font-size:92px">Jetzt Projekt</div>
+    <div class="row k" id="hB" data-fit="980" data-max="230" style="top:630px;font-size:170px">anfragen<span class="red">.</span></div>
+    <div class="row k" id="hP" data-fit="990" style="top:950px;font-size:126px">0174 5652015</div>
+    <div class="row k" id="hW" data-fit="800" style="top:1150px;font-size:96px">havvambau<span class="red">.</span>de</div>
+    <div id="hL" style="position:absolute;left:200px;top:1380px;width:680px"></div>
+    <div class="row s" id="hR" style="top:1500px;font-size:34px;letter-spacing:.32em;color:#555">AUGSBURG &amp; UMGEBUNG</div>
+  </div>
+
+  <div id="panel"></div>
+
+  <!-- accent layer (never inverted) -->
+  <div id="acc">
+    <svg id="lensSvg" width="1080" height="1920" viewBox="0 0 1080 1920" style="position:absolute;left:0;top:0;display:none;overflow:visible">
+      <defs><path id="lensTxt" d="M60 960 Q540 560 1020 960 Q540 1360 60 960 Z"/></defs>
+      <g id="lensG">
+        <path id="lens" d="M110 960 Q540 640 970 960 Q540 1280 110 960 Z" fill="#0d0d0d"/>
+        <path d="M110 960 L40 950 L40 970 Z M970 960 L1040 950 L1040 970 Z" fill="#0d0d0d"/>
+        <text id="lensT" font-family="Inter" font-weight="800" font-size="50" letter-spacing="-1" fill="#0d0d0d"><textPath href="#lensTxt" id="lensTP" startOffset="0">WIR SCHAFFEN DIE GRUNDLAGE • WIR SCHAFFEN DIE GRUNDLAGE • WIR SCHAFFEN DIE GRUNDLAGE • WIR SCHAFFEN DIE GRUNDLAGE •</textPath></text>
+      </g>
+    </svg>
+    <div id="lensLogo" style="position:absolute;left:250px;top:915px;width:580px;display:none"></div>
+    <div id="line"></div>
+    <div id="dot"></div>
+  </div>
+ </div>
+</div>
+
+<script>
+// ===== music grid (assets/music/track.mp3): 166 BPM, eighth = 0.3615 s =====
+const B0=-0.04,E8=0.3615,beat=k=>B0+E8*k,DROP=beat(16);
+window.DURATION=9.8;
+
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const p=(t,s,d)=>clamp((t-s)/d);
+const lerp=(a,b,x)=>a+(b-a)*x;
+const E={
+  out:x=>1-Math.pow(1-x,3), in:x=>x*x*x, io:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,
+  expo:x=>x>=1?1:1-Math.pow(2,-10*x), expoIn:x=>x<=0?0:Math.pow(2,10*x-10),
+  quint:x=>x<.5?16*x*x*x*x*x:1-Math.pow(-2*x+2,5)/2,
+  back:x=>{const c1=1.7,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)},
+};
+const $=id=>document.getElementById(id);
+let seed=21;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+const show=(el,on)=>{el.style.display=on?'block':'none';};
+
+// ===== logo =====
+const LOGO=[
+ [0,'M71.75 0V703H208V0ZM513 0V703H649.25V0ZM158.25 302.5V422.75H551.25V302.5Z',0],
+ [696,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [1386,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2066,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2746,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [3436,'M71.75 0V703H168L452.5 246.75H397.75L682 703H778.25V0H642.5V469.5L669.25 462.25L471 144H379L181 462.25L207.5 469.5V0Z',0],
+ [4261,'M171.5 0V111H355Q404.25 111 431.75 140.875Q459.25 170.75 459.25 212Q459.25 239.75 446.875 262.875Q434.5 286 411.125 299.5Q387.75 313 355 313H171.5V422.5H340Q381.75 422.5 407.25 443.75Q432.75 465 432.75 507.25Q432.75 549.5 407.25 570.75Q381.75 592 340 592H171.5V703H356.25Q425.75 703 473.125 677.375Q520.5 651.75 544.5 610.375Q568.5 569 568.5 520Q568.5 459.75 532.125 416.25Q495.75 372.75 425.5 351.5L431.75 395.75Q509.5 373.75 552.25 323.25Q595 272.75 595 201.75Q595 145.75 567.375 100.125Q539.75 54.5 487.25 27.25Q434.75 0 360 0ZM71.75 0V703H207V0Z',1],
+ [4867,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',1],
+ [5557,'M349.237 -10.5Q265.974 -10.5 201.27 26.087Q136.566 62.674 99.533 126.641Q62.5 190.607 62.5 271.75V703H198.75V268Q198.75 221.278 218.601 187.053Q238.453 152.827 272.639 134.414Q306.825 116 349.12 116Q392.25 116 425.345 134.394Q458.44 152.788 477.72 186.851Q497 220.915 497 267V703H633.5V270.75Q633.5 189.573 596.953 126.139Q560.407 62.706 496.453 26.103Q432.5 -10.5 349.237 -10.5Z',1],
+];
+function makeLogo(host,cA,cB){
+  const ns='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox','40 -720 6180 750');svg.style.width='100%';svg.style.display='block';svg.style.overflow='hidden';
+  const g=document.createElementNS(ns,'g');g.setAttribute('transform','scale(1 -1)');svg.appendChild(g);
+  const paths=LOGO.map(([x,d,b])=>{const el=document.createElementNS(ns,'path');el.setAttribute('d',d);el.setAttribute('fill',b?cB:cA);el.dataset.x=x;el.setAttribute('transform',`translate(${x} 0)`);g.appendChild(el);return el;});
+  host.appendChild(svg);return paths;
+}
+const lensLogo=makeLogo($('lensLogo'),'#ffffff','#b5c4ac');
+const endLogo=makeLogo($('hL'),'#0d0d0d','#1e4a4d');
+function animLogo(paths,t,s,stag=.035,d=.5){paths.forEach((el,i)=>{const k=E.expo(p(t,s+i*stag,d));el.setAttribute('transform',`translate(${el.dataset.x} ${-(1-k)*760})`);});}
+
+// ===== per-letter helpers =====
+function prep(el){
+  const cs=[];
+  const walk=n=>{
+    if(n.nodeType===3){
+      const f=document.createDocumentFragment();
+      for(const ch of n.textContent){
+        if(ch===' '){f.appendChild(document.createTextNode(' '));continue;}
+        const s=document.createElement('span');s.className='c';s.textContent=ch;s._r=rnd();cs.push(s);f.appendChild(s);
+      }
+      n.parentNode.replaceChild(f,n);
+    }else if(n.nodeType===1&&n.classList.contains('red')){n.classList.add('c');n._r=rnd();cs.push(n);}
+    else [...n.childNodes].forEach(walk);
+  };
+  [...el.childNodes].forEach(walk);el._c=cs;return el;
+}
+function setC(c,k,tr,blur){
+  c.style.opacity=clamp(k*2.5);
+  c.style.transform=tr;
+  c.style.filter=blur>.3?`blur(${blur}px)`:'none';
+}
+// letters fly in with motion blur (stretched + blurred while moving)
+function fly(el,t,s,o={}){
+  const {stag=.03,dur=.42,dx=280,dy=0,rot=0,blur=16,order='lr'}=o; const cs=el._c,n=cs.length;
+  cs.forEach((c,i)=>{const j=order==='rl'?n-1-i:order==='rand'?c._r*n:i;const k=E.expo(p(t,s+j*stag,dur));
+    setC(c,k,`translate(${(1-k)*dx}px,${(1-k)*dy}px) rotate(${(1-k)*rot}deg) scaleX(${1+(1-k)*.7})`,(1-k)*blur);});
+}
+function flyOut(el,t,s,o={}){
+  const {stag=.02,dur=.3,dx=-320,dy=0,blur=18}=o; const cs=el._c;
+  cs.forEach((c,i)=>{const k=E.expoIn(p(t,s+i*stag,dur));if(k<=0)return;
+    setC(c,1-k,`translate(${k*dx}px,${k*dy}px) scaleX(${1+k*.7})`,k*blur);});
+}
+function absPos(el){let x=0,y=0,n=el;while(n&&n.id!=='cam'){x+=n.offsetLeft;y+=n.offsetTop;n=n.offsetParent;}return {x,y,w:el.offsetWidth,h:el.offsetHeight};}
+
+// ===== build =====
+function fit(){
+  document.querySelectorAll('[data-fit]').forEach(el=>{
+    const r=document.createRange();r.selectNodeContents(el);const w=r.getBoundingClientRect().width;
+    const fs=parseFloat(getComputedStyle(el).fontSize);
+    el.style.fontSize=Math.min(+el.dataset.max||400,fs*(+el.dataset.fit)/w)+'px';
+  });
+}
+
+const STACK_N=11,STACK_MID=5,LH=182,STACK_FS=175;
+let stackLines=[],stackA,cA;
+function build(){
+  ['A','B','C','D','H'].forEach(id=>show($(id),true));
+  fit();
+  ['A','B','C','D','H'].forEach(id=>show($(id),false));
+  ['aW','aS','bW','cS','cW','d0','d1','d2','d3','hT','hB','hP','hW','hR'].forEach(id=>prep($(id)));
+  // B: stack of "Fundament?"
+  for(let i=0;i<STACK_N;i++){
+    const d=document.createElement('div');d.className='row k';d.style.cssText=`top:${i*LH}px;font-size:${STACK_FS}px`;d.textContent='Fundament?';
+    $('bStack').appendChild(d);stackLines.push(d);
+  }
+  prep(stackLines[STACK_MID]);
+  stackA=stackLines[STACK_MID]._c[4]; // the "a"
+  // C: scattered start offsets
+  cA=$('cW')._c[6];  // the "a" in Grundlage
+  $('cW')._c.forEach(c=>{c._sx=(rnd()-.5)*1000;c._sy=(rnd()-.5)*1700;c._sr=(rnd()>.5?1:-1)*(90+rnd()*220);});
+}
+
+// ===== timeline =====
+const T={A:0,B:beat(4),C:beat(8),D:beat(12),E:beat(15),F:DROP,G:beat(19),H:beat(20)};
+const BSCROLL=t=>{const k=E.expo(p(t,beat(5),.4));return lerp(1250,0,k)-170*Math.max(0,t-beat(5));};
+
+function panel(t){
+  let x0=0,x1=0;
+  if(t<T.B+.3){
+    x1=lerp(0,760,E.expo(p(t,0,.45))); x1=lerp(x1,1080,E.expo(p(t,beat(2),.25)));
+    x0=1080*E.quint(p(t,T.B,.24));
+  }else if(t>=T.D-.02&&t<T.F){
+    const k1=E.expo(p(t,T.D,.2)), k2=E.expo(p(t,beat(13),.18)), k3=E.expo(p(t,beat(14),.18)), k4=E.expo(p(t,T.E,.2));
+    x0=0;x1=540*k1;                                   // left half
+    x0=lerp(x0,540,k2);x1=lerp(x1,1080,k2);          // jump right
+    x0=lerp(x0,0,k3);x1=lerp(x1,540,k3);             // jump left
+    x1=lerp(x1,x0,k4);                               // close
+  }
+  const el=$('panel'); el.style.left=x0+'px'; el.style.width=Math.max(0,x1-x0)+'px';
+}
+
+// camera: slow push per scene + zoom kicks on hits
+const KICK=[[beat(2),.035],[beat(5),.03],[beat(6),.04],[beat(8),.025],[beat(10),.045],[beat(12),.035],[beat(13),.035],[beat(14),.04],[DROP,.09],[beat(17),.035],[beat(18),.035],[beat(20),.03],[beat(21),.03],[beat(22),.025],[beat(23),.025],[beat(24),.03]];
+const SCN=[0,T.B,T.C,T.D,T.F,T.H,9.8];
+function camera(t){
+  let i=0;while(i<SCN.length-2&&t>=SCN[i+1])i++;
+  const f=p(t,SCN[i],SCN[i+1]-SCN[i]);
+  let z=1+.045*E.io(f), r=(i%2?-1:1)*.5*(f-.5);
+  for(const [s,a] of KICK){const dt=t-s;if(dt>=0&&dt<.8)z+=a*Math.exp(-dt*9);}
+  let sx=0,sy=0;const dd=t-DROP;if(dd>=0&&dd<.5){const e=16*Math.exp(-dd*10);sx=e*Math.sin(dd*70);sy=e*Math.cos(dd*57);}
+  $('cam').style.transform=`translate(${sx}px,${sy}px) scale(${z}) rotate(${r}deg)`;
+}
+
+function sceneA(t){
+  const on=t<T.B+.35; show($('A'),on); if(!on) return;
+  fly($('aS'),t,.02,{dx:-200,stag:.04,dur:.4});
+  fly($('aW'),t,.06,{dx:340,stag:.035,dur:.45});
+  if(t>=T.B){flyOut($('aW'),t,T.B-.04,{dx:-460,stag:.008,dur:.2});flyOut($('aS'),t,T.B-.04,{dx:-460,stag:.008,dur:.2});}
+  const g=E.expo(p(t,beat(3),.5)), go=p(t,beat(3),.1)*(1-p(t,T.B+.05,.2));
+  $('aG1').style.opacity=$('aG2').style.opacity=go*.9;
+  $('aG1').style.transform=`translateX(${(1-g)*-500}px)`; $('aG2').style.transform=`translateX(${(1-g)*500}px)`;
+}
+function sceneB(t){
+  const on=t>=T.B&&t<T.C+.02; show($('B'),on); if(!on) return;
+  fly($('bW'),t,T.B+.14,{dx:300,stag:.03,dur:.36});
+  const ex=E.expoIn(p(t,beat(5)-.06,.22));
+  $('bW').style.transform=`translateY(${-ex*900}px)`; $('bW').style.filter=ex>0?`blur(${ex*20}px)`:'none';
+  const sc=BSCROLL(t); $('bStack').style.transform=`translateY(${sc}px)`;
+  $('bStack').style.display=t>=beat(5)-.05?'block':'none';
+  {const k=E.back(p(t,beat(5)+.08,.35));$('bSb').style.transform=`scale(${lerp(.4,1,k)})`;$('bSb').style.opacity=p(t,beat(5)+.08,.06);}
+  // red "a" on the big hit
+  const rk=p(t,beat(6),.001);
+  stackA.style.color=rk?'var(--accent)':''; stackA.style.transform=`scale(${1+.35*Math.exp(-Math.max(0,t-beat(6))*10)*rk})`;
+  // everything except the red "a" dissolves
+  const dk=E.in(p(t,beat(7),.33));
+  stackLines.forEach((l,i)=>{if(i===STACK_MID)return;l.style.opacity=1-dk;l.style.filter=dk>0?`blur(${dk*24}px)`:'none';});
+  stackLines[STACK_MID]._c.forEach(c=>{if(c===stackA)return;c.style.opacity=1-dk;c.style.filter=dk>0?`blur(${dk*24}px)`:'none';});
+  $('bS').style.opacity=1-dk;
+  stackA.style.visibility=t>=T.C?'hidden':'visible';
+}
+let A_FROM=null, DOT_FROM=null;
+// layout measurements, taken once with every scene visible (frames must not depend on render order)
+function measure(){
+  ['A','B','C','D','H'].forEach(id=>show($(id),true)); $('bStack').style.display='block';
+  const a=absPos(stackA), target=absPos(cA);
+  A_FROM={x:a.x-target.x,y:a.y+BSCROLL(T.C)-target.y,s:STACK_FS/parseFloat($('cW').style.fontSize)};
+  ['d0','d1','d2','d3'].forEach(id=>$(id)._h=$(id).offsetHeight);
+  $('d3').style.top=(LY[0]-$('d3')._h/2)+'px';
+  const d=absPos($('dDot'));
+  DOT_FROM={x:d.x+d.w*.5,y:LY[0]-$('d3')._h/2+$('d3')._h*.8};
+  ['A','B','C','D','H'].forEach(id=>show($(id),false));
+}
+function sceneC(t){
+  const on=t>=T.C&&t<T.D+.02; show($('C'),on); if(!on) return;
+  fly($('cS'),t,T.C+.02,{dx:-260,stag:.03,dur:.38});
+  $('cW')._c.forEach((c,i)=>{
+    if(c===cA){const k=E.io(p(t,T.C,.62));
+      setC(c,1,`translate(${(1-k)*A_FROM.x}px,${(1-k)*A_FROM.y}px) scale(${lerp(A_FROM.s,1,k)})`,0);c.style.color='var(--accent)';return;}
+    const s=T.C+.05+c._r*.28, k=E.expo(p(t,s,.48));
+    setC(c,k*1.2,`translate(${(1-k)*c._sx}px,${(1-k)*c._sy}px) rotate(${(1-k)*c._sr}deg) scale(${lerp(.7,1,k)})`,(1-k)*6);
+    c.style.color=k>.75?'var(--ink)':'var(--accent)';
+  });
+  // big outline G grows, then we zoom through it
+  const g1=E.expo(p(t,beat(10),.5)), g2=E.expoIn(p(t,beat(11)+.05,beat(12)-beat(11)-.05));
+  $('cG').style.opacity=p(t,beat(10),.08)*.9*(1-p(t,T.D-.05,.07));
+  $('cG').style.transform=`scale(${lerp(.3,1,g1)*(1+g2*7)})`;
+  $('cG').style.transformOrigin='540px 900px';
+  $('cW').style.transform=$('cS').style.transform=`scale(${1+g2*2.5})`;
+  $('cW').style.transformOrigin=$('cS').style.transformOrigin='540px 0';
+  $('cW').style.opacity=$('cS').style.opacity=1-p(t,T.D-.12,.12);
+}
+// D: cumulative stack
+const LS=[1,.36,.26,.2], LY=[1010,830,760,708];
+const lv=l=>{const i=Math.min(2,Math.floor(l)),f=l-i;return {s:lerp(LS[i],LS[i+1],f),y:lerp(LY[i],LY[i+1],f)};};
+function sceneD(t){
+  const on=t>=T.D-.02&&t<T.F; show($('D'),on); if(!on) return;
+  const k2=E.expo(p(t,beat(13),.25)), k3=E.expo(p(t,beat(14),.25));
+  const levels=[1+k2+k3, k2+k3, k3, 0];
+  const starts=[T.D-.12,T.D,beat(13),beat(14)];
+  const ex=E.expoIn(p(t,T.E,.22));
+  ['d0','d1','d2','d3'].forEach((id,i)=>{
+    const el=$(id), L=lv(levels[i]);
+    el.style.display=t>=starts[i]-.02?'block':'none';
+    el.style.top=(L.y-el._h/2)+'px';
+    el.style.transform=`scale(${L.s*(1-ex*.35)}) translateY(${ex*-120*(4-i)}px)`;
+    el.style.filter=ex>0?`blur(${ex*20}px)`:'none'; el.style.opacity=1-ex;
+    fly(el,t,starts[i],{dx:i%2?-320:320,stag:.022,dur:.3,blur:18});
+  });
+  $('dDot').style.visibility=t>=T.E?'hidden':'visible';
+  const gk=E.expo(p(t,T.D,.5));
+  $('grid').style.opacity=gk*(1-ex); $('grid').style.transform=`scale(${lerp(.6,1,gk)}) rotate(${(t-T.D)*6}deg)`;
+}
+function dotAndLens(t){
+  const dot=$('dot'), lensS=$('lensSvg');
+  // E: the red full stop becomes the dot
+  if(t>=T.E&&t<DROP+.05){
+    const k=E.io(p(t,T.E,.3)), grow=lerp(.3,1.3,E.out(p(t,T.E,.3)))*(1-.35*E.in(p(t,DROP-.08,.08)));
+    show(dot,true);dot.style.left=lerp(DOT_FROM.x,540,k)+'px';dot.style.top=lerp(DOT_FROM.y,960,k)+'px';dot.style.transform=`scale(${grow})`;
+  }else if(t>=DROP&&t<T.G){show(dot,false);}
+  // F: lens with the logo and the slogan running around it
+  const lOn=t>=DROP&&t<T.G+.45; lensS.style.display=lOn?'block':'none'; show($('lensLogo'),lOn);
+  if(lOn){
+    const k=E.back(p(t,DROP,.45));
+    let pulse=1;for(const b of [beat(17),beat(18)]){const dt=t-b;if(dt>=0)pulse+=.06*Math.exp(-dt*9);}
+    const fall=E.in(p(t,T.G,.38));
+    const tr=`translate(0px,${fall*1500}px) rotate(${fall*14+(1-E.expo(p(t,DROP,.6)))*-8}deg) scale(${Math.max(.001,k)*pulse})`;
+    $('lensG').style.transformOrigin='540px 960px';$('lensG').style.transform=tr;
+    $('lensT').style.opacity=E.out(p(t,DROP+.08,.3));
+    $('lensTP').setAttribute('startOffset',-(t-DROP)*300);
+    const lk=E.expo(p(t,DROP+.06,.4));
+    $('lensLogo').style.transformOrigin='290px 45px';
+    $('lensLogo').style.transform=`translate(0,${fall*1500}px) rotate(${fall*14}deg) scale(${lerp(1.6,1,lk)*pulse})`;
+    $('lensLogo').style.filter=lk<1?`blur(${(1-lk)*16}px)`:'none'; $('lensLogo').style.opacity=lk;
+  }
+  // G: dot pops out of the lens, bounces, rolls right and draws the line
+  if(t>=T.G&&t<T.H+.45){
+    show(dot,true);
+    const LAND=beat(20), ROLL0=LAND+.04, ROLL1=beat(21)-.03;
+    let x,y,sq=1;
+    if(t<LAND){const k=p(t,T.G,LAND-T.G);x=lerp(540,130,k);y=lerp(760,850,k)-420*4*k*(1-k);}
+    else{const k=E.io(p(t,ROLL0,ROLL1-ROLL0));x=lerp(130,1180,k);y=850;const dt=t-LAND;sq=1-.3*Math.exp(-dt*14)*Math.cos(dt*30);}
+    dot.style.left=x+'px';dot.style.top=y+'px';dot.style.transform=`scale(${.8/sq},${.8*sq})`;
+    const ln=$('line'); show(ln,t>=ROLL0);
+    ln.style.left='130px';ln.style.top='884px';ln.style.width=Math.max(0,x-130)+'px';ln.style.opacity=1-p(t,T.H+.12,.25);
+    $('hB').style.clipPath=`inset(-40px ${Math.max(0,1080-x+40)}px -40px 0)`;
+  }else if(t>=T.H+.45){show(dot,false);show($('line'),false);$('hB').style.clipPath='none';}
+}
+function sceneH(t){
+  const on=t>=T.H; show($('H'),on); if(!on) return;
+  fly($('hT'),t,T.H+.12,{dx:-260,stag:.03,dur:.38});
+  // phone number rides in on a wave and flattens
+  const amp=130*(1-E.io(p(t,beat(22)-.1,.6)));
+  $('hP')._c.forEach((c,i)=>{
+    const k=E.out(p(t,beat(22)-.25+i*.025,.42)), ph=i*.75-t*10;
+    setC(c,k,`translate(${(1-k)*700}px,${amp*Math.sin(ph)}px) rotate(${amp*.2*Math.cos(ph)}deg)`,(1-k)*10);
+  });
+  fly($('hW'),t,beat(23)-.18,{dx:300,stag:.025,dur:.36});
+  animLogo(endLogo,t,beat(24)-.08,.03,.45);
+  fly($('hR'),t,beat(24)+.1,{dx:0,dy:30,stag:.015,dur:.4,blur:8});
+}
+
+window.renderFrame=function(t){
+  camera(t); panel(t);
+  sceneA(t); sceneB(t); sceneC(t); sceneD(t); dotAndLens(t); sceneH(t);
+};
+window.ready=(async()=>{
+  await document.fonts.load('800 50px Inter');await document.fonts.load('600 50px Inter');
+  await document.fonts.ready;
+  build();
+  measure();
+  const q=new URLSearchParams(location.search);
+  renderFrame(q.has('t')?+q.get('t'):0);
+  return true;
+})();
+</script>
+</body>
+</html>

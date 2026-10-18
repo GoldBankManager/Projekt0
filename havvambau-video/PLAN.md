@@ -66,3 +66,26 @@ Takte: **0,00 · 2,85 · 5,74 (DROP) · 8,63 (Ausklang)**. Starke Achtel-Hits: 0
 | 7,19–9,80 | **CTA** (Schwenk nach unten, Landung auf 7,55) | Box „Ihr Projekt?“ · **„Jetzt anfragen.“** · **0174 5652015** (Marker-Kreis 7,91) · havvambau.de (Glow 8,27) · „Augsburg & Umgebung“ · „Unverbindlich. Persönlich. Direkt.“ Ruhiger Push-in bis zum Ende. |
 
 **SFX über der Musik** (wie im Referenz-SFX-Pack): Tipp-Klicks beim Buchstaben-Reveal, Whooshes bei den Schwenks, Kamera-Shutter bei Eckwinkeln, Shine beim Glow, Papier-Rascheln beim Notizblock, Marker-Kritzeln beim Kreis, Kies-Rieseln beim Fundament, Riser in den Drop, Impact auf dem Drop, Pops bei den Badges.
+
+---
+
+# Version 3: Kinetische Typografie (`video_v3.html`)
+
+**Feedback:** „Besser machen.“ Neue Stil-Referenz: Instagram-Reel `Den9zOltiZ2` (kinetische Typografie). Musik bleibt `assets/music/track.mp3` (9,8 s, gleiches Beat-Raster).
+
+**Stil der Referenz (85 % übernommen):** reinweißer Grund · fette Grotesk (Inter 800, enges Spacing) · Schwarz/Weiß + **Rot als einziger Akzent** · schwarze Panels, die über das Bild wischen und alles darunter invertieren (Difference-Blend) · Buchstaben fliegen gestaffelt mit Bewegungsunschärfe ein · Outline-Geisterkopien · gestapelte, scrollende Wort-Wiederholungen · verstreute, rotierende rote Buchstaben, die sich zum Wort sortieren · riesiger Outline-Buchstabe als Zoom-Durchflug · kumulativer Wort-Stapel (neues Wort groß, alte schrumpfen nach oben) mit Raster-Kreis · Text, der um eine schwarze Linse läuft · roter Punkt, der rollt und eine Linie zieht · Buchstaben auf einer Welle, die sich glätten.
+**15 % Marke:** HavvamBau-Logo in der Linse und am Ende, Inhalte und Kontakt von havvambau.de. Die Akzentfarbe ist in **einer** Variable (`--accent`) und lässt sich auf Markengrün umstellen.
+
+| Zeit (Beat) | Szene | Animation |
+|---|---|---|
+| 0,00–1,40 | **„Ihre Wärmepumpe“** | Schwarzes Panel wischt rein (Invertierung), Buchstaben fliegen mit Blur ein, auf 0,68 wird das Bild schwarz, Outline-Geister ziehen durch. |
+| 1,40–2,85 | **„bestellt?“ → „Fundament?“** | Panel wischt raus · „bestellt?“ fliegt rein · auf 1,77 füllt ein scrollender Stapel „Fundament?“ das Bild · auf 2,13 wird ein „a“ rot · der Stapel verschwimmt, nur das rote „a“ bleibt. |
+| 2,85–4,30 | **„Sie braucht eine Grundlage.“** | Verstreute rote Buchstaben fliegen rotierend ein und sortieren sich zu „Grundlage.“ (Wort fertig auf 3,57, das „a“ bleibt rot) · riesiges Outline-„G“ wächst · Zoom durch das „G“. |
+| 4,30–5,38 | **Build-up: Wir machen** | Kumulativer Stapel auf den 3 Hits: AUSHUB. (4,30) · AUFMASS. (4,66) · FUNDAMENT. (5,02), Panel springt jeweils die Hälfte, Raster-Kreis dahinter. Der Punkt von „Fundament.“ ist rot. |
+| 5,38–5,74 | **Stille** | Alles fällt weg, nur der rote Punkt bleibt und wächst. |
+| **5,74 DROP** | **Linse** | Der Punkt explodiert zur schwarzen Linse mit dem HAVVAMBAU-Logo, „WIR SCHAFFEN DIE GRUNDLAGE •“ läuft um die Linse, Pulse auf 6,10 / 6,47. |
+| 6,83–7,55 | **Punkt rollt** | Die Linse fällt raus, der rote Punkt springt, rollt und zieht eine Linie, die den CTA aufdeckt. |
+| 7,55–9,80 | **CTA** | „Jetzt Projekt“ / **„anfragen.“** · **0174 5652015** kommt auf einer Welle und glättet sich (7,91) · havvambau**.**de (8,27, roter Punkt) · Logo + „Augsburg & Umgebung“ (8,64) · ruhiger Push-in bis zum Ende. |
+
+**Kamera:** Durchgehender leichter Push-in mit Mikro-Rotation, Kicks auf den Hits, Whip-Zooms an den Szenengrenzen.
+**Sound:** Musik + SFX (Whooshes bei Buchstaben-Flügen, Klicks, Pop beim roten Punkt, Rollgeräusch, Riser in den Drop, Impact auf dem Drop).

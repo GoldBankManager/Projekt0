@@ -149,59 +149,64 @@ def impact(d=1.8):
     return np.tanh((boom + crack) * 1.5) * .9
 
 
-# ---------- cue sheet (matches video_v2.html) ----------
-typing(0.0, .38, 12)                          # "Ihre Wärmepumpe"
-add(whoosh(.5), .05, .25, pan=.4)             # pump slides in
-typing(beat(2) - .06, .34, 10)                # "ist bestellt. Und das"
-add(shutter(), beat(5), .55)                  # viewfinder snaps
-typing(beat(5) + .05, .3, 9, .3)              # "Fundament?"
-add(shine(), beat(6), .8)                     # glow line
-add(pop(), beat(6) - .04, .5)                 # eye icon
-for i in range(3):
-    add(pop(), beat(6) + .16 + i * .09, .4, pan=.2 * i)
-add(whoosh(.36), beat(8) - .2, .7, pan=-.2)   # whip to scene 2
-add(shutter(), beat(8), .5)                   # bracket + label box
-add(stones(.8), beat(8) + .05, .7, pan=.35)   # foundation rises
-typing(beat(9) - .08, .32, 7)                 # "Saubere"
-typing(beat(10) - .18, .3, 10, .3)            # "Grundlage."
-add(shine(), beat(10), .7)
-for i in range(3):
-    add(pop(), beat(10) + .25 + i * .09, .25)
-add(rustle(.5), beat(12) - .35, .8, pan=.2)   # notepad slides in
-add(whoosh(.36), beat(12) - .2, .6, pan=.2)   # whip to scene 3
-typing(beat(12) - .12, .3, 8, .25)
-for b in (12, 13, 14):                        # stamps
-    add(thud(), beat(b) - .03, .5)
-add(scribble(.18), beat(12) + .12, .45)       # check marks
-add(scribble(.18), beat(13) + .12, .45)
-add(scribble(.3), beat(14) + .08, .5)         # circle
-add(riser(DROP - (beat(15) - .1)), beat(15) - .1, .55)   # rush into the drop
-add(impact(), DROP, .75)
-add(shutter(), DROP, .5)
-typing(beat(17) - .12, .24, 8, .25)           # "Wir schaffen die"
-typing(beat(18) - .16, .26, 9, .25)           # "Grundlage."
-add(shine(), beat(18), .6)
-for i in range(6):                            # service badges
-    add(pop(), beat(19) - .1 + i * .09, .3, pan=-.4 + i * .16)
-add(whoosh(.45), beat(20) - .1, .6, pan=-.3)  # whip to CTA
-add(pop(), beat(21) - .12, .4)
-add(shutter(), beat(21), .45)
-typing(beat(21) - .05, .25, 5, .25)           # "Jetzt"
-typing(beat(21) + .08, .26, 8, .25)           # "anfragen."
-typing(beat(22) - .16, .2, 10, .3)            # phone number
-add(scribble(.34), beat(22), .55)             # marker circle
-typing(beat(23) - .2, .25, 9, .22)            # website
-add(shine(), beat(23), .55)
-for i in range(3):
-    add(pop(), beat(24) + i * .09, .35)
+def main():
+    # ---------- cue sheet (matches video_v2.html) ----------
+    typing(0.0, .38, 12)                          # "Ihre Wärmepumpe"
+    add(whoosh(.5), .05, .25, pan=.4)             # pump slides in
+    typing(beat(2) - .06, .34, 10)                # "ist bestellt. Und das"
+    add(shutter(), beat(5), .55)                  # viewfinder snaps
+    typing(beat(5) + .05, .3, 9, .3)              # "Fundament?"
+    add(shine(), beat(6), .8)                     # glow line
+    add(pop(), beat(6) - .04, .5)                 # eye icon
+    for i in range(3):
+        add(pop(), beat(6) + .16 + i * .09, .4, pan=.2 * i)
+    add(whoosh(.36), beat(8) - .2, .7, pan=-.2)   # whip to scene 2
+    add(shutter(), beat(8), .5)                   # bracket + label box
+    add(stones(.8), beat(8) + .05, .7, pan=.35)   # foundation rises
+    typing(beat(9) - .08, .32, 7)                 # "Saubere"
+    typing(beat(10) - .18, .3, 10, .3)            # "Grundlage."
+    add(shine(), beat(10), .7)
+    for i in range(3):
+        add(pop(), beat(10) + .25 + i * .09, .25)
+    add(rustle(.5), beat(12) - .35, .8, pan=.2)   # notepad slides in
+    add(whoosh(.36), beat(12) - .2, .6, pan=.2)   # whip to scene 3
+    typing(beat(12) - .12, .3, 8, .25)
+    for b in (12, 13, 14):                        # stamps
+        add(thud(), beat(b) - .03, .5)
+    add(scribble(.18), beat(12) + .12, .45)       # check marks
+    add(scribble(.18), beat(13) + .12, .45)
+    add(scribble(.3), beat(14) + .08, .5)         # circle
+    add(riser(DROP - (beat(15) - .1)), beat(15) - .1, .55)   # rush into the drop
+    add(impact(), DROP, .75)
+    add(shutter(), DROP, .5)
+    typing(beat(17) - .12, .24, 8, .25)           # "Wir schaffen die"
+    typing(beat(18) - .16, .26, 9, .25)           # "Grundlage."
+    add(shine(), beat(18), .6)
+    for i in range(6):                            # service badges
+        add(pop(), beat(19) - .1 + i * .09, .3, pan=-.4 + i * .16)
+    add(whoosh(.45), beat(20) - .1, .6, pan=-.3)  # whip to CTA
+    add(pop(), beat(21) - .12, .4)
+    add(shutter(), beat(21), .45)
+    typing(beat(21) - .05, .25, 5, .25)           # "Jetzt"
+    typing(beat(21) + .08, .26, 8, .25)           # "anfragen."
+    typing(beat(22) - .16, .2, 10, .3)            # phone number
+    add(scribble(.34), beat(22), .55)             # marker circle
+    typing(beat(23) - .2, .25, 9, .22)            # website
+    add(shine(), beat(23), .55)
+    for i in range(3):
+        add(pop(), beat(24) + i * .09, .35)
 
-music = load_music(sys.argv[1])
-sfx = np.stack([L, R], 1)
-mix = music * 1.0 + sfx * .55
-mix = np.tanh(mix * 1.05) / np.tanh(1.05)
-mix *= .9 / np.abs(mix).max()
-out = sys.argv[2]
-with wave.open(out, 'wb') as w:
-    w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
-    w.writeframes((mix * 32767).astype('<i2').tobytes())
-print('wrote', out)
+    music = load_music(sys.argv[1])
+    sfx = np.stack([L, R], 1)
+    mix = music * 1.0 + sfx * .55
+    mix = np.tanh(mix * 1.05) / np.tanh(1.05)
+    mix *= .9 / np.abs(mix).max()
+    out = sys.argv[2]
+    with wave.open(out, 'wb') as w:
+        w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
+        w.writeframes((mix * 32767).astype('<i2').tobytes())
+    print('wrote', out)
+
+
+if __name__ == '__main__':
+    main()
