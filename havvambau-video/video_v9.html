@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>HavvamBau Reel v9</title>
+<style>
+@font-face{font-family:Outfit;src:url(assets/fonts/outfit-latin.woff2) format('woff2');font-weight:100 900}
+/* HavvamBau brand (havvambau.de): paper, ink, green, sage, muted, line */
+:root{--paper:#ede8df;--white:#f7f5ef;--ink:#221f1b;--muted:#716e63;--green:#1e4a4d;--deep:#1b2e2e;--line:#d2cec2;--sage:#b5c4ac}
+html,body{margin:0;background:#000}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--paper);font-family:Outfit,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#cam{position:absolute;inset:0;transform-origin:540px 960px}
+.sc{position:absolute;inset:0;display:none}
+.row{position:absolute;left:90px;width:900px;text-align:center}
+.h{font-weight:700;font-size:118px;line-height:1.02;letter-spacing:-.025em}
+.m{font-weight:500;font-size:60px;line-height:1.2;color:var(--muted)}
+.lab{font-weight:600;font-size:36px;letter-spacing:.18em;text-transform:uppercase;color:var(--green)}
+.g{color:var(--green)}
+.box{display:inline-block;background:var(--green);color:var(--white);padding:14px 34px 20px;border-radius:14px;font-weight:600;font-size:58px}
+.ln{will-change:transform,opacity}
+.phone{position:absolute;left:300px;top:850px;width:480px;height:939px;overflow:visible}
+.dots{position:absolute;left:0;width:1080px;top:300px;display:flex;justify-content:center;gap:18px}
+.dots i{width:18px;height:18px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--green)}
+#t0 .h,#t1 .h,#t2 .h,#t3 .h{font-size:104px;white-space:nowrap}
+#t0 .m,#t1 .m,#t2 .m,#t3 .m{font-size:54px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <defs>
+  <pattern id="pav" width="40" height="24" patternUnits="userSpaceOnUse"><rect width="40" height="24" fill="#f7f5ef"/><path d="M0 0 H40 M0 12 H40 M10 0 V12 M30 12 V24" stroke="#d2cec2" stroke-width="2.5"/></pattern>
+  <symbol id="phoneI" viewBox="0 0 360 704"><rect width="360" height="704" rx="52" fill="#221f1b"/><rect x="16" y="16" width="328" height="672" rx="38" fill="#f7f5ef"/><rect x="140" y="30" width="80" height="10" rx="5" fill="#221f1b"/></symbol>
+ </defs>
+</svg>
+
+<div id="stage"><div id="cam">
+
+  <!-- 1 Hook -->
+  <div class="sc" id="s1">
+    <div class="row lab ln" style="top:420px">Augsburg &amp; Umgebung</div>
+    <div class="row h ln" style="top:520px">Neuer Weg,<br>Terrasse oder<br><span class="g">Einfahrt</span> geplant?</div>
+    <svg class="ln" style="position:absolute;left:190px;top:1010px;width:700px;height:560px" viewBox="0 0 700 560">
+      <rect x="0" y="300" width="700" height="260" rx="28" fill="#b5c4ac" opacity=".55"/>
+      <rect x="30" y="120" width="230" height="200" rx="10" fill="#f7f5ef" stroke="#221f1b" stroke-width="8"/>
+      <path d="M10 130 L145 30 L280 130" fill="none" stroke="#221f1b" stroke-width="8" stroke-linejoin="round"/>
+      <rect x="120" y="220" width="56" height="100" rx="6" fill="#221f1b"/>
+      <circle cx="560" cy="210" r="88" fill="#1e4a4d"/><rect x="550" y="280" width="20" height="50" fill="#221f1b"/>
+      <path id="path1" d="M148 320 L120 560 H330 L210 320 Z" fill="url(#pav)" stroke="#221f1b" stroke-width="8" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- 2 Entlastung -->
+  <div class="sc" id="s2">
+    <div class="row m ln" style="top:560px">Für ein Angebot brauchen Sie</div>
+    <div class="row h ln" style="top:660px">keinen fertigen Plan.</div>
+    <div class="row ln" style="top:1080px"><span class="lab" style="font-size:40px">Nur diese</span></div>
+    <div class="row ln" style="top:1140px;font-weight:700;font-size:420px;line-height:1;color:var(--green)">4</div>
+    <div class="row h ln" style="top:1560px;font-size:96px">Infos.</div>
+  </div>
+
+  <!-- 3–6 Tips -->
+  <div class="sc" id="tip">
+    <div class="dots" id="dots"><i></i><i></i><i></i><i></i></div>
+    <div class="row lab" id="tipLab" style="top:360px">Info 1 von 4</div>
+  </div>
+  <div class="sc" id="t0">
+    <div class="row h ln" style="top:440px">Fotos vom Bereich</div>
+    <div class="row m ln" style="top:600px">Ein paar Handyfotos reichen – gern aus mehreren Blickwinkeln.</div>
+    <svg class="phone ln" viewBox="0 0 360 704"><use href="#phoneI"/>
+      <svg x="16" y="70" width="328" height="420" viewBox="0 0 700 560" preserveAspectRatio="xMidYMid slice">
+        <rect width="700" height="560" fill="#f7f5ef"/><rect x="0" y="300" width="700" height="260" fill="#b5c4ac" opacity=".55"/>
+        <rect x="30" y="120" width="230" height="200" rx="10" fill="#f7f5ef" stroke="#221f1b" stroke-width="8"/><path d="M10 130 L145 30 L280 130" fill="none" stroke="#221f1b" stroke-width="8"/>
+        <rect x="120" y="220" width="56" height="100" rx="6" fill="#221f1b"/><circle cx="560" cy="210" r="88" fill="#1e4a4d"/><rect x="550" y="280" width="20" height="50" fill="#221f1b"/>
+        <path d="M148 320 L120 560 H330 L210 320 Z" fill="url(#pav)" stroke="#221f1b" stroke-width="8"/>
+      </svg>
+      <g stroke="#1e4a4d" stroke-width="6" fill="none"><path d="M40 92 h36 M40 92 v36 M320 92 h-36 M320 92 v36 M40 468 h36 M40 468 v-36 M320 468 h-36 M320 468 v-36"/></g>
+      <rect id="flash" x="16" y="70" width="328" height="420" fill="#fff" opacity="0"/>
+      <circle cx="180" cy="590" r="46" fill="#f7f5ef" stroke="#221f1b" stroke-width="8"/><circle id="shutter" cx="180" cy="590" r="34" fill="#1e4a4d"/>
+      <g id="thumbs"></g>
+    </svg>
+  </div>
+  <div class="sc" id="t1">
+    <div class="row h ln" style="top:440px">Ungefähre Maße</div>
+    <div class="row m ln" style="top:600px">Länge mal Breite, grob geschätzt. Genaues klären wir vor Ort.</div>
+    <svg class="phone ln" viewBox="0 0 360 704"><use href="#phoneI"/>
+      <rect x="16" y="16" width="328" height="672" rx="38" fill="#b5c4ac" opacity=".45"/>
+      <rect x="80" y="210" width="200" height="290" fill="url(#pav)" stroke="#221f1b" stroke-width="7"/>
+      <g id="dimH" stroke="#1e4a4d" stroke-width="6" fill="#1e4a4d"><path d="M80 170 H280"/><path d="M80 170 l16 -10 v20 Z M280 170 l-16 -10 v20 Z"/></g>
+      <g id="dimV" stroke="#1e4a4d" stroke-width="6" fill="#1e4a4d"><path d="M310 210 V500"/><path d="M310 210 l-10 16 h20 Z M310 500 l-10 -16 h20 Z"/></g>
+      <text id="dimHt" x="180" y="148" text-anchor="middle" font-family="Outfit" font-weight="700" font-size="30" fill="#221f1b">ca. 6 m</text>
+      <text id="dimVt" x="296" y="355" text-anchor="middle" font-family="Outfit" font-weight="700" font-size="30" fill="#221f1b" transform="rotate(90 296 355)" dy="-12">ca. 3 m</text>
+    </svg>
+  </div>
+  <div class="sc" id="t2">
+    <div class="row h ln" style="top:440px">PLZ und Ort</div>
+    <div class="row m ln" style="top:600px">Damit wir Anfahrt und Termin einplanen können.</div>
+    <svg class="phone ln" viewBox="0 0 360 704"><use href="#phoneI"/>
+      <g stroke="#d2cec2" stroke-width="6" fill="none"><path d="M16 300 Q120 280 180 340 T344 360"/><path d="M60 16 Q90 200 180 340 T240 688"/><path d="M16 520 Q150 470 180 340 Q220 260 344 150"/></g>
+      <circle id="ring" cx="180" cy="340" r="130" fill="#b5c4ac" opacity=".35"/>
+      <g id="towns" font-family="Outfit" font-weight="500" font-size="21" fill="#221f1b" text-anchor="middle"></g>
+      <g id="pin"><path d="M180 340 C 150 290, 140 270, 140 250 A40 40 0 0 1 220 250 C 220 270, 210 290, 180 340 Z" fill="#1e4a4d"/><circle cx="180" cy="250" r="15" fill="#f7f5ef"/></g>
+    </svg>
+  </div>
+  <div class="sc" id="t3">
+    <div class="row h ln" style="top:440px">Die Zufahrt</div>
+    <div class="row m ln" style="top:600px">Wie breit ist der Weg in den Garten? Wichtig für den Bagger.</div>
+    <svg class="phone ln" viewBox="0 0 360 704"><use href="#phoneI"/>
+      <rect x="16" y="16" width="328" height="672" rx="38" fill="#b5c4ac" opacity=".45"/>
+      <rect x="44" y="70" width="272" height="200" fill="#f7f5ef" stroke="#221f1b" stroke-width="7"/>
+      <text x="180" y="180" text-anchor="middle" font-family="Outfit" font-weight="600" font-size="28" fill="#716e63">Haus</text>
+      <path d="M16 380 H138 M222 380 H344" stroke="#221f1b" stroke-width="12"/>
+      <g id="gate" stroke="#1e4a4d" stroke-width="6" fill="#1e4a4d"><path d="M138 400 H222"/><path d="M138 400 l14 -9 v18 Z M222 400 l-14 -9 v18 Z"/></g>
+      <text id="gateT" x="180" y="432" text-anchor="middle" font-family="Outfit" font-weight="700" font-size="28" fill="#221f1b">Breite?</text>
+      <g id="dig"><rect x="-34" y="-50" width="14" height="100" rx="5" fill="#221f1b"/><rect x="20" y="-50" width="14" height="100" rx="5" fill="#221f1b"/>
+        <rect x="-24" y="-38" width="48" height="70" rx="8" fill="#f7f5ef" stroke="#221f1b" stroke-width="6"/><path d="M0 -38 V-90" stroke="#221f1b" stroke-width="12" stroke-linecap="round"/>
+        <path d="M-16 -104 H16 L10 -84 H-10 Z" fill="#1e4a4d"/></g>
+    </svg>
+  </div>
+
+  <!-- 7 Persönlich -->
+  <div class="sc" id="s7">
+    <div class="row h ln" style="top:640px">Den Rest klären<br>wir <span class="g">persönlich.</span></div>
+    <div class="row ln" style="top:960px"><span class="box">Eine Anfrage. Kein Auftrag.</span></div>
+    <div class="row m ln" style="top:1120px">Unverbindlich. Persönlich. Direkt.</div>
+  </div>
+
+  <!-- 8 CTA -->
+  <div class="sc" id="s8">
+    <div class="ln" id="logoW" style="position:absolute;left:150px;top:440px;width:780px"></div>
+    <div class="row lab ln" style="top:610px">Ihr Projekt. Unser Handwerk.</div>
+    <div class="row m ln" style="top:800px">Infos schicken auf</div>
+    <div class="row h ln" style="top:880px;font-size:112px">havvambau<span class="g">.</span>de</div>
+    <div class="row m ln" style="top:1090px">oder direkt anrufen</div>
+    <div class="row h ln" style="top:1170px;font-size:112px;color:var(--green)">0174 5652015</div>
+    <div class="row m ln" style="top:1330px;font-size:44px">Ahmet Yüksel · Ihr Ansprechpartner</div>
+    <div class="row lab ln" style="top:1480px">Augsburg &amp; Umgebung</div>
+  </div>
+
+</div></div>
+
+<script>
+// ===== timeline (seconds). Scene starts are placeholders until the full song is in; they will be
+// snapped to its bar downbeats. Each scene holds ≥3.5 s so everything can be read.
+const SC=[
+  ['s1',0.0],['s2',4.0],['t0',8.5],['t1',13.0],['t2',17.5],['t3',22.0],['s7',26.5],['s8',30.5]
+];
+window.DURATION=36.5;
+const FADE=.55;                      // cross-fade between scenes
+const STAG=.35;                      // delay between lines inside a scene
+
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const p=(t,s,d)=>clamp((t-s)/d);
+const lerp=(a,b,x)=>a+(b-a)*x;
+const out3=x=>1-Math.pow(1-x,3), io=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2, back=x=>{const c1=1.4,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+const $=id=>document.getElementById(id);
+const ns='http://www.w3.org/2000/svg';
+
+// ===== logo =====
+const LOGO=[
+ [0,'M71.75 0V703H208V0ZM513 0V703H649.25V0ZM158.25 302.5V422.75H551.25V302.5Z',0],
+ [696,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [1386,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2066,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2746,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [3436,'M71.75 0V703H168L452.5 246.75H397.75L682 703H778.25V0H642.5V469.5L669.25 462.25L471 144H379L181 462.25L207.5 469.5V0Z',0],
+ [4261,'M171.5 0V111H355Q404.25 111 431.75 140.875Q459.25 170.75 459.25 212Q459.25 239.75 446.875 262.875Q434.5 286 411.125 299.5Q387.75 313 355 313H171.5V422.5H340Q381.75 422.5 407.25 443.75Q432.75 465 432.75 507.25Q432.75 549.5 407.25 570.75Q381.75 592 340 592H171.5V703H356.25Q425.75 703 473.125 677.375Q520.5 651.75 544.5 610.375Q568.5 569 568.5 520Q568.5 459.75 532.125 416.25Q495.75 372.75 425.5 351.5L431.75 395.75Q509.5 373.75 552.25 323.25Q595 272.75 595 201.75Q595 145.75 567.375 100.125Q539.75 54.5 487.25 27.25Q434.75 0 360 0ZM71.75 0V703H207V0Z',1],
+ [4867,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',1],
+ [5557,'M349.237 -10.5Q265.974 -10.5 201.27 26.087Q136.566 62.674 99.533 126.641Q62.5 190.607 62.5 271.75V703H198.75V268Q198.75 221.278 218.601 187.053Q238.453 152.827 272.639 134.414Q306.825 116 349.12 116Q392.25 116 425.345 134.394Q458.44 152.788 477.72 186.851Q497 220.915 497 267V703H633.5V270.75Q633.5 189.573 596.953 126.139Q560.407 62.706 496.453 26.103Q432.5 -10.5 349.237 -10.5Z',1],
+];
+(()=>{const svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','40 -720 6180 750');svg.style.width='100%';svg.style.display='block';
+  const g=document.createElementNS(ns,'g');g.setAttribute('transform','scale(1 -1)');svg.appendChild(g);
+  LOGO.forEach(([x,d,b])=>{const el=document.createElementNS(ns,'path');el.setAttribute('d',d);el.setAttribute('fill',b?'#1e4a4d':'#221f1b');el.setAttribute('transform',`translate(${x} 0)`);g.appendChild(el);});
+  $('logoW').appendChild(svg);})();
+
+// ===== build =====
+const thumbs=[];
+for(let i=0;i<3;i++){const g=document.createElementNS(ns,'g');
+  g.innerHTML=`<rect x="-46" y="-58" width="92" height="116" rx="8" fill="#f7f5ef" stroke="#221f1b" stroke-width="5"/><rect x="-38" y="-50" width="76" height="62" fill="#b5c4ac"/><circle cx="16" cy="-30" r="14" fill="#1e4a4d"/><path d="M-28 50 L-18 12 H-2 L14 50 Z" fill="#d2cec2"/>`;
+  $('thumbs').appendChild(g);thumbs.push(g);}
+[['Augsburg',180,376,1],['Friedberg',290,320,0],['Gersthofen',250,170,0],['Neusäß',75,215,0],['Stadtbergen',90,430,0],['Königsbrunn',190,570,0]].forEach(([n,x,y,big])=>{
+  const g=document.createElementNS(ns,'g');g.innerHTML=`<circle cx="${x}" cy="${y-30}" r="${big?9:7}" fill="#221f1b"/><text x="${x}" y="${y}" ${big?'font-weight="700" font-size="25"':''}>${n}</text>`;$('towns').appendChild(g);});
+
+// ===== scene engine: lines fade + rise in one after another, the scene cross-fades out =====
+function scene(id,t,start,end){
+  const el=$(id), on=t>=start-.01&&t<end+FADE; el.style.display=on?'block':'none'; if(!on) return null;
+  const outK=io(p(t,end,FADE));
+  el.style.opacity=1-outK; el.style.transform=`translateY(${-outK*40}px)`;
+  el.querySelectorAll('.ln').forEach((ln,i)=>{const q=out3(p(t,start+.15+i*STAG,.7));ln.style.opacity=q;ln.style.transform=`translateY(${(1-q)*36}px)`;});
+  return t-start;
+}
+function render(t){
+  // gentle continuous push-in
+  $('cam').style.transform=`scale(${1+.012*Math.sin(t*.35)+.01})`;
+  const S=SC.map(([id,s],i)=>({id,s,e:i<SC.length-1?SC[i+1][1]:99}));
+  S.forEach(({id,s,e})=>{
+    if(id[0]==='t') return;
+    scene(id,t,s,e);
+  });
+  // tips share a header with progress dots
+  const tipS=S.filter(x=>x.id[0]==='t'), first=tipS[0].s, last=tipS[3].e;
+  const hOn=t>=first-.01&&t<last+FADE; $('tip').style.display=hOn?'block':'none';
+  if(hOn){const ok=out3(p(t,first,.6))*(1-io(p(t,last,FADE)));$('tip').style.opacity=ok;
+    const idx=clamp(tipS.findIndex(x=>t>=x.s&&t<x.e),0,3);$('tipLab').textContent=`Info ${idx+1} von 4`;
+    [...$('dots').children].forEach((d,i)=>d.className=i<=idx?'on':'');}
+  tipS.forEach(({id,s,e})=>scene(id,t,s,e));
+  // phone animations (relative to each tip's start)
+  const T=Object.fromEntries(S.map(x=>[x.id,x.s]));
+  {const r=t-T.t0;const shots=[1.6,2.2,2.8];let fl=0;
+   shots.forEach((sh,i)=>{const dt=r-sh;if(dt>=0&&dt<.3)fl=Math.max(fl,1-dt/.3);const q=out3(p(r,sh,.6));
+     thumbs[i].setAttribute('transform',`translate(${lerp(180,80+i*100,q)} ${lerp(280,620,q)}) scale(${lerp(1.5,.62,q)}) rotate(${lerp(0,-6+i*6,q)})`);thumbs[i].style.opacity=r>=sh?1:0;});
+   $('flash').setAttribute('opacity',fl*.85);$('shutter').setAttribute('r',shots.some(sh=>r>=sh-.06&&r<sh+.1)?28:34);}
+  {const r=t-T.t1;const h=io(p(r,1.4,.7)),v=io(p(r,2.1,.7));
+   $('dimH').setAttribute('transform',`translate(180 0) scale(${Math.max(.001,h)} 1) translate(-180 0)`);$('dimV').setAttribute('transform',`translate(0 355) scale(1 ${Math.max(.001,v)}) translate(0 -355)`);
+   $('dimHt').style.opacity=p(r,1.9,.3);$('dimVt').style.opacity=p(r,2.6,.3);}
+  {const r=t-T.t2;[...$('towns').children].forEach((g,i)=>{g.style.opacity=out3(p(r,1.2+i*.12,.4));});
+   const q=back(p(r,2.0,.6));$('pin').setAttribute('transform',`translate(0 ${(1-q)*-300})`);$('pin').style.opacity=p(r,2.0,.1);
+   $('ring').setAttribute('r',lerp(10,140,out3(p(r,2.5,1.0))));$('ring').style.opacity=p(r,2.5,.1)*.35;}
+  {const r=t-T.t3;const w=io(p(r,1.4,.6));$('gate').setAttribute('transform',`translate(180 0) scale(${Math.max(.001,w)} 1) translate(-180 0)`);$('gateT').style.opacity=p(r,1.8,.3);
+   $('dig').setAttribute('transform',`translate(180 ${lerp(640,300,io(p(r,2.2,1.8)))})`);}
+}
+window.renderFrame=render;
+window.ready=(async()=>{await document.fonts.load('700 50px Outfit');await document.fonts.load('500 50px Outfit');await document.fonts.ready;
+  const q=new URLSearchParams(location.search);render(q.has('t')?+q.get('t'):0);return true;})();
+</script>
+</body>
+</html>

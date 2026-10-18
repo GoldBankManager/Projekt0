@@ -175,3 +175,14 @@ Takte: **0,00 · 2,85 · 5,74 (DROP) · 8,63 (Ausklang)**. Starke Achtel-Hits: 0
 **Farben (Website-CSS + Logo):** Paper `#ede8df` (Grund) · Ink `#221f1b` (Text, dunkle Szenen, „HAVVAM“) · Green `#1e4a4d` (Akzent, „BAU“) · Sage `#b5c4ac` (Akzent auf dunklem Grund) · Muted/Grau ergibt sich aus der Abbildung.
 **Umsetzung:** Die Szenen sind in Schwarz/Weiß + Rot + Blau gebaut und laufen komplett durch eine affine Farbmatrix (`#brand`, feColorMatrix in sRGB): Schwarz → Ink, Weiß → Paper, Rot → Green, Blau → Sage. Weil sie linear ist, bleiben Kantenglättung, Blur und das Difference-Panel (Schwarz/Weiß-Wechsel) exakt. Gemessen im fertigen MP4: Paper #ece6dd, Ink #221d1a (±2 durch die yuv420p-Kodierung).
 **Auf dunklen Karten (2/4, 4/4):** Maßpfeile, Baggerschaufel, Haken und Fortschrittsbalken in Sage statt Grün, damit sie lesbar bleiben.
+
+---
+
+# Version 9: ruhig und lesbar (`video_v9.html`), wartet auf den ganzen Song
+
+**Feedback:** „Die Hintergrundmusik startet immer wieder neu! Die Szenen vergehen zu schnell, es schaut zu durcheinander aus.“
+**Ursache Musik:** Der gelieferte Clip ist nur 9,8 s lang. In V4–V8 wurde der 2,9-s-Drop-Takt 4–6× wiederholt, das hört man als ständigen Neustart. Lösung: Der Kunde schickt den kompletten Song, das Video wird ohne Wiederholungen darauf geschnitten.
+**Ursache Unruhe:** Pro Takt (2,9 s) liefen Titel, Untertitel, Animation, Fortschritt, Haken und Schwarz/Weiß-Wechsel gleichzeitig.
+**Neu:** eine Aussage pro Szene · 3,5–4,5 s Standzeit · Zeilen blenden nacheinander weich ein (0,7 s, 0,35 s versetzt) · 0,55 s Überblendung · keine Wisch-Panels, kein Buchstaben-Flug · Markenfarben direkt (Paper, Ink, Green, Sage, Muted, Line) · Markenschrift Outfit · 36,5 s.
+**Szenen:** Hook „Neuer Weg, Terrasse oder Einfahrt geplant?“ · „Für ein Angebot brauchen Sie keinen fertigen Plan. Nur diese 4 Infos.“ · Info 1–4 auf dem Smartphone (Fotos, Maße, PLZ/Ort, Zufahrt) · „Den Rest klären wir persönlich. Eine Anfrage. Kein Auftrag. Unverbindlich. Persönlich. Direkt.“ · CTA mit Logo, „Ihr Projekt. Unser Handwerk.“, havvambau.de, 0174 5652015, Ansprechpartner.
+**Nächster Schritt:** Song analysieren (BPM, Takte, Abschnitte) und die Szenenstarts in `SC` auf Taktanfänge legen.
