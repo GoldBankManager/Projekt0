@@ -166,3 +166,12 @@ Takte: **0,00 · 2,85 · 5,74 (DROP) · 8,63 (Ausklang)**. Starke Achtel-Hits: 0
 | 14,4–17,3 | 4/4 **Die Zufahrt.** | Tor vermessen „Breite?“, Minibagger fährt durch |
 | 17,3–20,2 | Marke | „Das war’s.“ · „Den Rest klären wir persönlich.“ · „Eine Anfrage. Kein Auftrag.“ · Logo · Leistungs-Laufband |
 | 20,2–24,3 | CTA | „Infos schicken auf **havvambau.de**“ · „oder direkt anrufen:“ 0174 5652015 · „Ahmet Yüksel · Ihr Ansprechpartner“ · Logo |
+
+---
+
+# Version 8: V7 in Markenfarben (`video_v8.html`, Ton = `sound_v7.py`)
+
+**Feedback:** „Achte darauf, dass die Farben im Video unserem Branding entsprechen.“
+**Farben (Website-CSS + Logo):** Paper `#ede8df` (Grund) · Ink `#221f1b` (Text, dunkle Szenen, „HAVVAM“) · Green `#1e4a4d` (Akzent, „BAU“) · Sage `#b5c4ac` (Akzent auf dunklem Grund) · Muted/Grau ergibt sich aus der Abbildung.
+**Umsetzung:** Die Szenen sind in Schwarz/Weiß + Rot + Blau gebaut und laufen komplett durch eine affine Farbmatrix (`#brand`, feColorMatrix in sRGB): Schwarz → Ink, Weiß → Paper, Rot → Green, Blau → Sage. Weil sie linear ist, bleiben Kantenglättung, Blur und das Difference-Panel (Schwarz/Weiß-Wechsel) exakt. Gemessen im fertigen MP4: Paper #ece6dd, Ink #221d1a (±2 durch die yuv420p-Kodierung).
+**Auf dunklen Karten (2/4, 4/4):** Maßpfeile, Baggerschaufel, Haken und Fortschrittsbalken in Sage statt Grün, damit sie lesbar bleiben.
