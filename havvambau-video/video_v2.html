@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>HavvamBau Reel v2</title>
+<style>
+@font-face{font-family:Inter;src:url(assets/fonts/inter-latin-400-normal.woff2) format('woff2');font-weight:400}
+@font-face{font-family:Inter;src:url(assets/fonts/inter-latin-500-normal.woff2) format('woff2');font-weight:500}
+@font-face{font-family:Inter;src:url(assets/fonts/inter-latin-600-normal.woff2) format('woff2');font-weight:600}
+@font-face{font-family:Inter;src:url(assets/fonts/inter-latin-800-normal.woff2) format('woff2');font-weight:800}
+@font-face{font-family:Anton;src:url(assets/fonts/anton-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:Serif;src:url(assets/fonts/instrument-serif-latin-400-italic.woff2) format('woff2');font-style:italic}
+:root{--paper:#f1f0ee;--ink:#141414;--grey:#4a4a4a;--line:#8f8f8f;--orange:#ff6d12;--brown:#8a3b10;--green:#1e4a4d}
+html,body{margin:0;background:#000}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--paper);font-family:Inter,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#view{position:absolute;inset:0;transform-origin:540px 960px}
+.board{position:absolute;left:0;top:0;width:1080px;transform-origin:0 0;background-color:var(--paper);
+  background-image:linear-gradient(to right,rgba(0,0,0,.055) 2px,transparent 2px),linear-gradient(to bottom,rgba(0,0,0,.055) 2px,transparent 2px);
+  background-size:72px 72px;background-position:-1px -1px}
+#b1{height:6300px}#b2{height:4000px}
+.a{position:absolute;white-space:nowrap}
+.ch{display:inline-block;will-change:transform,opacity,filter}
+.sh{text-shadow:0 8px 18px rgba(0,0,0,.13)}
+.lbox{background:#121212;color:#fff;font-weight:600;padding:.06em .3em .12em;border-radius:8px;box-shadow:0 12px 26px rgba(0,0,0,.28);transform-origin:50% 50%}
+.lex{font-size:23px;line-height:1.2;color:#262626;white-space:normal}
+.lex b{font-weight:800}
+.badges{display:flex;gap:10px;padding:9px;border:4px solid #121212;border-radius:14px;background:#fff;box-shadow:0 10px 22px rgba(0,0,0,.14)}
+.badge{border:3px solid #121212;border-radius:8px;padding:2px 14px 5px;font-weight:800;font-size:34px;transform-origin:50% 50%}
+.brk{position:absolute;width:120px;height:120px;border-left:18px solid #121212;border-top:18px solid #121212;filter:drop-shadow(8px 12px 10px rgba(0,0,0,.35))}
+.vf{position:absolute;width:30px;height:30px;border-left:7px solid #222;border-top:7px solid #222;filter:drop-shadow(2px 3px 3px rgba(0,0,0,.3))}
+.glow{position:absolute;height:9px;border-radius:5px;background:var(--orange);transform-origin:0 50%;mix-blend-mode:multiply;
+  box-shadow:0 0 10px 3px rgba(255,110,20,.95),0 0 36px 12px rgba(255,140,40,.5)}
+.obj{position:absolute;overflow:visible}
+.soft{filter:drop-shadow(18px 30px 26px rgba(0,0,0,.30)) drop-shadow(4px 8px 6px rgba(0,0,0,.18))}
+.bp{fill:none;stroke:#929292;stroke-width:1.8}
+.bpt{font-family:Inter;font-size:20px;fill:#8c8c8c}
+.noteW{position:absolute;filter:drop-shadow(0 34px 30px rgba(0,0,0,.26)) drop-shadow(0 6px 6px rgba(0,0,0,.14))}
+.note{position:relative;width:540px;height:860px;background-color:#fbfbfa;
+  background-image:repeating-linear-gradient(to bottom,transparent 0 50px,#d5d9df 50px 52px);background-position:0 120px;background-size:100% calc(100% - 140px);background-repeat:no-repeat;
+  clip-path:polygon(0 0,100% 0,100% 97%,96% 99%,90% 97.6%,82% 99.3%,74% 97.8%,66% 99.4%,57% 97.9%,48% 99.5%,40% 98%,31% 99.3%,22% 97.7%,13% 99.4%,6% 97.8%,0 99%)}
+.hole{position:absolute;top:26px;width:26px;height:26px;border-radius:50%;background:#3a3a3a;box-shadow:inset 0 3px 4px rgba(0,0,0,.6),0 0 0 3px #e7e7e5}
+.stamp{font-family:Anton;font-size:100px;line-height:1;color:#1b1b1b;letter-spacing:.005em}
+.serif{font-family:Serif;font-style:italic;font-weight:400}
+#fg{position:absolute;inset:0;pointer-events:none}
+.fgi{position:absolute;filter:blur(13px) drop-shadow(10px 20px 20px rgba(0,0,0,.3));transform-origin:50% 50%}
+#flash{position:absolute;inset:0;background:#fff;opacity:0}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse 75% 65% at 50% 48%,rgba(0,0,0,0) 55%,rgba(40,30,25,.20) 100%)}
+#grain{position:absolute;left:-200px;top:-200px;width:1480px;height:2320px;opacity:.085;mix-blend-mode:multiply}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="mb" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB"><feGaussianBlur id="mbBlur" stdDeviation="0 0"/></filter>
+    <linearGradient id="pBody" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e4e1da"/></linearGradient>
+    <linearGradient id="pSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dcd8cf"/><stop offset="1" stop-color="#b9b4a9"/></linearGradient>
+    <radialGradient id="pFan" cx=".45" cy=".4" r=".7"><stop offset="0" stop-color="#4a463f"/><stop offset="1" stop-color="#1c1a17"/></radialGradient>
+    <linearGradient id="concG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0ddd5"/><stop offset="1" stop-color="#c3beb2"/></linearGradient>
+    <linearGradient id="concTop" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#eeece7"/><stop offset="1" stop-color="#dcd9d1"/></linearGradient>
+    <linearGradient id="soilG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e5a49"/><stop offset="1" stop-color="#4f4034"/></linearGradient>
+    <pattern id="gravelP" width="46" height="36" patternUnits="userSpaceOnUse">
+      <rect width="46" height="36" fill="#b9b3a6"/>
+      <ellipse cx="10" cy="9" rx="8" ry="6" fill="#9d9688"/><ellipse cx="31" cy="12" rx="9" ry="6.5" fill="#d2ccc0"/>
+      <ellipse cx="19" cy="27" rx="8" ry="5.5" fill="#8c8578"/><ellipse cx="40" cy="30" rx="6" ry="4.5" fill="#aaa497"/>
+    </pattern>
+    <pattern id="soilP" width="120" height="90" patternUnits="userSpaceOnUse">
+      <ellipse cx="25" cy="30" rx="9" ry="5" fill="rgba(255,255,255,.08)"/><ellipse cx="85" cy="70" rx="7" ry="4" fill="rgba(0,0,0,.14)"/>
+      <ellipse cx="100" cy="18" rx="5" ry="3" fill="rgba(255,255,255,.06)"/>
+    </pattern>
+    <linearGradient id="penG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a4a4a"/><stop offset=".35" stop-color="#1a1a1a"/><stop offset="1" stop-color="#2e2e2e"/></linearGradient>
+    <linearGradient id="metalG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e9e9e9"/><stop offset=".5" stop-color="#9a9a9a"/><stop offset="1" stop-color="#cfcfcf"/></linearGradient>
+    <radialGradient id="pinG" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ff9a5a"/><stop offset="1" stop-color="#b8420c"/></radialGradient>
+    <filter id="grainF"><feTurbulence id="turb" type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="3"/><feColorMatrix type="saturate" values="0"/></filter>
+
+    <symbol id="pumpS" viewBox="0 0 340 280">
+      <path d="M300 22 L334 6 L334 238 L300 258 Z" fill="url(#pSide)"/>
+      <path d="M16 22 L50 6 L334 6 L300 22 Z" fill="#f6f4ef"/>
+      <rect x="0" y="22" width="300" height="236" rx="14" fill="url(#pBody)"/>
+      <path d="M228 22 H286 Q300 22 300 36 V244 Q300 258 286 258 H228 Z" fill="rgba(0,0,0,.05)"/>
+      <circle cx="116" cy="140" r="93" fill="#d6d2c8"/>
+      <circle cx="116" cy="140" r="84" fill="url(#pFan)"/>
+      <g fill="#6a665e">
+        <path d="M116 140 C 104 98, 130 66, 154 68 C 154 98, 140 122, 116 140 Z"/>
+        <path d="M116 140 C 104 98, 130 66, 154 68 C 154 98, 140 122, 116 140 Z" transform="rotate(120 116 140)"/>
+        <path d="M116 140 C 104 98, 130 66, 154 68 C 154 98, 140 122, 116 140 Z" transform="rotate(240 116 140)"/>
+      </g>
+      <g fill="none" stroke="#8d887e" stroke-width="3"><circle cx="116" cy="140" r="30"/><circle cx="116" cy="140" r="54"/><circle cx="116" cy="140" r="76"/><path d="M34 140 H198 M116 58 V222"/></g>
+      <circle cx="116" cy="140" r="12" fill="#d3cfc5"/>
+      <g stroke="#bdb7ab" stroke-width="7" stroke-linecap="round"><path d="M244 60 H284 M244 82 H284 M244 104 H284 M244 126 H284 M244 148 H284 M244 170 H284 M244 192 H284 M244 214 H284"/></g>
+      <rect x="22" y="258" width="58" height="16" rx="3" fill="#2f2c28"/><rect x="220" y="258" width="58" height="16" rx="3" fill="#2f2c28"/>
+    </symbol>
+
+    <symbol id="foundS" viewBox="0 -170 560 650">
+      <path d="M0 120 L440 120 L510 74 L70 74 Z" fill="url(#concTop)"/>
+      <path d="M440 120 L510 74 L510 144 L440 190 Z" fill="#b5b0a4"/>
+      <path d="M440 190 L510 144 L510 254 L440 300 Z" fill="url(#gravelP)"/><path d="M440 190 L510 144 L510 254 L440 300 Z" fill="rgba(0,0,0,.22)"/>
+      <path d="M440 300 L510 254 L510 424 L440 470 Z" fill="#45382d"/>
+      <rect x="0" y="120" width="440" height="70" fill="url(#concG)"/>
+      <rect x="0" y="190" width="440" height="110" fill="url(#gravelP)"/>
+      <rect x="0" y="300" width="440" height="170" fill="url(#soilG)"/><rect x="0" y="300" width="440" height="170" fill="url(#soilP)"/>
+      <rect x="0" y="188" width="440" height="4" fill="rgba(0,0,0,.12)"/><rect x="0" y="298" width="440" height="4" fill="rgba(0,0,0,.18)"/>
+      <use href="#pumpS" x="92" y="-150" width="300" height="247"/>
+    </symbol>
+
+    <symbol id="penS" viewBox="0 0 720 44">
+      <path d="M0 22 L56 12 L56 32 Z" fill="#7a7a7a"/><path d="M0 22 L14 19.5 L14 24.5 Z" fill="#222"/>
+      <rect x="56" y="8" width="60" height="28" rx="3" fill="url(#metalG)"/>
+      <rect x="114" y="5" width="560" height="34" rx="12" fill="url(#penG)"/>
+      <rect x="430" y="0" width="200" height="10" rx="5" fill="url(#metalG)"/>
+      <rect x="660" y="5" width="56" height="34" rx="14" fill="url(#penG)"/>
+      <rect x="120" y="9" width="540" height="4" rx="2" fill="rgba(255,255,255,.18)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="stage">
+ <div id="view">
+
+  <!-- ================= BOARD 1: hook → grundlage → notepad ================= -->
+  <div id="b1" class="board">
+    <svg class="obj" style="left:0;top:0" width="1080" height="6300">
+      <circle cx="1560" cy="-420" r="1560" class="bp" style="stroke:#a5a5a5"/>
+      <circle cx="-700" cy="2350" r="1250" class="bp" style="stroke:#a5a5a5"/>
+      <circle cx="1700" cy="4300" r="1150" class="bp" style="stroke:#b0b0b0"/>
+      <!-- blueprint (scene 2) -->
+      <g id="bp1">
+        <rect x="690" y="2180" width="300" height="250" class="bp" pathLength="1"/>
+        <rect x="750" y="2228" width="180" height="150" class="bp" pathLength="1"/>
+        <path d="M690 2180 L750 2228 M990 2180 L930 2228 M690 2430 L750 2378 M990 2430 L930 2378" class="bp" pathLength="1"/>
+        <path d="M690 2150 H990 M690 2140 V2160 M990 2140 V2160 M1020 2180 V2430 M1010 2180 H1030 M1010 2430 H1030" class="bp" pathLength="1"/>
+        <path d="M600 2300 H680 M600 2290 V2310" class="bp" pathLength="1"/>
+        <circle cx="620" cy="2420" r="26" class="bp" pathLength="1"/><path d="M590 2420 H650 M620 2390 V2450" class="bp" pathLength="1"/>
+        <path d="M60 3760 H520 M60 3760 V3980 M60 3980 H520 M120 3760 V3980 M200 3760 L120 3840 M280 3760 L120 3920 M360 3760 L180 3980 M440 3760 L260 3980 M520 3760 L340 3980 M520 3840 L420 3980" class="bp" pathLength="1"/>
+        <path d="M40 3700 H540 M40 3690 V3710 M540 3690 V3710" class="bp" pathLength="1"/>
+        <path d="M580 3760 V3980 M570 3760 H590 M570 3980 H590" class="bp" pathLength="1"/>
+      </g>
+      <g id="bp1t" opacity="0">
+        <text x="700" y="2128" class="bpt">Detail 1</text><text x="1036" y="2312" class="bpt" transform="rotate(90 1036 2312)">Ansicht A</text>
+        <text x="60" y="3684" class="bpt">Schnitt A–A</text><text x="596" y="3880" class="bpt">M 1:20</text>
+      </g>
+    </svg>
+
+    <!-- ===== scene 1: hook ===== -->
+    <div class="obj" id="logo1" style="left:72px;top:150px;width:300px"></div>
+    <div class="a" id="tag1" style="left:72px;top:205px;font-size:22px;font-weight:600;letter-spacing:.22em;color:#777">AUGSBURG &amp; UMGEBUNG</div>
+    <svg class="obj" id="bar1" style="left:800px;top:300px" width="200" height="80"></svg>
+    <div class="a sh" id="h1" style="left:84px;top:440px;font-size:96px;letter-spacing:-.045em"><span style="font-weight:400;color:#3c3c3c">Ihre </span><span style="font-weight:800">Wärmepumpe</span></div>
+    <div class="a sh" id="h2" style="left:250px;top:565px;font-size:72px;font-weight:400;letter-spacing:-.04em;color:#333">ist bestellt. Und das</div>
+    <div class="vf" id="vf1" style="left:58px;top:678px"></div>
+    <div class="vf" id="vf2" style="left:992px;top:678px;transform:scaleX(-1)"></div>
+    <div class="vf" id="vf3" style="left:58px;top:858px;transform:scaleY(-1)"></div>
+    <div class="vf" id="vf4" style="left:992px;top:858px;transform:scale(-1,-1)"></div>
+    <svg class="obj" id="eye1" style="left:96px;top:722px" width="104" height="104" viewBox="0 0 104 104"><circle cx="52" cy="52" r="34" fill="none" stroke="#141414" stroke-width="10"/><circle cx="52" cy="52" r="15" fill="#141414"/></svg>
+    <div class="a sh" id="h3" style="left:214px;top:700px;font-size:128px;font-weight:800;letter-spacing:-.05em">Fundament?</div>
+    <div class="glow" id="glow1" style="left:80px;top:777px;width:910px"></div>
+    <div class="a badges" id="bd1" style="left:476px;top:900px"><span class="badge">Aushub</span><span class="badge">Fundament</span><span class="badge">Pflaster</span></div>
+    <svg class="obj soft" id="pump1" style="left:560px;top:1080px;width:440px;height:362px;transform-origin:50% 100%" viewBox="0 0 340 280"><use href="#pumpS"/></svg>
+    <div class="a lex" id="lex1" style="left:96px;top:1180px;width:420px"><b>Wärmepumpe –</b> Die Außeneinheit braucht einen tragfähigen, ebenen Aufstellplatz. Bevor sie steht, wird ausgehoben, vermessen und befestigt.</div>
+
+    <!-- ===== scene 2: grundlage ===== -->
+    <div class="brk" id="brk1" style="left:84px;top:2370px"></div>
+    <div class="a lbox" id="box1" style="left:190px;top:2440px;font-size:58px">Sie braucht eine</div>
+    <div class="a sh" id="h4" style="left:150px;top:2555px;font-size:150px;font-weight:400;letter-spacing:-.05em;color:#2a2a2a">Saubere</div>
+    <div class="a sh" id="h5" style="left:236px;top:2715px;font-size:150px;font-weight:800;letter-spacing:-.055em">Grundlage.</div>
+    <div class="glow" id="glow2" style="left:236px;top:2862px;width:770px"></div>
+    <div class="a lex" id="lex2" style="left:96px;top:2990px;width:390px"><b>Grundlage –</b> Aushub, Aufmaß, Kiesbett und Fundament. Sauber geplant, präzise umgesetzt, damit die Anlage sicher und gerade steht.</div>
+    <svg class="obj soft" id="found1" style="left:430px;top:3020px;width:720px;height:836px" viewBox="0 -170 560 650"><use href="#foundS"/></svg>
+    <div class="a" id="lb1" style="left:150px;top:3395px;font-size:28px;font-weight:600;color:#333">Beton <span style="display:inline-block;width:150px;height:2px;background:#333;vertical-align:middle"></span></div>
+    <div class="a" id="lb2" style="left:150px;top:3520px;font-size:28px;font-weight:600;color:#333">Kiesbett <span style="display:inline-block;width:110px;height:2px;background:#333;vertical-align:middle"></span></div>
+    <div class="a" id="lb3" style="left:150px;top:3690px;font-size:28px;font-weight:600;color:#333">Erdreich <span style="display:inline-block;width:110px;height:2px;background:#333;vertical-align:middle"></span></div>
+
+    <!-- ===== scene 3: notepad ===== -->
+    <svg class="obj soft" id="pen1" style="left:-170px;top:4400px;width:720px;height:44px;transform:rotate(-2.5deg)" viewBox="0 0 720 44"><use href="#penS"/></svg>
+    <svg class="obj soft" id="pen2" style="left:560px;top:5990px;width:720px;height:44px;transform:rotate(-3.5deg)" viewBox="0 0 720 44"><use href="#penS"/></svg>
+    <div class="noteW" id="noteW" style="left:270px;top:4640px">
+      <div class="note" id="note">
+        <div id="holes"></div>
+        <div class="a serif" id="nh" style="left:46px;top:122px;font-size:62px;color:#2b2b2b">Wir übernehmen:</div>
+        <div class="a stamp" id="st1" style="left:46px;top:250px">AUSHUB</div>
+        <div class="a stamp" id="st2" style="left:46px;top:390px">AUFMASS</div>
+        <div class="a stamp" id="st3" style="left:46px;top:530px">FUNDAMENT</div>
+        <svg class="obj" style="left:0;top:0" width="540" height="860">
+          <path id="ck1" d="M346 296 l18 22 l40 -54" fill="none" stroke="#8a3b10" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="1"/>
+          <path id="ck2" d="M396 436 l18 22 l40 -54" fill="none" stroke="#8a3b10" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" pathLength="1"/>
+          <path id="circ1" transform="translate(-6 -22)" d="M268 552 C 120 548, 22 568, 26 600 C 30 640, 200 668, 330 664 C 470 660, 530 630, 520 596 C 510 562, 390 542, 250 546 C 170 549, 110 556, 92 566" fill="none" stroke="#8a3b10" stroke-width="7" stroke-linecap="round" pathLength="1"/>
+        </svg>
+      </div>
+      <svg class="obj" id="pin" style="left:452px;top:8px" width="70" height="80" viewBox="0 0 70 80"><path d="M30 44 L22 74" stroke="#9a9a9a" stroke-width="4" stroke-linecap="round"/><circle cx="34" cy="30" r="20" fill="url(#pinG)"/><ellipse cx="28" cy="23" rx="7" ry="5" fill="rgba(255,255,255,.55)"/></svg>
+    </div>
+  </div>
+
+  <!-- ================= BOARD 2: drop → brand → CTA ================= -->
+  <div id="b2" class="board" style="display:none">
+    <svg class="obj" style="left:0;top:0" width="1080" height="4000">
+      <circle cx="-500" cy="300" r="1100" class="bp" style="stroke:#a8a8a8"/>
+      <circle cx="1650" cy="2100" r="1250" class="bp" style="stroke:#a8a8a8"/>
+      <g class="bp" style="stroke:#a0a0a0">
+        <rect x="760" y="1520" width="240" height="190"/><rect x="805" y="1556" width="150" height="118"/>
+        <path d="M760 1490 H1000 M760 1480 V1500 M1000 1480 V1500"/>
+        <path d="M70 3500 H430 M70 3490 V3510 M430 3490 V3510 M70 3540 H430 V3760 H70 Z M70 3540 L290 3760 M150 3540 L370 3760 M230 3540 L430 3740"/>
+      </g>
+    </svg>
+    <div class="a" id="tag2" style="left:0;width:1080px;text-align:center;top:500px;font-size:24px;font-weight:600;letter-spacing:.24em;color:#6e6e6e">IHR PROJEKT. UNSER HANDWERK.</div>
+    <svg class="obj" id="bar2" style="left:810px;top:380px" width="190" height="72"></svg>
+    <div class="brk" id="brk2" style="left:96px;top:600px"></div>
+    <div class="brk" id="brk3" style="left:864px;top:1210px;transform:rotate(180deg)"></div>
+    <div class="obj" id="logo2" style="left:120px;top:760px;width:840px;filter:drop-shadow(0 12px 18px rgba(0,0,0,.16))"></div>
+    <div class="a sh" id="sl1" style="left:0;width:1080px;text-align:center;top:930px;font-size:56px;font-weight:500;letter-spacing:-.03em;color:#333">Wir schaffen die</div>
+    <div class="a serif sh" id="sl2" style="left:0;width:1080px;text-align:center;top:985px;font-size:150px;color:#141414">Grundlage.</div>
+    <div class="glow" id="glow3" style="left:290px;top:1128px;width:500px"></div>
+    <div class="a" id="bd2w" style="left:0;width:1080px;top:1300px;display:flex;flex-wrap:wrap;justify-content:center;gap:14px;white-space:normal">
+      <span class="badge" style="background:#fff">Erdarbeiten</span><span class="badge" style="background:#fff">Pflaster</span><span class="badge" style="background:#fff">Gartenbau</span>
+      <span class="badge" style="background:#fff">Umbau</span><span class="badge" style="background:#fff">Abbruch</span><span class="badge" style="background:#fff">Montage</span>
+    </div>
+    <div class="a lex" id="lex3" style="left:96px;top:1560px;width:430px"><b>HavvamBau –</b> Erdarbeiten, Fundamente, Pflaster und Außenanlagen. Renovierung, Umbau und Montage in Augsburg &amp; Umgebung.</div>
+
+    <!-- CTA -->
+    <div class="obj" id="logo3" style="left:330px;top:2290px;width:420px"></div>
+    <div class="brk" id="brk4" style="left:70px;top:2390px"></div>
+    <div class="brk" id="brk5" style="left:890px;top:3330px;transform:rotate(180deg)"></div>
+    <div class="a lbox" id="box2" style="left:170px;top:2450px;font-size:60px">Ihr Projekt?</div>
+    <div class="a sh" id="c1" style="left:130px;top:2560px;font-size:150px;font-weight:400;letter-spacing:-.05em;color:#2a2a2a">Jetzt</div>
+    <div class="a sh" id="c2" style="left:220px;top:2715px;font-size:150px;font-weight:800;letter-spacing:-.055em">anfragen.</div>
+    <div class="a" id="c3" style="left:0;width:1080px;text-align:center;top:2925px;font-family:Anton;font-size:150px;line-height:1;color:#1b1b1b;text-shadow:0 8px 18px rgba(0,0,0,.12)">0174 5652015</div>
+    <svg class="obj" style="left:0;top:2890px" width="1080" height="260">
+      <path id="circ2" d="M560 34 C 300 26, 70 52, 66 120 C 62 196, 330 236, 560 232 C 820 228, 1020 196, 1014 120 C 1008 50, 780 22, 520 30 C 380 34, 250 46, 200 58" fill="none" stroke="#8a3b10" stroke-width="9" stroke-linecap="round" pathLength="1"/>
+    </svg>
+    <div class="a sh" id="c4" style="left:0;width:1080px;text-align:center;top:3165px;font-size:74px;font-weight:800;letter-spacing:-.035em;color:var(--green)">havvambau.de</div>
+    <div class="glow" id="glow4" style="left:300px;top:3262px;width:480px"></div>
+    <div class="a" id="bd3w" style="left:0;width:1080px;top:3330px;display:flex;justify-content:center">
+      <div class="badges"><span class="badge">Unverbindlich</span><span class="badge">Persönlich</span><span class="badge">Direkt</span></div>
+    </div>
+    <svg class="obj soft" id="found2" style="left:690px;top:3480px;width:430px;height:500px" viewBox="0 -170 560 650"><use href="#foundS"/></svg>
+    <div class="a lex" id="lex4" style="left:110px;top:3500px;width:470px"><b>Projekt anfragen –</b> Vorhaben kurz schildern, Details persönlich abstimmen, sauber umsetzen. Augsburg &amp; Umgebung.</div>
+  </div>
+ </div>
+
+ <!-- foreground depth-of-field layer -->
+ <div id="fg">
+   <svg class="fgi" id="fg1" width="560" height="461" viewBox="0 0 340 280"><use href="#pumpS"/></svg>
+   <svg class="fgi" id="fg2" width="760" height="46" viewBox="0 0 720 44"><use href="#penS"/></svg>
+   <svg class="fgi" id="fg3" width="560" height="461" viewBox="0 0 340 280"><use href="#pumpS"/></svg>
+   <svg class="fgi" id="fg4" width="700" height="44" viewBox="0 0 720 44"><use href="#penS"/></svg>
+ </div>
+ <div id="vig"></div>
+ <svg id="grain" width="1480" height="2320"><rect width="1480" height="2320" filter="url(#grainF)"/></svg>
+ <div id="flash"></div>
+</div>
+
+<script>
+// ===== music grid (assets/music/track.mp3): 166 BPM, eighth = 0.3615 s =====
+const B0=-0.04, E8=0.3615;
+const beat=k=>B0+E8*k;               // k-th eighth note
+const DROP=beat(16);                 // 5.742
+window.DURATION=9.8;
+
+// ===== math =====
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const p=(t,s,d)=>clamp((t-s)/d);
+const lerp=(a,b,x)=>a+(b-a)*x;
+const E={
+  out:x=>1-Math.pow(1-x,3), in:x=>x*x*x, io:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,
+  sine:x=>-(Math.cos(Math.PI*x)-1)/2, expo:x=>x>=1?1:1-Math.pow(2,-10*x), expoIn:x=>x<=0?0:Math.pow(2,10*x-10),
+  quint:x=>x<.5?16*x*x*x*x*x:1-Math.pow(-2*x+2,5)/2,
+  back:x=>{const c1=1.6,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)},
+};
+const $=id=>document.getElementById(id);
+let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+
+// ===== logo =====
+const LOGO=[
+ [0,'M71.75 0V703H208V0ZM513 0V703H649.25V0ZM158.25 302.5V422.75H551.25V302.5Z',0],
+ [696,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [1386,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2066,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2746,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [3436,'M71.75 0V703H168L452.5 246.75H397.75L682 703H778.25V0H642.5V469.5L669.25 462.25L471 144H379L181 462.25L207.5 469.5V0Z',0],
+ [4261,'M171.5 0V111H355Q404.25 111 431.75 140.875Q459.25 170.75 459.25 212Q459.25 239.75 446.875 262.875Q434.5 286 411.125 299.5Q387.75 313 355 313H171.5V422.5H340Q381.75 422.5 407.25 443.75Q432.75 465 432.75 507.25Q432.75 549.5 407.25 570.75Q381.75 592 340 592H171.5V703H356.25Q425.75 703 473.125 677.375Q520.5 651.75 544.5 610.375Q568.5 569 568.5 520Q568.5 459.75 532.125 416.25Q495.75 372.75 425.5 351.5L431.75 395.75Q509.5 373.75 552.25 323.25Q595 272.75 595 201.75Q595 145.75 567.375 100.125Q539.75 54.5 487.25 27.25Q434.75 0 360 0ZM71.75 0V703H207V0Z',1],
+ [4867,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',1],
+ [5557,'M349.237 -10.5Q265.974 -10.5 201.27 26.087Q136.566 62.674 99.533 126.641Q62.5 190.607 62.5 271.75V703H198.75V268Q198.75 221.278 218.601 187.053Q238.453 152.827 272.639 134.414Q306.825 116 349.12 116Q392.25 116 425.345 134.394Q458.44 152.788 477.72 186.851Q497 220.915 497 267V703H633.5V270.75Q633.5 189.573 596.953 126.139Q560.407 62.706 496.453 26.103Q432.5 -10.5 349.237 -10.5Z',1],
+];
+function makeLogo(host,cA,cB){
+  const ns='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox','40 -720 6180 750');svg.style.width='100%';svg.style.display='block';svg.style.overflow='hidden';
+  const g=document.createElementNS(ns,'g');g.setAttribute('transform','scale(1 -1)');svg.appendChild(g);
+  const paths=LOGO.map(([x,d,b])=>{const el=document.createElementNS(ns,'path');el.setAttribute('d',d);el.setAttribute('fill',b?cB:cA);el.dataset.x=x;el.setAttribute('transform',`translate(${x} 0)`);g.appendChild(el);return el;});
+  host.appendChild(svg);return paths;
+}
+const logo1=makeLogo($('logo1'),'#141414','#1e4a4d');
+const logo2=makeLogo($('logo2'),'#141414','#1e4a4d');
+const logo3=makeLogo($('logo3'),'#141414','#1e4a4d');
+function animLogo(paths,t,s,stag=.035,d=.5){
+  paths.forEach((el,i)=>{const k=E.expo(p(t,s+i*stag,d));el.setAttribute('transform',`translate(${el.dataset.x} ${-(1-k)*760})`);});
+}
+
+// ===== barcodes / notepad holes =====
+function barcode(svg,w,h){let x=0;let s='';while(x<w-6){const bw=1+Math.floor(rnd()*5);if(rnd()>.35)s+=`<rect x="${x}" y="0" width="${bw}" height="${h}" fill="#151515"/>`;x+=bw+1+Math.floor(rnd()*3);}svg.innerHTML=s;}
+barcode($('bar1'),200,80);barcode($('bar2'),190,72);
+for(let i=0;i<9;i++){const h=document.createElement('div');h.className='hole';h.style.left=(34+i*54)+'px';$('holes').appendChild(h);}
+
+// ===== letter reveal (blurred, random order – like the reference) =====
+function prepLetters(root){
+  const chs=[];
+  const walk=n=>{
+    if(n.nodeType===3){
+      const frag=document.createDocumentFragment();
+      for(const c of n.textContent){
+        if(c===' '){frag.appendChild(document.createTextNode(' '));continue;}
+        const s=document.createElement('span');s.className='ch';s.textContent=c;s._r=rnd();chs.push(s);frag.appendChild(s);
+      }
+      n.parentNode.replaceChild(frag,n);
+    }else [...n.childNodes].forEach(walk);
+  };
+  walk(root);root._chs=chs;return root;
+}
+function letters(root,t,s,d=.4,blur=12){
+  for(const c of root._chs){
+    const k=E.out(p(t,s+c._r*d*.6,d*.4));
+    if(c._k===k) continue; c._k=k;
+    c.style.opacity=k; c.style.filter=k<1?`blur(${(1-k)*blur}px)`:'none';
+    c.style.transform=k<1?`translate3d(0,${(1-k)*.12}em,0) scale(${1+(1-k)*.25})`:'none';
+  }
+}
+['h1','h2','h3','h4','h5','sl1','sl2','c1','c2','c3','c4','st1','st2','st3','nh','tag2'].forEach(id=>prepLetters($(id)));
+
+// ===== small animation helpers =====
+const st=(el,o)=>Object.assign(el.style,o);
+function pop(el,t,s,d=.45,base=''){const k=E.back(p(t,s,d));st(el,{opacity:p(t,s,.08),transform:`${base} scale(${lerp(.55,1,k)})`});}
+function fadeUp(el,t,s,d=.5,dy=30){const k=E.out(p(t,s,d));st(el,{opacity:k,transform:`translate3d(0,${(1-k)*dy}px,0)`,filter:k<1?`blur(${(1-k)*8}px)`:'none'});}
+function glow(el,t,s,d=.28){const k=E.quint(p(t,s,d));st(el,{transform:`scaleX(${k})`,opacity:k>0?1:0});}
+function draw(el,t,s,d){el.style.strokeDasharray=1;el.style.strokeDashoffset=1-E.io(p(t,s,d));el.style.opacity=t>=s?1:0;}
+function bracketSnap(el,t,s,dx,dy,base=''){const k=E.expo(p(t,s,.35));st(el,{opacity:p(t,s,.06),transform:`${base} translate(${(1-k)*dx}px,${(1-k)*dy}px)`});}
+function vfSnap(t,s){
+  const k=E.expo(p(t,s,.4)),o=p(t,s,.08);
+  [['vf1',-1,-1,''],['vf2',1,-1,'scaleX(-1)'],['vf3',-1,1,'scaleY(-1)'],['vf4',1,1,'scale(-1,-1)']].forEach(([id,sx,sy,b])=>{
+    st($(id),{opacity:o,transform:`translate(${sx*(1-k)*70}px,${sy*(1-k)*50}px) ${b}`});
+  });
+}
+
+// ===== camera =====
+// board 1 scenes: S1 centre (540,960) · S2 (540,3060) · S3 (540,5160); board 2: brand (540,960) · CTA (540,2960)
+const S1=t=>{const k=E.sine(p(t,0,2.8)),k0=1-E.expo(p(t,0,.8));return {b:1,x:540+18*k,y:960+36*k,z:1+.16*k0+.07*k,r:-.9*k};};
+const S2=t=>{const k=E.sine(p(t,beat(8)+.12,1.2));return {b:1,x:540-10*k,y:3080+60*k,z:1.0+.05*k,r:.7-.9*k};};
+const S3=t=>{const k=E.sine(p(t,beat(12)+.12,1.0));return {b:1,x:540,y:5100+26*k,z:1.16+.05*k,r:-.6+.4*k};};
+const R1=t=>{const k=E.sine(p(t,DROP,1.4)),k0=1-E.expo(p(t,DROP,.7));return {b:2,x:540,y:960-10*k,z:1+.75*k0+.04*k,r:-3*k0+.3*k};};
+const R2=t=>{const k=E.sine(p(t,beat(21),2.3));return {b:2,x:540+10*k,y:2960+34*k,z:1+.075*k,r:.4-.7*k};};
+function mixCam(a,b,k){return {b:a.b,x:lerp(a.x,b.x,k),y:lerp(a.y,b.y,k),z:lerp(a.z,b.z,k),r:lerp(a.r,b.r,k)};}
+function whip(t,s,d,A,Bf){const k=E.quint(p(t,s,d));return mixCam(A(s),Bf(s+d),k);}
+function camAt(t){
+  const w1=beat(8)-.17, w2=beat(12)-.17, w3=beat(20)-.08;
+  if(t<w1) return S1(t);
+  if(t<w1+.34) return whip(t,w1,.34,S1,S2);
+  if(t<w2) return S2(t);
+  if(t<w2+.34) return whip(t,w2,.34,S2,S3);
+  if(t<beat(15)-.06){return S3(t);}
+  if(t<DROP){ // rush into the notepad
+    const s=beat(15)-.06, A=S3(s), k=E.expoIn(p(t,s,DROP-s));
+    return {b:1,x:lerp(A.x,540,k),y:lerp(A.y,5245,k),z:lerp(A.z,7,k),r:lerp(A.r,4,k)};
+  }
+  if(t<w3) return R1(t);
+  if(t<w3+.42) return whip(t,w3,.42,R1,R2);
+  return R2(t);
+}
+
+// camera shake impulses [time, px]
+const IMP=[[beat(6),7],[beat(8),5],[beat(12),6],[beat(13),6],[beat(14),8],[DROP,24],[beat(21),6],[beat(24),6]];
+function shake(t){let x=0,y=0,r=0;for(const [s,a] of IMP){const dt=t-s;if(dt<0||dt>.6)continue;const e=a*Math.exp(-dt*10);x+=e*Math.sin(dt*68);y+=e*Math.cos(dt*53);r+=e*.04*Math.sin(dt*41);}return [x,y,r];}
+
+const boards={1:$('b1'),2:$('b2')};
+function applyCam(t){
+  const c=camAt(t), c0=camAt(Math.max(0,t-1/60));
+  for(const k in boards){
+    const b=boards[k]; const on=+k===c.b; b.style.display=on?'block':'none';
+    if(!on) continue;
+    b.style.transform=`translate(540px,960px) rotate(${c.r}deg) scale(${c.z}) translate(${-c.x}px,${-c.y}px)`;
+    // directional motion blur from camera velocity (screen px per frame), applied in board space
+    let bx=0,by=0;
+    if(c0.b===c.b){
+      const vx=(c.x-c0.x)*c.z, vy=(c.y-c0.y)*c.z, vz=Math.abs(c.z-c0.z)/c.z*900;
+      bx=Math.min(70,Math.abs(vx)*.42+vz*.35); by=Math.min(70,Math.abs(vy)*.42+vz*.35);
+    }
+    if(bx+by>.6){$('mbBlur').setAttribute('stdDeviation',`${bx/c.z} ${by/c.z}`);b.style.filter='url(#mb)';}
+    else b.style.filter='none';
+  }
+  const [sx,sy,sr]=shake(t);
+  $('view').style.transform=`translate(${sx}px,${sy}px) rotate(${sr}deg)`;
+  return c;
+}
+
+// foreground DOF items: board, board position, parallax factor, size/rotation
+const FG=[
+  {el:$('fg1'),b:1,x:1010,y:120,f:1.65,r:24},
+  {el:$('fg2'),b:1,x:40,y:1880,f:1.55,r:-16},
+  {el:$('fg3'),b:1,x:1030,y:3900,f:1.6,r:-20},
+  {el:$('fg4'),b:2,x:980,y:3720,f:1.6,r:-12},
+];
+function applyFG(c){
+  FG.forEach(o=>{
+    if(o.b!==c.b){o.el.style.display='none';return;}
+    const sx=540+(o.x-c.x)*c.z*o.f, sy=960+(o.y-c.y)*c.z*o.f;
+    const w=+o.el.getAttribute('width'),h=+o.el.getAttribute('height');
+    if(sx<-w||sx>1080+w||sy<-h||sy>1920+h){o.el.style.display='none';return;}
+    o.el.style.display='block';
+    o.el.style.transform=`translate(${sx-w/2}px,${sy-h/2}px) rotate(${o.r+c.r*1.5}deg) scale(${c.z*1.1})`;
+  });
+}
+
+// ===== scene animation =====
+function renderB1(t){
+  // scene 1 – hook
+  animLogo(logo1,t,0,.03,.45); $('tag1').style.opacity=E.out(p(t,.15,.4));
+  letters($('h1'),t,0,.38);
+  letters($('h2'),t,beat(2)-.06,.34);
+  vfSnap(t,beat(5));
+  letters($('h3'),t,beat(5)+.05,.3,16);
+  pop($('eye1'),t,beat(6)-.04,.4);
+  glow($('glow1'),t,beat(6));
+  ['bd1'].forEach(id=>fadeUp($(id),t,beat(6)+.12,.4));
+  [...$('bd1').children].forEach((b,i)=>pop(b,t,beat(6)+.16+i*.09,.35));
+  const pk=E.out(p(t,.05,.9));
+  st($('pump1'),{transform:`translate(${(1-pk)*260}px,${(1-pk)*420}px) rotate(${-5+(1-pk)*14}deg)`,opacity:p(t,.05,.1)});
+  fadeUp($('lex1'),t,beat(4),.6,20);
+  fadeUp($('bar1'),t,.25,.5,0);
+
+  // scene 2 – grundlage
+  const S=beat(8);
+  document.querySelectorAll('#bp1 .bp').forEach((el,i)=>draw(el,t,S-.1+i*.05,.7));
+  $('bp1t').setAttribute('opacity',E.out(p(t,S+.5,.4)));
+  bracketSnap($('brk1'),t,S,-60,-60);
+  pop($('box1'),t,S,.4);
+  letters($('h4'),t,beat(9)-.08,.32);
+  letters($('h5'),t,beat(10)-.18,.3,16);
+  glow($('glow2'),t,beat(10));
+  fadeUp($('lex2'),t,beat(10)+.15,.5,20);
+  const fk=E.expo(p(t,S-.05,.75));
+  st($('found1'),{transform:`translate(0,${(1-fk)*520}px)`});
+  ['lb1','lb2','lb3'].forEach((id,i)=>fadeUp($(id),t,beat(10)+.25+i*.09,.35,0));
+
+  // scene 3 – notepad
+  const N=beat(12);
+  const nk=E.out(p(t,N-.3,.55));
+  st($('noteW'),{transform:`translate(0,${(1-nk)*160}px) rotate(${-1.6+(1-nk)*-5}deg)`});
+  letters($('nh'),t,N-.12,.3);
+  [['st1',12],['st2',13],['st3',14]].forEach(([id,b])=>{
+    const s=beat(b)-.03; letters($(id),t,s,.12,10);
+    const k=E.expo(p(t,s,.3)); $(id).style.transform=`scale(${lerp(1.18,1,k)})`; $(id).style.transformOrigin='0 60%';
+  });
+  draw($('ck1'),t,beat(12)+.12,.18); draw($('ck2'),t,beat(13)+.12,.18);
+  draw($('circ1'),t,beat(14)+.08,.28);
+}
+function renderB2(t){
+  const D=DROP;
+  letters($('tag2'),t,D+.15,.4,8);
+  fadeUp($('bar2'),t,D+.1,.4,0);
+  bracketSnap($('brk2'),t,D,-90,-90); bracketSnap($('brk3'),t,D,90,90,'rotate(180deg)');
+  const lk=E.expo(p(t,D,.4));
+  st($('logo2'),{transform:`scale(${lerp(1.3,1,lk)})`,opacity:p(t,D,.05)}); $('logo2').style.filter=`blur(${(1-lk)*14}px) drop-shadow(0 12px 18px rgba(0,0,0,.16))`;
+  letters($('sl1'),t,beat(17)-.12,.24);
+  letters($('sl2'),t,beat(18)-.16,.26,16);
+  glow($('glow3'),t,beat(18));
+  [...$('bd2w').children].forEach((b,i)=>pop(b,t,beat(19)-.1+i*.09,.32));
+  fadeUp($('lex3'),t,beat(19),.5,20);
+  // CTA
+  const C=beat(21);
+  animLogo(logo3,t,C-.3,.03,.45);
+  bracketSnap($('brk4'),t,C,-70,-70); bracketSnap($('brk5'),t,C,70,70,'rotate(180deg)');
+  pop($('box2'),t,C-.12,.4);
+  letters($('c1'),t,C-.05,.25);
+  letters($('c2'),t,C+.08,.26,16);
+  letters($('c3'),t,beat(22)-.16,.2,10);
+  draw($('circ2'),t,beat(22),.32);
+  letters($('c4'),t,beat(23)-.2,.25);
+  glow($('glow4'),t,beat(23));
+  fadeUp($('bd3w'),t,beat(24)-.05,.35,24);
+  [...$('bd3w').firstElementChild.children].forEach((b,i)=>pop(b,t,beat(24)+i*.09,.32));
+  const f2=E.expo(p(t,beat(22),.7)); st($('found2'),{transform:`translate(0,${(1-f2)*400}px)`});
+  fadeUp($('lex4'),t,beat(24)+.2,.5,20);
+}
+
+window.renderFrame=function(t){
+  const c=applyCam(t);
+  applyFG(c);
+  if(c.b===1) renderB1(t); else renderB2(t);
+  // flash into / out of the drop
+  const fl= t<DROP ? E.expoIn(p(t,DROP-.22,.22)) : 1-E.out(p(t,DROP,.32));
+  $('flash').style.opacity=fl;
+  // grain: shift noise per frame
+  const f=Math.floor(t*30); $('grain').style.transform=`translate(${(f*37)%180-90}px,${(f*53)%180-90}px)`;
+};
+window.ready=(async()=>{
+  const fams=['400 50px Inter','500 50px Inter','600 50px Inter','800 50px Inter','50px Anton','italic 50px Serif','800 50px Inter'];
+  for(const f of fams) await document.fonts.load(f);
+  await document.fonts.ready;
+  const q=new URLSearchParams(location.search);
+  renderFrame(q.has('t')?+q.get('t'):0);
+  return true;
+})();
+</script>
+</body>
+</html>

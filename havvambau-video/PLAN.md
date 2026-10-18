@@ -41,3 +41,28 @@
 - `video.html`: eine Szene als HTML/CSS. `window.renderFrame(t)` setzt alle Zustände deterministisch für Zeit *t*, ohne CSS-Animationen, damit jedes Frame reproduzierbar ist.
 - `render.mjs`: Playwright/Chromium gibt jedes Frame exakt aus und reicht es an ffmpeg weiter (H.264, yuv420p, faststart).
 - `sound.py`: synthetisches Sounddesign (Beat 120 BPM, Impacts bei Hook/Logo, Effekte für Bagger, Maßband, Kies, Pflaster). Es gibt zusätzlich eine Version **ohne Ton** für Plattform-Musik.
+
+---
+
+# Version 2: Referenz-Stil + Musik-Sync (`video_v2.html`)
+
+**Feedback:** Den Stil der Referenz zu 85 % übernehmen, flüssigere Kamerafahrten, die gelieferte Musik nehmen und das Video beat-genau darauf schneiden. SFX sind ausdrücklich erlaubt.
+
+**Musik (`assets/music/track.mp3`, 9,8 s):** 166 BPM (Halbtakt 83 BPM → Viertel = 0,723 s, Achtel = 0,3615 s).
+Takte: **0,00 · 2,85 · 5,74 (DROP) · 8,63 (Ausklang)**. Starke Achtel-Hits: 0,68 · 1,77 · 2,13 · 2,85 · 3,57 · 4,30 · 4,66 · 5,02 · 5,74 · 6,10 · 6,47 · 7,55 · 7,91 · 8,27 · 8,63. Bei 5,38 s Stille vor dem Drop. Der Track fadet am Ende aus → **das Video ist so lang wie die Musik (9,8 s)**, ohne Loop.
+
+**Stil-Übernahme aus der Referenz:** heller Papiergrund mit feinem Raster, großen dünnen Kreisbögen und Bauplan-Skizzen · Barcode · kleine Lexikon-Textblöcke („Grundlage – …“) · schwarze Label-Boxen · schwarze Eckwinkel mit weichem Schatten · Outline-Badges · Inter (Regular/Bold gemischt) + Instrument Serif Italic + Anton Condensed · orangener Glow-Strich mit Augen-Icon und Sucher-Ecken · brauner Marker-Kreis · Objekte mit weichen Schatten (hier als Vektor-Illustrationen: Wärmepumpe, Fundament-Querschnitt, Notizblock, Stifte) · Buchstaben tauchen mit Blur einzeln auf · Tiefenunschärfe im Vordergrund · Film-Grain · Vignette.
+**Die 15 % Marke:** HavvamBau-Logo, Grün `#1e4a4d` im Logo/CTA, Inhalte und Texte von havvambau.de. **Weiterhin keine Website-Fotos.**
+
+**Kamera:** Alles liegt auf einer durchgehenden Papier-Fläche. Eine virtuelle Kamera driftet ständig (leichter Push-in + Rotation) und macht auf den Beats schnelle Schwenks mit echter richtungsabhängiger Bewegungsunschärfe (aus der Kamerageschwindigkeit berechnet). Vor dem Drop fährt die Kamera in den Notizblock hinein; auf dem Drop zoomt sie aus dem Logo heraus.
+
+| Zeit (Beat) | Szene | Inhalt |
+|---|---|---|
+| 0,00–2,85 (Takt 1) | **Hook** | „Ihre **Wärmepumpe**“ (0,0) · „ist bestellt. Und das“ (0,68) · Sucher-Ecken + Glow-Strich + Auge: **„Fundament?“** (2,13). Wärmepumpe schiebt sich mit Schatten ins Bild, unscharfe Vordergrund-Pumpe, Barcode, Lexikon-Text, Badges. |
+| 2,85–4,30 | **Grundlage** (Whip-Schwenk nach unten) | Schwarze Box „Sie braucht eine“ (2,85) · „Saubere“ (3,21) · **„Grundlage.“** mit Glow (3,57). Fundament-Querschnitt mit Wärmepumpe fährt hoch, Bauplan-Skizzen, Lexikon „Grundlage – …“. |
+| 4,30–5,38 | **Notizblock** (Whip-Schwenk) | Serif-Kursiv „Wir übernehmen:“ · Stempel auf den Build-up-Hits: AUSHUB (4,30) · AUFMASS (4,66) · FUNDAMENT (5,02) + Marker-Kreis. Stifte mit Schatten. |
+| 5,38–5,74 | **Rush** | Kamera rast in den Notizblock (Zoom + Blur) in die Stille. |
+| **5,74 DROP** | **Marke** | Logo-Slam mit Eckwinkeln, Shake, Flash · „Wir schaffen die *Grundlage.*“ (6,10/6,47) · Leistungs-Badges ploppen auf Achteln. |
+| 7,19–9,80 | **CTA** (Schwenk nach unten, Landung auf 7,55) | Box „Ihr Projekt?“ · **„Jetzt anfragen.“** · **0174 5652015** (Marker-Kreis 7,91) · havvambau.de (Glow 8,27) · „Augsburg & Umgebung“ · „Unverbindlich. Persönlich. Direkt.“ Ruhiger Push-in bis zum Ende. |
+
+**SFX über der Musik** (wie im Referenz-SFX-Pack): Tipp-Klicks beim Buchstaben-Reveal, Whooshes bei den Schwenks, Kamera-Shutter bei Eckwinkeln, Shine beim Glow, Papier-Rascheln beim Notizblock, Marker-Kritzeln beim Kreis, Kies-Rieseln beim Fundament, Riser in den Drop, Impact auf dem Drop, Pops bei den Badges.

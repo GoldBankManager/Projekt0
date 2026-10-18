@@ -1,6 +1,7 @@
 // Renders video.html frame-by-frame with Chromium and encodes with ffmpeg.
 //   node render.mjs stills 0.5 2.8 6 ...   -> out/still_<t>.png
-//   node render.mjs video [fps] [workers]  -> out/havvambau_reel_silent.mp4
+//   node render.mjs video [fps] [workers]  -> out/<name>_silent.mp4
+// HTML=video_v2.html selects the composition (default video.html).
 import { createRequire } from 'node:module';
 import { spawn } from 'node:child_process';
 import { mkdirSync, writeFileSync, rmSync } from 'node:fs';
@@ -14,7 +15,9 @@ try { pw = require('playwright'); } catch { pw = require('/opt/node-tools/node_m
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const out = path.join(dir, 'out');
 mkdirSync(out, { recursive: true });
-const url = pathToFileURL(path.join(dir, 'video.html')).href;
+const html = process.env.HTML || 'video.html';
+const url = pathToFileURL(path.join(dir, html)).href;
+const name = html === 'video.html' ? 'havvambau_reel' : `havvambau_reel_${path.basename(html, '.html').replace('video_', '')}`;
 
 async function openPage(browser) {
   const page = await browser.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
@@ -68,7 +71,7 @@ if (mode === 'stills') {
   await new Promise((res, rej) => {
     const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', path.join(segDir, 'list.txt'),
       '-c:v', 'libx264', '-preset', 'slow', '-crf', '16', '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-movflags', '+faststart',
-      '-r', String(fps), path.join(out, 'havvambau_reel_silent.mp4')], { stdio: 'inherit' });
+      '-r', String(fps), path.join(out, `${name}_silent.mp4`)], { stdio: 'inherit' });
     ff.on('close', c => (c === 0 ? res() : rej(new Error('ffmpeg concat failed'))));
   });
   console.log(`done: ${total} frames in ${((Date.now() - t0) / 1000).toFixed(0)}s`);
