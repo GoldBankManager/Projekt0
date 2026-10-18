@@ -173,6 +173,7 @@ def main():
     p.add_argument("--interior", type=Path, help="Innenraum-Bild")
     p.add_argument("--brand", default="", help='Schriftzug hinten, z. B. "Porsche"')
     p.add_argument("--extra", default="", help="Zusätzliche Anweisungen (englisch)")
+    p.add_argument("--prompt-file", type=Path, help="Eigener Prompt statt des generierten (Reihenfolge: bg, interior, car)")
     p.add_argument("--takes", type=int, default=1, help="Anzahl Versionen (je eigener Seed)")
     p.add_argument("--seed", type=int, default=None)
     p.add_argument("--model", default="mini", choices=list(MODELS), help="mini = günstig, standard = beste Qualität")
@@ -195,7 +196,10 @@ def main():
         if not img.exists():
             sys.exit(f"Datei nicht gefunden: {img}")
 
-    prompt = build_prompt(bool(a.bg), bool(a.interior), len(a.car), a.brand, a.extra)
+    if a.prompt_file:
+        prompt = a.prompt_file.read_text(encoding="utf-8").strip()
+    else:
+        prompt = build_prompt(bool(a.bg), bool(a.interior), len(a.car), a.brand, a.extra)
     mode = "Showreel (Kamera aus Video, Szene aus Bild)" if a.bg else "Swap (Szene aus Video)"
     print(f"\nModus: {mode}\n\n--- PROMPT ---\n{prompt}\n--------------")
     if a.show_prompt:
