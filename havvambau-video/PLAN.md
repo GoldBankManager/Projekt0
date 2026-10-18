@@ -145,3 +145,24 @@ Takte: **0,00 · 2,85 · 5,74 (DROP) · 8,63 (Ausklang)**. Starke Achtel-Hits: 0
 
 **Texte (wie ein Profi, der einen Tipp gibt):**
 „Wärmepumpe bestellt?“ → **4** (groß, rot) „Vor dem Liefertermin klären: Punkte für den Aufstellplatz.“ → „Sie steht dort viele Jahre. Also: einmal richtig.“ → Check 1/4 **Fester Grund.** „Verdichteter Kies, frostfrei gegründet. Da sackt nichts nach.“ · 2/4 **Exakt in Waage.** „Genau so, wie es der Hersteller vorgibt.“ · 3/4 **Wasser muss weg.** „Die Anlage tropft. Ohne Ablauf wird’s im Winter glatt.“ · 4/4 **Leitungsweg.** „Graben zum Haus gleich mit einplanen. Danach wird alles wieder sauber geschlossen.“ → **„Das alles machen wir.“** + Linse/Logo + „Wir schaffen die Grundlage.“ + „Die Wärmepumpe selbst installiert Ihr Fachbetrieb.“ → „Liefertermin steht? **Rufen Sie an.**“ 0174 5652015 · havvambau.de
+
+---
+
+# Version 7: komplett neues Video, „Nur 4 Infos fürs Angebot“ (`video_v7.html`, `sound_v7.py`)
+
+**Feedback:** „Komplett neues Video.“
+**Idee:** Der Zuschauer lernt, was er für ein Angebot schicken muss. Das nimmt die Hemmschwelle („kein fertiger Plan nötig“) und führt direkt zum CTA.
+**Quellen (havvambau.de):** Anfrage: „Sie brauchen noch keinen fertigen Plan.“ · „Eine Anfrage. Kein Auftrag.“ · „Ahmet Yüksel · Ihr Ansprechpartner“. Garten- & Landschaftsbau: „Für ein passendes Angebot brauchen wir zunächst eine Beschreibung, Fotos und ungefähre Maße.“ Einsatzgebiet: „Nennen Sie … die Postleitzahl und den Ort. Bei Erdarbeiten helfen Angaben zur Zufahrt, Durchgangsbreite …“ sowie die Orte Augsburg, Friedberg, Gersthofen, Neusäß, Stadtbergen, Königsbrunn.
+**Bildwelt neu:** Jeder Punkt läuft auf einem animierten Smartphone (Kamera, Maße, Karte, Zufahrt). Stil, Musik, Tempo und Mix wie in V6.
+
+| Zeit | Szene | Inhalt |
+|---|---|---|
+| 0–2,9 | Hook | „Neuer Weg?“ · „Neue Terrasse?“ · „Neue Einfahrt?“ (auf den Hits, Invertier-Panel) |
+| 2,9–4,3 | Entlastung | „Für ein Angebot brauchen Sie keinen ~~fertigen~~ Plan.“ (roter Strich auf dem Hit) |
+| 4,3–5,7 | Versprechen | „Nur **4** Infos.“ → roter Punkt → Flash auf dem Drop |
+| 5,7–8,6 | 1/4 **Fotos vom Bereich.** | Handykamera, 3 Auslöser auf dem Beat, Thumbnails |
+| 8,6–11,5 | 2/4 **Ungefähre Maße.** | Draufsicht mit Maßpfeilen „ca. 6 m / ca. 3 m“ |
+| 11,5–14,4 | 3/4 **PLZ und Ort.** | Karte mit den Orten des Einsatzgebiets, Pin, Radius |
+| 14,4–17,3 | 4/4 **Die Zufahrt.** | Tor vermessen „Breite?“, Minibagger fährt durch |
+| 17,3–20,2 | Marke | „Das war’s.“ · „Den Rest klären wir persönlich.“ · „Eine Anfrage. Kein Auftrag.“ · Logo · Leistungs-Laufband |
+| 20,2–24,3 | CTA | „Infos schicken auf **havvambau.de**“ · „oder direkt anrufen:“ 0174 5652015 · „Ahmet Yüksel · Ihr Ansprechpartner“ · Logo |

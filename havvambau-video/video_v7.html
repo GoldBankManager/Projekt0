@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>HavvamBau Reel v7</title>
+<style>
+@font-face{font-family:Inter;src:url(assets/fonts/inter-latin-600-normal.woff2) format('woff2');font-weight:600}
+@font-face{font-family:Inter;src:url(assets/fonts/inter-latin-800-normal.woff2) format('woff2');font-weight:800}
+/* --accent is the only colour; --accentInv is its inverse for shapes under the black (difference) panel */
+:root{--accent:#e3120b;--accentInv:#1cedf4;--ink:#0d0d0d}
+html,body{margin:0;background:#000}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#fff;font-family:Inter,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+#cam{position:absolute;inset:0;background:#fff;transform-origin:540px 960px;isolation:isolate}
+.sc{position:absolute;inset:0;display:none}
+.row{position:absolute;left:0;width:1080px;text-align:center;white-space:nowrap}
+.k{font-weight:800;letter-spacing:-.05em;line-height:1}
+.s{font-weight:600;letter-spacing:-.02em;line-height:1}
+.wrap{white-space:normal;left:90px;width:900px;line-height:1.18}
+.c{display:inline-block;will-change:transform,opacity,filter}
+.red{color:var(--accent)}
+.img{position:absolute;overflow:visible}
+.box{display:inline-block;background:var(--ink);color:#fff;padding:10px 26px 16px;border-radius:10px}
+#panel{position:absolute;top:-300px;bottom:-300px;left:0;width:0;background:#fff;mix-blend-mode:difference;pointer-events:none}
+#acc{position:absolute;inset:0;pointer-events:none}
+#dot{position:absolute;left:0;top:0;width:100px;height:100px;margin:-50px 0 0 -50px;border-radius:50%;background:var(--accent);display:none}
+#line{position:absolute;height:7px;background:var(--ink);display:none}
+#prog{position:absolute;left:240px;top:290px;width:600px;height:12px;display:none;gap:14px}
+#prog div{flex:1;border-radius:6px;background:#9a9a9a;overflow:hidden}
+#prog i{display:block;height:100%;background:var(--accent);transform-origin:0 50%;transform:scaleX(0)}
+.check{position:absolute;width:140px;height:140px;display:none}
+.phone{position:absolute;left:265px;top:760px;width:550px;height:1076px;overflow:visible}
+#ticker{position:absolute;left:0;top:1420px;width:1080px;height:90px;overflow:hidden;display:none;border-top:5px solid var(--ink);border-bottom:5px solid var(--ink)}
+#tickerIn{position:absolute;left:0;top:14px;white-space:nowrap;font-weight:800;font-size:56px;letter-spacing:-.03em}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+ <defs>
+  <symbol id="checkI" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#e3120b"/><path d="M28 52 l15 15 l30 -34" fill="none" stroke="#fff" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <pattern id="pav" width="40" height="24" patternUnits="userSpaceOnUse"><rect width="40" height="24" fill="#fff"/><path d="M0 0 H40 M0 12 H40 M10 0 V12 M30 12 V24" stroke="#0d0d0d" stroke-width="2.5"/></pattern>
+  <pattern id="grass" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="#fff"/><path d="M4 14 l3 -6 l3 6 M13 8 l3 -6 l3 6" fill="none" stroke="#0d0d0d" stroke-width="2"/></pattern>
+  <!-- garden scene used inside the camera viewfinder (screen coordinates 0..324 x 0..420) -->
+  <symbol id="gardenI" viewBox="0 0 324 420">
+    <rect width="324" height="420" fill="#fff"/>
+    <path d="M0 210 H324" stroke="#0d0d0d" stroke-width="5"/>
+    <rect x="0" y="80" width="110" height="130" fill="#fff" stroke="#0d0d0d" stroke-width="5"/><path d="M-10 84 L55 30 L120 84" fill="none" stroke="#0d0d0d" stroke-width="5"/>
+    <rect x="35" y="130" width="40" height="80" fill="#0d0d0d"/>
+    <circle cx="250" cy="150" r="48" fill="#0d0d0d"/><rect x="244" y="190" width="12" height="22" fill="#0d0d0d"/>
+    <circle cx="180" cy="190" r="22" fill="#0d0d0d"/>
+    <path d="M55 420 L95 210 H135 L215 420 Z" fill="url(#pav)" stroke="#0d0d0d" stroke-width="5"/>
+    <rect x="0" y="210" width="324" height="210" fill="url(#grass)" opacity=".55"/>
+    <path d="M55 420 L95 210 H135 L215 420 Z" fill="url(#pav)" stroke="#0d0d0d" stroke-width="5"/>
+  </symbol>
+ </defs>
+</svg>
+
+<div id="stage">
+ <div id="cam">
+
+  <!-- A: Neuer Weg? Neue Terrasse? Neue Einfahrt? -->
+  <div class="sc" id="A">
+    <div class="row k" id="a1" data-fit="760" data-max="190" style="top:600px;font-size:170px">Neuer Weg?</div>
+    <div class="row k" id="a2" data-fit="900" data-max="190" style="top:820px;font-size:170px">Neue Terrasse?</div>
+    <div class="row k" id="a3" data-fit="900" data-max="190" style="top:1040px;font-size:170px">Neue Einfahrt?</div>
+  </div>
+
+  <!-- B: Für ein Angebot brauchen Sie keinen fertigen Plan. → Nur 4 Infos. -->
+  <div class="sc" id="B">
+    <div class="row s" id="b1" data-fit="940" style="top:560px;font-size:84px">Für ein Angebot brauchen Sie</div>
+    <div class="row k" id="b2" data-fit="980" style="top:690px;font-size:170px">keinen <span id="bStrike" style="position:relative;display:inline-block">fertigen<i id="bLine" style="position:absolute;left:-4%;top:52%;width:108%;height:.11em;background:var(--accent);transform-origin:0 50%;transform:scaleX(0)"></i></span></div>
+    <div class="row k" id="b3" style="top:880px;font-size:200px">Plan<span class="red">.</span></div>
+  </div>
+  <div class="sc" id="B2">
+    <div class="row s" id="n1" style="top:560px;font-size:120px">Nur</div>
+    <div class="row k red" id="n2" style="top:680px;font-size:620px;letter-spacing:0">4</div>
+    <div class="row k" id="n3" style="top:1290px;font-size:170px">Infos<span id="nDot" class="red">.</span></div>
+  </div>
+
+  <!-- T: four tips on a phone -->
+  <div class="sc" id="T">
+    <div class="row s" id="tHead" style="top:210px;font-size:42px;letter-spacing:.06em">FÜRS ANGEBOT · <span id="tCnt">1</span>/4</div>
+
+    <div class="sc" id="t0">
+      <div class="row k" id="t0w" data-fit="980" data-max="190" style="top:360px;font-size:170px">Fotos vom Bereich.</div>
+      <div class="row s wrap" id="t0s" style="top:560px;font-size:54px">Ein paar Handyfotos reichen. Gern aus mehreren Blickwinkeln.</div>
+      <svg class="phone" id="t0i" viewBox="0 0 360 704">
+        <rect width="360" height="704" rx="52" fill="#0d0d0d"/><rect x="18" y="18" width="324" height="668" rx="36" fill="#fff"/>
+        <svg x="18" y="60" width="324" height="420" viewBox="0 0 324 420"><g id="t0view"><use href="#gardenI"/></g></svg>
+        <g stroke="#e3120b" stroke-width="5" fill="none"><path d="M40 82 h30 M40 82 v30 M320 82 h-30 M320 82 v30 M40 458 h30 M40 458 v-30 M320 458 h-30 M320 458 v-30"/></g>
+        <rect id="t0flash" x="18" y="60" width="324" height="420" fill="#fff" opacity="0"/>
+        <circle cx="180" cy="590" r="46" fill="#fff" stroke="#0d0d0d" stroke-width="8"/><circle id="t0btn" cx="180" cy="590" r="34" fill="#0d0d0d"/>
+        <g id="t0thumbs"></g>
+      </svg>
+    </div>
+
+    <div class="sc" id="t1">
+      <div class="row k" id="t1w" data-fit="980" data-max="190" style="top:360px;font-size:170px">Ungefähre Maße.</div>
+      <div class="row s wrap" id="t1s" style="top:560px;font-size:54px">Länge mal Breite, grob geschätzt. Den Rest klären wir vor Ort.</div>
+      <svg class="phone" id="t1i" viewBox="0 0 360 704">
+        <rect width="360" height="704" rx="52" fill="#0d0d0d"/><rect x="18" y="18" width="324" height="668" rx="36" fill="#fff"/>
+        <rect x="18" y="18" width="324" height="668" rx="36" fill="url(#grass)" opacity=".5"/>
+        <rect id="t1area" x="70" y="200" width="220" height="300" fill="url(#pav)" stroke="#0d0d0d" stroke-width="7"/>
+        <g id="t1h" stroke="var(--accentInv)" stroke-width="6" fill="var(--accentInv)"><path d="M70 160 H290"/><path d="M70 160 l16 -10 v20 Z M290 160 l-16 -10 v20 Z"/></g>
+        <g id="t1v" stroke="var(--accentInv)" stroke-width="6" fill="var(--accentInv)"><path d="M320 200 V500"/><path d="M320 200 l-10 16 h20 Z M320 500 l-10 -16 h20 Z"/></g>
+        <g font-family="Inter" font-weight="800" font-size="30" fill="#0d0d0d">
+          <text id="t1ht" x="180" y="140" text-anchor="middle">ca. 6 m</text>
+          <text id="t1vt" x="304" y="360" text-anchor="middle" transform="rotate(90 304 360)" dy="-14">ca. 3 m</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="sc" id="t2">
+      <div class="row k" id="t2w" data-fit="900" data-max="190" style="top:360px;font-size:170px">PLZ und Ort.</div>
+      <div class="row s wrap" id="t2s" style="top:560px;font-size:54px">Damit wir Anfahrt und Termin einplanen können.</div>
+      <svg class="phone" id="t2i" viewBox="0 0 360 704">
+        <rect width="360" height="704" rx="52" fill="#0d0d0d"/><rect x="18" y="18" width="324" height="668" rx="36" fill="#fff"/>
+        <g stroke="#bdbdbd" stroke-width="5" fill="none"><path d="M18 300 Q120 280 180 340 T342 360"/><path d="M60 18 Q90 200 180 340 T240 686"/><path d="M18 520 Q150 470 180 340 Q220 260 342 150"/></g>
+        <circle id="t2ring" cx="180" cy="340" r="120" fill="none" stroke="#0d0d0d" stroke-width="4" stroke-dasharray="10 10"/>
+        <g id="t2towns" font-family="Inter" font-weight="600" font-size="20" fill="#0d0d0d" text-anchor="middle"></g>
+        <g id="t2pin"><path d="M180 340 C 150 290, 140 270, 140 250 A40 40 0 0 1 220 250 C 220 270, 210 290, 180 340 Z" fill="#e3120b"/><circle cx="180" cy="250" r="15" fill="#fff"/></g>
+      </svg>
+    </div>
+
+    <div class="sc" id="t3">
+      <div class="row k" id="t3w" data-fit="900" data-max="190" style="top:360px;font-size:170px">Die Zufahrt.</div>
+      <div class="row s wrap" id="t3s" style="top:560px;font-size:54px">Wie breit ist der Weg in den Garten? Wichtig für Bagger und Material.</div>
+      <svg class="phone" id="t3i" viewBox="0 0 360 704">
+        <rect width="360" height="704" rx="52" fill="#0d0d0d"/><rect x="18" y="18" width="324" height="668" rx="36" fill="#fff"/>
+        <rect x="18" y="18" width="324" height="668" rx="36" fill="url(#grass)" opacity=".5"/>
+        <rect x="40" y="70" width="280" height="200" fill="#fff" stroke="#0d0d0d" stroke-width="7"/>
+        <path d="M58 88 L302 252 M302 88 L58 252" stroke="#0d0d0d" stroke-width="3"/>
+        <path d="M18 380 H140 M220 380 H342" stroke="#0d0d0d" stroke-width="10"/>
+        <g stroke="#0d0d0d" stroke-width="3"><path d="M30 372 v16 M50 372 v16 M70 372 v16 M90 372 v16 M110 372 v16 M130 372 v16 M230 372 v16 M250 372 v16 M270 372 v16 M290 372 v16 M310 372 v16 M330 372 v16"/></g>
+        <g id="t3w1" stroke="var(--accentInv)" stroke-width="6" fill="var(--accentInv)"><path d="M140 350 H220"/><path d="M140 350 l14 -9 v18 Z M220 350 l-14 -9 v18 Z"/></g>
+        <text id="t3wt" x="180" y="334" font-family="Inter" font-weight="800" font-size="26" text-anchor="middle" fill="#0d0d0d">Breite?</text>
+        <g id="t3dig"><rect x="-34" y="-50" width="14" height="100" rx="5" fill="#0d0d0d"/><rect x="20" y="-50" width="14" height="100" rx="5" fill="#0d0d0d"/>
+          <rect x="-24" y="-38" width="48" height="70" rx="8" fill="#fff" stroke="#0d0d0d" stroke-width="6"/><path d="M0 -38 V-90" stroke="#0d0d0d" stroke-width="12" stroke-linecap="round"/>
+          <path d="M-16 -104 H16 L10 -84 H-10 Z" fill="var(--accentInv)"/></g>
+      </svg>
+    </div>
+  </div>
+
+  <!-- R: brand -->
+  <div class="sc" id="R">
+    <div class="row k" id="r1" style="top:330px;font-size:190px">Das war’s<span class="red">.</span></div>
+    <div class="row s" id="r2" style="top:560px;font-size:64px">Den Rest klären wir persönlich.</div>
+    <div class="row s" id="r3" style="top:690px"><span class="box" id="r3b" style="font-size:58px">Eine Anfrage. Kein Auftrag.</span></div>
+    <div id="rLogo" style="position:absolute;left:110px;top:1000px;width:860px"></div>
+    <div class="row s" id="r4" style="top:1150px;font-size:44px;letter-spacing:.03em">Augsburg &amp; Umgebung</div>
+  </div>
+
+  <!-- H: CTA -->
+  <div class="sc" id="H">
+    <div class="row s" id="hT" style="top:420px;font-size:80px">Infos schicken auf</div>
+    <div class="row k" id="hB" data-fit="980" data-max="200" style="top:530px;font-size:170px">havvambau<span class="red">.</span>de</div>
+    <div class="row s" id="hO" style="top:820px;font-size:64px">oder direkt anrufen:</div>
+    <svg class="img" id="hIcon" style="left:480px;top:920px;width:120px;height:120px" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="12" fill="#e3120b"/>
+      <path transform="translate(5.2 5.2) scale(.57)" fill="#fff" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/>
+    </svg>
+    <div class="row k" id="hP" data-fit="990" style="top:1080px;font-size:126px">0174 5652015</div>
+    <div class="row s" id="hA" style="top:1240px;font-size:46px;color:#444">Ahmet Yüksel · Ihr Ansprechpartner</div>
+    <div id="hL" style="position:absolute;left:250px;top:1420px;width:580px"></div>
+    <div class="row s" id="hR" style="top:1520px;font-size:32px;letter-spacing:.32em;color:#555">AUGSBURG &amp; UMGEBUNG</div>
+  </div>
+
+  <div id="panel"></div>
+
+  <!-- accent layer (never inverted) -->
+  <div id="acc">
+    <div id="prog"><div><i></i></div><div><i></i></div><div><i></i></div><div><i></i></div></div>
+    <svg class="check" id="ck0" viewBox="0 0 100 100" style="left:770px;top:720px"><use href="#checkI"/></svg>
+    <svg class="check" id="ck1" viewBox="0 0 100 100" style="left:770px;top:720px"><use href="#checkI"/></svg>
+    <svg class="check" id="ck2" viewBox="0 0 100 100" style="left:770px;top:720px"><use href="#checkI"/></svg>
+    <svg class="check" id="ck3" viewBox="0 0 100 100" style="left:770px;top:720px"><use href="#checkI"/></svg>
+    <div id="ticker"><div id="tickerIn"></div></div>
+    <div id="flash" style="position:absolute;inset:0;background:var(--accent);opacity:0"></div>
+    <div id="line"></div>
+    <div id="dot"></div>
+  </div>
+ </div>
+</div>
+
+<script>
+// ===== music grid: 166 BPM, eighth = 0.3615 s. Track extended on this grid (sound_v7.py):
+// intro/build-up eighths 0–15, drop bar ×6 (eighths 16–63), fade-out from eighth 64.
+const B0=-0.04,E8=0.3615,k=n=>B0+E8*n,DROP=k(16);
+const TIP=[k(16),k(24),k(32),k(40)], BRAND=k(48), CTA=k(56);
+window.DURATION=24.26;
+
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const p=(t,s,d)=>clamp((t-s)/d);
+const lerp=(a,b,x)=>a+(b-a)*x;
+const E={
+  out:x=>1-Math.pow(1-x,3), in:x=>x*x*x, io:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,
+  expo:x=>x>=1?1:1-Math.pow(2,-10*x), expoIn:x=>x<=0?0:Math.pow(2,10*x-10),
+  quint:x=>x<.5?16*x*x*x*x*x:1-Math.pow(-2*x+2,5)/2,
+  back:x=>{const c1=1.7,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)},
+};
+const $=id=>document.getElementById(id);
+let seed=33;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
+const show=(el,on)=>{el.style.display=on?'block':'none';};
+const st=(el,o)=>Object.assign(el.style,o);
+const ns='http://www.w3.org/2000/svg';
+
+// ===== logo =====
+const LOGO=[
+ [0,'M71.75 0V703H208V0ZM513 0V703H649.25V0ZM158.25 302.5V422.75H551.25V302.5Z',0],
+ [696,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [1386,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2066,'M297.25 0 19.75 703H166.5L380.5 134H324L540.25 703H684.75L404.75 0Z',0],
+ [2746,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',0],
+ [3436,'M71.75 0V703H168L452.5 246.75H397.75L682 703H778.25V0H642.5V469.5L669.25 462.25L471 144H379L181 462.25L207.5 469.5V0Z',0],
+ [4261,'M171.5 0V111H355Q404.25 111 431.75 140.875Q459.25 170.75 459.25 212Q459.25 239.75 446.875 262.875Q434.5 286 411.125 299.5Q387.75 313 355 313H171.5V422.5H340Q381.75 422.5 407.25 443.75Q432.75 465 432.75 507.25Q432.75 549.5 407.25 570.75Q381.75 592 340 592H171.5V703H356.25Q425.75 703 473.125 677.375Q520.5 651.75 544.5 610.375Q568.5 569 568.5 520Q568.5 459.75 532.125 416.25Q495.75 372.75 425.5 351.5L431.75 395.75Q509.5 373.75 552.25 323.25Q595 272.75 595 201.75Q595 145.75 567.375 100.125Q539.75 54.5 487.25 27.25Q434.75 0 360 0ZM71.75 0V703H207V0Z',1],
+ [4867,'M19.5 0 303.25 703H414.25L695.75 0H550.75L333 576.5H382.5L162 0ZM170 131.25V245.25H547.75V131.25Z',1],
+ [5557,'M349.237 -10.5Q265.974 -10.5 201.27 26.087Q136.566 62.674 99.533 126.641Q62.5 190.607 62.5 271.75V703H198.75V268Q198.75 221.278 218.601 187.053Q238.453 152.827 272.639 134.414Q306.825 116 349.12 116Q392.25 116 425.345 134.394Q458.44 152.788 477.72 186.851Q497 220.915 497 267V703H633.5V270.75Q633.5 189.573 596.953 126.139Q560.407 62.706 496.453 26.103Q432.5 -10.5 349.237 -10.5Z',1],
+];
+function makeLogo(host,cA,cB){
+  const svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox','40 -720 6180 750');svg.style.width='100%';svg.style.display='block';svg.style.overflow='hidden';
+  const g=document.createElementNS(ns,'g');g.setAttribute('transform','scale(1 -1)');svg.appendChild(g);
+  const paths=LOGO.map(([x,d,b])=>{const el=document.createElementNS(ns,'path');el.setAttribute('d',d);el.setAttribute('fill',b?cB:cA);el.dataset.x=x;el.setAttribute('transform',`translate(${x} 0)`);g.appendChild(el);return el;});
+  host.appendChild(svg);return paths;
+}
+const brandLogo=makeLogo($('rLogo'),'#0d0d0d','#1e4a4d');
+const endLogo=makeLogo($('hL'),'#0d0d0d','#1e4a4d');
+function animLogo(paths,t,s,stag=.035,d=.5){paths.forEach((el,i)=>{const q=E.expo(p(t,s+i*stag,d));el.setAttribute('transform',`translate(${el.dataset.x} ${-(1-q)*760})`);});}
+
+// ===== per-letter helpers (letters are grouped per word so rows only wrap between words) =====
+function prep(el){
+  const cs=[];
+  const walk=n=>{
+    if(n.nodeType===3){
+      const f=document.createDocumentFragment();
+      n.textContent.split(/( )/).forEach(part=>{
+        if(part===' '){f.appendChild(document.createTextNode(' '));return;}
+        if(!part) return;
+        const w=document.createElement('span');w.style.cssText='display:inline-block;white-space:nowrap';
+        for(const ch of part){const s=document.createElement('span');s.className='c';s.textContent=ch;s._r=rnd();cs.push(s);w.appendChild(s);}
+        f.appendChild(w);
+      });
+      n.parentNode.replaceChild(f,n);
+    }else if(n.nodeType===1&&n.classList.contains('red')&&n.textContent.length===1&&n.tagName==='SPAN'){n.classList.add('c');n._r=rnd();cs.push(n);}
+    else if(n.nodeType===1&&n.tagName!=='I') [...n.childNodes].forEach(walk);
+  };
+  [...el.childNodes].forEach(walk);el._c=cs;return el;
+}
+function setC(c,q,tr,blur){c.style.opacity=clamp(q*2.5);c.style.transform=tr;c.style.filter=blur>.3?`blur(${blur}px)`:'none';}
+function fly(el,t,s,o={}){
+  const {stag=.03,dur=.5,dx=280,dy=0,blur=16}=o;
+  el._c.forEach((c,i)=>{const q=E.expo(p(t,s+i*stag,dur));setC(c,q,`translate(${(1-q)*dx}px,${(1-q)*dy}px) scaleX(${1+(1-q)*.7})`,(1-q)*blur);});
+}
+function exitEl(el,t,s,dur=.28,dy=-160){const q=E.in(p(t,s,dur));if(q<=0){if(el._ex){el.style.opacity='';el.style.filter='';el.style.translate='';el._ex=0;}return;}
+  el._ex=1;el.style.opacity=1-q;el.style.filter=`blur(${q*22}px)`;el.style.translate=`0 ${q*dy}px`;}
+function popIn(el,t,s,d=.5,from=.3){const q=E.back(p(t,s,d));el.style.opacity=p(t,s,.06);el.style.scale=lerp(from,1,q);}
+function absPos(el){let x=0,y=0,n=el;while(n&&n.id!=='cam'){x+=n.offsetLeft;y+=n.offsetTop;n=n.offsetParent;}return {x,y,w:el.offsetWidth,h:el.offsetHeight};}
+function fit(){
+  document.querySelectorAll('[data-fit]').forEach(el=>{
+    const r=document.createRange();r.selectNodeContents(el);const w=r.getBoundingClientRect().width;
+    const fs=parseFloat(getComputedStyle(el).fontSize);
+    el.style.fontSize=Math.min(+el.dataset.max||400,fs*(+el.dataset.fit)/w)+'px';
+  });
+}
+function svgOpacity(el,o){el.style.opacity=o;}
+
+// ===== build =====
+const SCENES=['A','B','B2','T','t0','t1','t2','t3','R','H'];
+let DOT_FROM=null, thumbs=[];
+const TOWNS=[['Augsburg',180,372,1],['Friedberg',290,330,0],['Gersthofen',250,170,0],['Neusäß',75,215,0],['Stadtbergen',90,420,0],['Königsbrunn',190,560,0]];
+function build(){
+  SCENES.forEach(id=>show($(id),true));
+  fit();
+  const d=absPos($('nDot'));DOT_FROM={x:d.x+d.w*.5,y:d.y+d.h*.78};
+  SCENES.forEach(id=>show($(id),false));
+  ['a1','a2','a3','b1','b2','b3','n1','n3','t0w','t0s','t1w','t1s','t2w','t2s','t3w','t3s','r1','r2','r4','hT','hB','hO','hP','hA','hR'].forEach(id=>prep($(id)));
+  // photo thumbnails that fly out of the camera
+  for(let i=0;i<3;i++){const g=document.createElementNS(ns,'g');
+    g.innerHTML=`<rect x="-50" y="-64" width="100" height="128" rx="8" fill="#fff" stroke="#0d0d0d" stroke-width="5"/><svg x="-44" y="-58" width="88" height="116" viewBox="${i*40} ${40+i*30} 260 340" preserveAspectRatio="xMidYMid slice"><use href="#gardenI"/></svg>`;
+    $('t0thumbs').appendChild(g);thumbs.push(g);}
+  TOWNS.forEach(([n,x,y,big])=>{const g=document.createElementNS(ns,'g');
+    g.innerHTML=`<circle cx="${x}" cy="${y-28}" r="${big?9:7}" fill="#0d0d0d"/><text x="${x}" y="${y}" ${big?'font-weight="800" font-size="24"':''}>${n}</text>`;$('t2towns').appendChild(g);});
+  $('tickerIn').textContent=('Renovierung · Umbau · Erdarbeiten · Garten- & Landschaftsbau · Pflaster · Abbruch · Gartenpflege · Montage · Wärmepumpen-Fundamente · ').repeat(3);
+}
+
+// ===== timeline =====
+function panel(t){
+  let x0=0,x1=0;
+  if(t<k(8)+.4){
+    // hook: black sweeps in, flips to the right half, leaves
+    const a=E.expo(p(t,0,.45)), b=E.quint(p(t,k(4)-.15,.35)), c=E.quint(p(t,k(8)-.25,.35));
+    x0=0;x1=1080*a;
+    x0=lerp(x0,540,b);
+    x0=lerp(x0,1080,c);
+  }else if(t>=TIP[1]-.2&&t<BRAND+.5){
+    const a=E.quint(p(t,TIP[1]-.2,.4)), b=E.quint(p(t,TIP[2]-.2,.4)), c=E.quint(p(t,TIP[3]-.2,.4)), d=E.quint(p(t,BRAND-.25,.4));
+    x0=lerp(1080,0,a); x1=1080;
+    x1=lerp(x1,0,b);
+    if(t>=TIP[3]-.2){x0=0;x1=1080*c;}
+    if(t>=BRAND-.25){x0=1080*d;x1=1080;}
+  }
+  $('panel').style.left=x0+'px';$('panel').style.width=Math.max(0,x1-x0)+'px';
+}
+const KICK=[[k(0),.03],[k(2),.035],[k(4),.035],[k(8),.035],[k(9),.03],[k(10),.04],[k(12),.035],[k(13),.05],[k(14),.04],[DROP,.08],
+  ...TIP.flatMap(s=>[[s,.035],[s+6*E8,.03]]),[BRAND,.05],[k(50),.03],[k(52),.04],[CTA,.035],[k(58),.03],[k(60),.025],[k(62),.03]];
+const SCN=[0,k(8),k(12),DROP,TIP[1],TIP[2],TIP[3],BRAND,CTA,24.3];
+function camera(t){
+  let i=0;while(i<SCN.length-2&&t>=SCN[i+1])i++;
+  const f=p(t,SCN[i],SCN[i+1]-SCN[i]);
+  let z=1+.04*E.io(f), r=(i%2?-1:1)*.45*(f-.5);
+  for(const [s,a] of KICK){const dt=t-s;if(dt>=0&&dt<.8)z+=a*Math.exp(-dt*9);}
+  let sx=0,sy=0;
+  for(const [s,a] of [[DROP,16],[k(13),8]]){const dd=t-s;if(dd>=0&&dd<.5){const e=a*Math.exp(-dd*10);sx+=e*Math.sin(dd*70);sy+=e*Math.cos(dd*57);}}
+  $('cam').style.transform=`translate(${sx}px,${sy}px) scale(${z}) rotate(${r}deg)`;
+}
+
+// ---- A: three questions stack up on the beat
+function sceneA(t){
+  const on=t<k(8)+.05; show($('A'),on); if(!on) return;
+  fly($('a1'),t,0,{dx:340,stag:.035,dur:.45});
+  fly($('a2'),t,k(2)-.1,{dx:-340,stag:.03,dur:.45});
+  fly($('a3'),t,k(4)-.1,{dx:340,stag:.03,dur:.45});
+  ['a1','a2','a3'].forEach((id,i)=>exitEl($(id),t,k(8)-.3+i*.04,.28,-200));
+}
+// ---- B: "Für ein Angebot brauchen Sie keinen fertigen Plan." → B2: "Nur 4 Infos."
+function sceneB(t){
+  const on=t>=k(8)-.1&&t<k(12)+.05; show($('B'),on); if(!on) return;
+  fly($('b1'),t,k(8)-.05,{dx:-280,stag:.018,dur:.42});
+  fly($('b2'),t,k(9)-.1,{dx:300,stag:.03,dur:.42});
+  fly($('b3'),t,k(9)+.15,{dx:0,dy:120,stag:.04,dur:.42});
+  $('bLine').style.transform=`scaleX(${E.quint(p(t,k(10),.3))})`;
+  ['b1','b2','b3'].forEach(id=>exitEl($(id),t,k(12)-.25,.25));
+}
+function sceneB2(t){
+  const on=t>=k(12)-.05&&t<DROP; show($('B2'),on); if(!on) return;
+  fly($('n1'),t,k(12)-.08,{dx:-300,stag:.04,dur:.4});
+  const q=E.back(p(t,k(13)-.04,.45));
+  st($('n2'),{opacity:p(t,k(13)-.04,.05),transform:`scale(${lerp(.2,1,q)}) rotate(${(1-q)*-20}deg)`,transformOrigin:'540px 300px'});
+  fly($('n3'),t,k(14)-.1,{dx:300,stag:.035,dur:.4});
+  const ex=E.expoIn(p(t,k(15),.25));
+  ['n1','n2'].forEach(id=>{const o=parseFloat($(id).style.opacity);$(id).style.opacity=(isNaN(o)?1:o)*(1-ex);$(id).style.filter=ex>0?`blur(${ex*20}px)`:'none';});
+  $('n3')._c.forEach(c=>{if(c.id==='nDot')return;const o=parseFloat(c.style.opacity);c.style.opacity=Math.min(isNaN(o)?1:o,1-ex);});
+  $('nDot').style.visibility=t>=k(15)?'hidden':'visible';
+}
+// ---- full stop → dot → red flash on the drop
+function sceneDot(t){
+  const dot=$('dot');
+  if(t>=k(15)&&t<DROP+.25){
+    const q=E.io(p(t,k(15),.3)), g=lerp(.3,1.3,E.out(p(t,k(15),.3)))*(1-.35*E.in(p(t,DROP-.08,.08)))+E.expoIn(p(t,DROP,.12))*30;
+    show(dot,true);st(dot,{left:lerp(DOT_FROM.x,540,q)+'px',top:lerp(DOT_FROM.y,900,q)+'px',transform:`scale(${g})`});
+  }else if(t<CTA-.4) show(dot,false);
+  $('flash').style.opacity=t>=DROP+.1?1-E.out(p(t,DROP+.1,.35)):0;
+}
+// ---- tips on the phone
+function sceneT(t){
+  const on=t>=TIP[0]-.05&&t<BRAND+.1; show($('T'),on); if(!on){$('prog').style.display='none';[0,1,2,3].forEach(i=>show($('ck'+i),false));return;}
+  $('prog').style.display='flex';
+  const idx=clamp(Math.floor((t-TIP[0])/(8*E8)),0,3); $('tCnt').textContent=idx+1;
+  {const q=E.out(p(t,TIP[0],.35)),x=E.in(p(t,BRAND-.25,.25));st($('tHead'),{opacity:q*(1-x),transform:`translateY(${(1-q)*-40}px)`});$('prog').style.opacity=q*(1-x);}
+  document.querySelectorAll('#prog i').forEach((b,i)=>{b.style.transform=`scaleX(${E.out(p(t,TIP[i]+6*E8,.3))})`;});
+  for(let i=0;i<4;i++){
+    const s=TIP[i], e=s+8*E8, el=$('t'+i), cardOn=t>=s-.05&&t<e+.05; show(el,cardOn);
+    const ck=$('ck'+i); show(ck,t>=s+6*E8-.05&&t<e);
+    if(ck.style.display!=='none'){const q=E.back(p(t,s+6*E8,.4));st(ck,{transform:`scale(${q}) rotate(${(1-q)*-40}deg)`,opacity:1-E.in(p(t,e-.22,.2))});}
+    if(!cardOn) continue;
+    fly($(`t${i}w`),t,s,{dx:i%2?-340:340,stag:.025,dur:.45});
+    fly($(`t${i}s`),t,s+.3,{dx:0,dy:40,stag:.006,dur:.45,blur:10});
+    // phone slides up and settles with a slight tilt
+    const q=E.back(p(t,s+.1,.6)), ex=E.in(p(t,e-.24,.24));
+    st($(`t${i}i`),{opacity:p(t,s+.1,.08)*(1-ex),transform:`translateY(${(1-q)*700-ex*120}px) rotate(${(1-q)*(i%2?8:-8)}deg)`,filter:ex>0?`blur(${ex*20}px)`:'none'});
+    [`t${i}w`,`t${i}s`].forEach(id=>exitEl($(id),t,e-.22,.24,-120));
+  }
+  // 1 camera: three shots on the beat, each flashes and drops a thumbnail
+  {const s=TIP[0];const shots=[s+2*E8,s+3*E8,s+4*E8];
+   let fl=0;shots.forEach((sh,i)=>{const dt=t-sh;if(dt>=0&&dt<.25)fl=Math.max(fl,1-dt/.25);
+     const q=E.out(p(t,sh,.45)), th=thumbs[i];
+     th.setAttribute('transform',`translate(${lerp(180,70+i*110,q)} ${lerp(270,620+(i%2)*6,q)}) rotate(${lerp(0,-8+i*8,q)}) scale(${lerp(1.6,.62,q)})`);th.style.opacity=t>=sh?1:0;});
+   $('t0flash').setAttribute('opacity',fl*.9);
+   const vz=1+.04*Math.sin((t-s)*1.7);$('t0view').setAttribute('transform',`translate(162 210) scale(${vz}) translate(-162 -210) translate(${Math.sin((t-s)*1.3)*6} 0)`);
+   const pr=shots.some(sh=>t>=sh-.06&&t<sh+.08);$('t0btn').setAttribute('r',pr?28:34);}
+  // 2 dimensions draw in
+  {const s=TIP[1];const h=E.io(p(t,s+.8,.45)), v=E.io(p(t,s+1.2,.45));
+   $('t1h').setAttribute('transform',`translate(180 0) scale(${Math.max(.001,h)} 1) translate(-180 0)`);$('t1v').setAttribute('transform',`translate(0 350) scale(1 ${Math.max(.001,v)}) translate(0 -350)`);
+   $('t1ht').style.opacity=p(t,s+1.1,.15);$('t1vt').style.opacity=p(t,s+1.5,.15);}
+  // 3 map: towns pop, pin drops, radius pulses
+  {const s=TIP[2];[...$('t2towns').children].forEach((g,i)=>{const q=E.back(p(t,s+.6+i*.07,.35));g.style.opacity=q>0?1:0;g.style.scale=q;g.style.transformBox='fill-box';g.style.transformOrigin='50% 50%';});
+   const pq=E.out(p(t,s+1.1,.35));const b=t>s+1.45?Math.exp(-(t-s-1.45)*9)*Math.cos((t-s-1.45)*30):0;
+   $('t2pin').setAttribute('transform',`translate(0 ${(1-pq)*-400+b*-10})`);$('t2pin').style.opacity=p(t,s+1.1,.05);
+   const rq=E.out(p(t,s+1.5,.6));$('t2ring').setAttribute('r',lerp(10,150,rq));$('t2ring').style.opacity=rq>0?1-.3*rq:0;}
+  // 4 access: measure the gate, excavator drives through
+  {const s=TIP[3];const w=E.io(p(t,s+.8,.4));$('t3w1').setAttribute('transform',`translate(180 0) scale(${Math.max(.001,w)} 1) translate(-180 0)`);$('t3wt').style.opacity=p(t,s+1.1,.15);
+   const d=E.io(p(t,s+1.3,1.2));$('t3dig').setAttribute('transform',`translate(180 ${lerp(640,250,d)})`);}
+}
+// ---- brand
+function sceneR(t){
+  const on=t>=BRAND-.05&&t<CTA+.05; show($('R'),on); show($('ticker'),on); if(!on) return;
+  fly($('r1'),t,BRAND,{dx:340,stag:.035,dur:.45});
+  fly($('r2'),t,k(49)-.05,{dx:-300,stag:.012,dur:.45});
+  {const q=E.back(p(t,k(50)-.05,.4));$('r3b').style.transform=`scale(${lerp(.4,1,q)})`;$('r3b').style.opacity=p(t,k(50)-.05,.06);}
+  animLogo(brandLogo,t,k(52)-.1,.035,.5);
+  fly($('r4'),t,k(53),{dx:0,dy:30,stag:.012,dur:.4,blur:8});
+  const tq=E.out(p(t,k(52),.4));$('ticker').style.opacity=tq;$('tickerIn').style.transform=`translateX(${-(t-BRAND)*260}px)`;
+  ['r1','r2','r3','rLogo','r4'].forEach(id=>exitEl($(id),t,CTA-.25,.25));
+  if(t>=CTA-.25) $('ticker').style.opacity=tq*(1-E.in(p(t,CTA-.25,.25)));
+}
+// ---- CTA: dot bounces in, rolls and reveals the website
+function sceneH(t){
+  const on=t>=CTA-.3; show($('H'),on); if(!on) return;
+  const dot=$('dot'), LAND=CTA, ROLL1=k(57)+.1;
+  if(t<ROLL1+.45){
+    show(dot,true);let x,y,sq=1;
+    if(t<LAND){const q=p(t,LAND-.3,.3);x=130;y=lerp(-80,750,q*q);}
+    else{const q=E.io(p(t,LAND+.04,ROLL1-LAND-.04));x=lerp(130,1180,q);y=750;const dt=t-LAND;sq=1-.3*Math.exp(-dt*14)*Math.cos(dt*30);}
+    st(dot,{left:x+'px',top:y+'px',transform:`scale(${.8/sq},${.8*sq})`});
+    const ln=$('line');show(ln,t>=LAND);st(ln,{left:'130px',top:'784px',width:Math.max(0,x-130)+'px',opacity:1-p(t,ROLL1+.1,.3)});
+    $('hB').style.clipPath=`inset(-60px ${Math.max(0,1080-x+40)}px -60px 0)`;
+  }else{show(dot,false);show($('line'),false);$('hB').style.clipPath='none';}
+  fly($('hT'),t,LAND+.15,{dx:-260,stag:.025,dur:.45});
+  fly($('hO'),t,k(58)-.2,{dx:260,stag:.02,dur:.42});
+  popIn($('hIcon'),t,k(58)-.05,.5,.2);
+  const amp=110*(1-E.io(p(t,k(58)+.1,.7)));
+  $('hP')._c.forEach((c,i)=>{const q=E.out(p(t,k(58)-.1+i*.025,.45)),ph=i*.75-t*8;
+    setC(c,q,`translate(${(1-q)*700}px,${amp*Math.sin(ph)}px) rotate(${amp*.2*Math.cos(ph)}deg)`,(1-q)*10);});
+  fly($('hA'),t,k(60)-.15,{dx:0,dy:30,stag:.01,dur:.45,blur:10});
+  animLogo(endLogo,t,k(62)-.1,.03,.5);
+  fly($('hR'),t,k(62)+.15,{dx:0,dy:30,stag:.015,dur:.45,blur:8});
+}
+
+window.renderFrame=function(t){
+  camera(t); panel(t);
+  sceneA(t); sceneB(t); sceneB2(t); sceneDot(t); sceneT(t); sceneR(t); sceneH(t);
+};
+window.ready=(async()=>{
+  await document.fonts.load('800 50px Inter');await document.fonts.load('600 50px Inter');
+  await document.fonts.ready;
+  build();
+  const q=new URLSearchParams(location.search);
+  renderFrame(q.has('t')?+q.get('t'):0);
+  return true;
+})();
+</script>
+</body>
+</html>
