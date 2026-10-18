@@ -6,7 +6,7 @@ The two supplied clips are parts of the same song (83 BPM):
 Music = track.mp3 through its drop hit, then all of track2.mp3 placed on the same beat grid
 (found by cross-correlating onset envelopes); short fade-out because track2 stops mid-bar.
 
-usage: python3 sound_v10.py <track.mp3> <track2.mp3> <out.wav>
+usage: python3 sound_v10.py <track.mp3> <track2.mp3> <out.wav> [--sfx-only]
 """
 import sys
 import wave
@@ -59,9 +59,13 @@ def main():
         add(shutter(), drop + .9 + j * .45, .35)                    # camera on info 1
     add(roll(1.4), drop + 3 * BAR + 1.0, .2)                       # excavator on info 4
     add(shine(), T[-1] + .6, .3)                                   # end card
-    mix = music + np.stack([base.L, base.R], 1) * .3
-    mix = np.tanh(mix * 1.05) / np.tanh(1.05)
-    mix *= .9 / np.abs(mix).max()
+    sfx = np.stack([base.L, base.R], 1) * .3
+    mix = np.tanh((music + sfx) * 1.05) / np.tanh(1.05)
+    norm = .9 / np.abs(mix).max()
+    if '--sfx-only' in sys.argv:
+        mix = sfx * norm          # same level the SFX have inside the full mix, no music
+    else:
+        mix *= norm
     with wave.open(sys.argv[3], 'wb') as w:
         w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
         w.writeframes((mix * 32767).astype('<i2').tobytes())
