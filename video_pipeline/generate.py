@@ -77,7 +77,7 @@ def main():
     p.add_argument("--negative", default=NEGATIVE)
     p.add_argument("--big", action="store_true", help="wan22: A14B statt 5B (48–80 GB VRAM)")
     p.add_argument("--seconds", type=float, default=5.0)
-    p.add_argument("--aspect", default="16:9", help="ohne --image: 16:9, 9:16, 1:1 …")
+    p.add_argument("--aspect", default="9:16", help="ohne --image: 9:16 (Standard, TikTok/Reels/Shorts), 16:9, 1:1 …")
     p.add_argument("--res", default="720p", choices=list(RES))
     p.add_argument("--enhance", action="store_true", help="ltx2: Prompt automatisch ausbauen lassen")
     p.add_argument("--steps", type=int, default=None, help="Standard: 30 (ltx2) / 40 (wan22)")

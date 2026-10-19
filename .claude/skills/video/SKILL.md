@@ -66,6 +66,8 @@ Vor jedem Prompt den Skill `video-prompts` anwenden. Für Hooks/Skripte/Copy: `m
 | Studio: Referenzen ins Video (Phantom), Multi-Referenz mit Ton (LTX-2.5 MSR), Gesicht halten (Stand-In/Lynx), Charakter animieren (animate2), Kamerafahrt (uni3c), lange Videos (sky_df_14B), sprechender Avatar (infinitetalk) | `python remote.py run studio run --model phantom_14B --ref in/a.jpg --prompt "..."` (Liste: `run studio models`; erst `--dry-run`) | je nach Modell |
 | Fertig machen: RIFE 30/60 fps, Real-ESRGAN auf **1080p** (Standard), Ton, Untertitel | `python remote.py run finish out/<datei>.mp4 [--audio-from in/clip.mp4 --audio-offset 2] [--srt out/clip.srt] [--res 2160 für 4K] [--fps 60]` | 24 GB |
 
+**Format:** Standard **9:16** nativ erzeugen (720x1280 → 1080x1920). Nicht 16:9 erzeugen und hochkant zuschneiden – dabei bleiben nur ~400 Pixel Breite übrig. 16:9 wählen bei querem Ausgangsclip (`swap` übernimmt das Format des Clips automatisch), breiten Fahrszenen/Panoramen oder YouTube-Videos. Bei 9:16 im Prompt das Hauptmotiv mittig/vertikal denken ("centered, vertical framing", Auto eher schräg von vorne als seitlich).
+
 **Qualitätsziel: in 720p erzeugen, als 1080p ausliefern** (`finish` skaliert automatisch auf 1080p, hochkant 1080x1920). Upscaling kostet nur Sekunden GPU-Zeit (< 1 Cent pro Clip).
 - 720p direkt erzeugen können: `generate wan22` (5B, 24 GB), `ref2video` mit 14B (48 GB+), `generate ltx2` (48 GB+), die meisten Studio-Modelle mit `--resolution 1280x720`.
 - Auf 24 GB läuft VACE nur als 1.3B in 480p → Upscale auf 1080p klappt, aber mit weniger Details. Für Auto-Tausch in guter Qualität eine 48-GB-Karte vorschlagen (neues OK).

@@ -167,7 +167,7 @@ def main():
     p.add_argument("--overlap", type=int, default=8, help="swap: Frames Überlappung zwischen Durchgängen")
     p.add_argument("--grow", type=int, default=12, help="swap: Maske um N Pixel vergrößern (Schatten/Kanten)")
     p.add_argument("--seconds", type=float, default=5.0, help="r2v: Länge (max. ~5 s)")
-    p.add_argument("--aspect", default="16:9", help="r2v: Seitenverhältnis, z. B. 16:9, 9:16, 1:1")
+    p.add_argument("--aspect", default="9:16", help="r2v: 9:16 (Standard, TikTok/Reels/Shorts), 16:9, 1:1")
     p.add_argument("--res", default="720p", choices=list(RES))
     p.add_argument("--model", default="Wan-AI/Wan2.1-VACE-14B-diffusers")
     p.add_argument("--offload", default="none", choices=["none", "model", "seq"])

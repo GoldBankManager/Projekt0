@@ -7,6 +7,7 @@ Ziel: Videos erstellen, Autos/Objekte in Clips tauschen, Clips und Hooks analysi
 - `car_swap.py`: bezahlte Alternative über fal.ai (Seedance 2.0), nur mit OK.
 - Der Start-Hook installiert die vast.ai-CLI. `VAST_API_KEY` kommt aus den Umgebungs-Einstellungen. Den Key nie ausgeben oder in Dateien schreiben.
 - Mit dem Nutzer Deutsch sprechen. Videoprompts auf Englisch.
+- **Format: Standard 9:16** (TikTok/Reels/Shorts), ausgeliefert als 1080x1920. 16:9 (1920x1080) nur, wenn der Nutzer es will, das Ausgangsmaterial quer ist oder die Szene klar davon profitiert (breite Fahrszenen, YouTube) – dann kurz sagen, warum.
 
 ## Geld und Guthaben (gilt immer, für alle Dienste: vast.ai, fal.ai und jeden anderen bezahlten Anbieter)
 
