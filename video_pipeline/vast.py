@@ -54,6 +54,7 @@ def onstart(model):
     return (f'mkdir -p /workspace && cd /workspace && python -c "{fetch}" '
             f"&& cd Projekt0-{BRANCH}/video_pipeline "
             f"&& (nohup python server.py > /workspace/server.log 2>&1 &) "
+            f"&& (bash tunnel.sh &) "
             f"&& {{ bash setup_vast.sh {'1.3b' if model == '1.3b' else ''} "
             f"&& echo PIPELINE_READY || echo PIPELINE_FAILED; }} 2>&1 | tee /workspace/setup.log")
 

@@ -6,3 +6,4 @@ video_pipeline/downloads/
 video_pipeline/in/
 video_pipeline/out/
 video_pipeline/jobs/
+video_pipeline/.pipe_url

@@ -98,8 +98,10 @@ class Handler(BaseHTTPRequestHandler):
         if path == "health":
             ready = READY.exists() and "PIPELINE_READY" in READY.read_text(errors="replace")
             busy = [j["id"] for j in jobs.values() if j["status"] in ("queued", "running")]
+            tunnel = Path("/workspace/tunnel_url")
             return self.send(200, {"ready": ready, "gpu": gpu(), "busy": busy,
-                                   "disk_free_gb": round(shutil.disk_usage(ROOT).free / 2**30)})
+                                   "disk_free_gb": round(shutil.disk_usage(ROOT).free / 2**30),
+                                   "tunnel": tunnel.read_text().strip() if tunnel.exists() else None})
         if path == "jobs":
             return self.send(200, [self.job_view(j, tail=3) for j in jobs.values()])
         if path.startswith("jobs/"):
@@ -173,6 +175,18 @@ def fetch(url, name=None):
     if not url.startswith(("http://", "https://")):
         return {"error": "ungültige URL"}
     DIRS["in"].mkdir(exist_ok=True)
+    if "drive.google.com" in url:  # Google-Drive-Freigabelink
+        out = subprocess.run([sys.executable, "-m", "gdown", "--fuzzy", url, "-O", str(DIRS["in"]) + "/"],
+                             capture_output=True, text=True, cwd=DIRS["in"])
+        saved = [l for l in out.stdout.splitlines() + out.stderr.splitlines() if l.startswith("To: ")]
+        if out.returncode != 0 or not saved:
+            return {"error": (out.stderr or out.stdout)[-800:]}
+        dst = Path(saved[-1][4:].strip())
+        if name:
+            dst = dst.rename(DIRS["in"] / name)
+        return {"saved": str(dst.relative_to(ROOT))}
+    if "dropbox.com" in url:
+        url = url.replace("dl=0", "dl=1") if "dl=0" in url else url + ("&" if "?" in url else "?") + "dl=1"
     if Path(url.split("?")[0]).suffix.lower() in (".jpg", ".jpeg", ".png", ".webp", ".mp4", ".mov", ".webm"):
         dst = DIRS["in"] / (name or Path(url.split("?")[0]).name)
         urllib.request.urlretrieve(url, dst)

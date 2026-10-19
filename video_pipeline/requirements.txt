@@ -13,5 +13,6 @@ spandrel
 ccvfi
 av
 yt-dlp
+gdown
 pillow
 numpy

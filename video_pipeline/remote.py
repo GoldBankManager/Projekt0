@@ -18,6 +18,7 @@ BEISPIELE:
 import argparse
 import json
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -27,6 +28,7 @@ from pathlib import Path
 from vast import LABEL, PORT, pipe_token, vast
 
 DOWNLOADS = Path(__file__).resolve().parent / "downloads"
+CACHE_FILE = Path(__file__).resolve().parent / ".pipe_url"  # zuletzt funktionierende Adresse
 
 
 def base_url(instance_id=None):
@@ -38,10 +40,36 @@ def base_url(instance_id=None):
     if not insts:
         sys.exit("Keine Pipeline-Instanz gefunden. Erst mieten:  python vast.py start")
     i = max(insts, key=lambda x: x.get("start_date") or 0)
+    if i.get("actual_status") != "running":
+        sys.exit(f"Instanz {i['id']} läuft noch nicht (Status: {i.get('actual_status')}). Gleich nochmal versuchen.")
+    cache = CACHE_FILE.read_text().split() if CACHE_FILE.exists() else []
+    if len(cache) == 2 and cache[0] == str(i["id"]) and reachable(cache[1]):
+        return cache[1]
     port = (i.get("ports") or {}).get(f"{PORT}/tcp")
-    if i.get("actual_status") != "running" or not port or not i.get("public_ipaddr"):
-        sys.exit(f"Instanz {i['id']} ist noch nicht erreichbar (Status: {i.get('actual_status')}). Gleich nochmal versuchen.")
-    return f"http://{i['public_ipaddr']}:{port[0]['HostPort']}"
+    candidates = [f"http://{i['public_ipaddr']}:{port[0]['HostPort']}"] if port and i.get("public_ipaddr") else []
+    # Ausweg, falls der Chat-Proxy den direkten Port blockt: HTTPS-Tunnel aus dem Instanz-Log (tunnel.sh)
+    try:
+        logs = vast("logs", i["id"], "--tail", "400", raw=False)
+    except SystemExit:
+        logs = ""
+    candidates += list(dict.fromkeys(reversed(re.findall(r"PIPE_TUNNEL=(https://[a-z0-9-]+\.trycloudflare\.com)", logs))))
+    for url in candidates:
+        if reachable(url):
+            CACHE_FILE.write_text(f"{i['id']} {url}")
+            return url
+    sys.exit(f"Job-Server von Instanz {i['id']} (noch) nicht erreichbar – direkt: {candidates[:1] or 'kein Port'}, "
+             f"Tunnel: {candidates[1:] or 'noch keiner im Log'}. In 1–2 min nochmal versuchen.")
+
+
+def reachable(url):
+    """Antwortet dort unser Server? (401 ohne Token zählt als erreichbar)"""
+    try:
+        urllib.request.urlopen(f"{url}/health", timeout=8)
+        return True
+    except urllib.error.HTTPError as e:
+        return e.code == 401
+    except (urllib.error.URLError, TimeoutError, ConnectionError, OSError):
+        return False
 
 
 class Pipe:
@@ -103,21 +131,24 @@ def main():
     sub.add_parser("get-new", help="alle *_final.mp4 aus out/ holen, die lokal noch fehlen")
     a = p.parse_args()
 
+    if a.cmd == "wait":
+        print("Warte auf die Instanz … (Start + Installation dauern ca. 10–25 min)")
+        deadline = time.time() + 50 * 60
+        while time.time() < deadline:
+            try:
+                pipe = Pipe(a.id)
+                h = pipe.call("GET", "health", timeout=15)
+                if h["ready"]:
+                    print(f"✓ Bereit über {pipe.url} – GPU: {h['gpu']}, frei: {h['disk_free_gb']} GB")
+                    return
+            except (SystemExit, ConnectionError):
+                pass
+            time.sleep(30)
+        sys.exit("Nach 50 min nicht bereit – Log ansehen: python vast.py logs <ID>")
+
     pipe = Pipe(a.id)
     if a.cmd == "health":
         print(json.dumps(pipe.call("GET", "health"), indent=2, ensure_ascii=False))
-
-    elif a.cmd == "wait":
-        print(f"Warte auf {pipe.url} … (Installation dauert ca. 10–25 min)")
-        while True:
-            try:
-                h = pipe.call("GET", "health", timeout=15)
-                if h["ready"]:
-                    print(f"✓ Bereit – GPU: {h['gpu']}, frei: {h['disk_free_gb']} GB")
-                    return
-            except ConnectionError:
-                pass
-            time.sleep(30)
 
     elif a.cmd == "up":
         for f in a.files:

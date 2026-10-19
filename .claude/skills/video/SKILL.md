@@ -9,23 +9,46 @@ Alles läuft aus `video_pipeline/` heraus. Die GPU-Arbeit passiert auf einer vas
 
 **Geld-Regel aus CLAUDE.md gilt immer:** nie Guthaben aufladen; mieten oder sonstige Kosten nur nach ausdrücklichem OK für genau diese Aktion, mit Preis vorher.
 
+## Der Ablauf, den der Nutzer erwartet
+
+Der Nutzer schreibt `/video`, schickt Bilder/Clips (oder Links) und sagt grob, was er will. **Claude erledigt den Rest selbst** und fragt nur:
+1. einmal nach dem **OK zum Mieten** (GPU, $/h, Reichweite des Guthabens) – nur wenn noch keine Instanz läuft,
+2. nach der **Zielsetzung**, falls sie wirklich unklar ist (sonst sinnvoll annehmen und sagen, was angenommen wurde),
+3. am Ende, ob die Instanz **zerstört** werden soll.
+
+Zwischendurch kurz Bescheid geben (Instanz startet, installiert, Job läuft, fertig) – nicht bei jedem Befehl.
+
+**Ziel ableiten, wenn der Nutzer nur Material schickt:**
+| Material | Standard |
+|---|---|
+| Clip mit Auto + Fotos eines anderen Autos | `ref2video swap` (Auto tauschen), danach `finish` mit Originalton |
+| Nur Foto(s) von Auto/Produkt/Person | `ref2video r2v` bzw. bei Personen `studio` Phantom / Stand-In, 9:16, 5 s |
+| Nur Text-Idee | `generate wan22` (24 GB) oder `generate ltx2` wenn Ton gewünscht (48 GB+) |
+| Links zu fremden Videos + „analysieren/Hooks“ | `fetch` + `analyze --ask` (Hook der ersten 2 s, Schnitttempo, Stil) |
+
+## 0. Material finden
+
+- Angehängte Dateien liegen in der Cloud-Sitzung unter **`/mnt/user-data/uploads/`** (auch `/mnt/attach/` prüfen): `ls -la /mnt/user-data/uploads /mnt/attach`.
+- Ist ein Bild nur im Chat sichtbar, aber nicht als Datei vorhanden: den Nutzer um die Datei als Anhang oder um einen Link bitten.
+- Links: TikTok/Reels/YouTube/X, Google-Drive- und Dropbox-Freigaben, direkte Bild-/Video-URLs – alles per `fetch` (die Instanz lädt selbst).
+
 ## 1. Instanz prüfen oder starten
 
 ```bash
 cd video_pipeline
 python vast.py status          # läuft schon eine? → weiter mit Schritt 2
 python vast.py balance
-python vast.py offers          # bzw. --model 14b --gpu "A100 SXM4" --max-price 1.5
+python vast.py offers          # 24 GB: Standard | 48 GB+: --model 14b --gpu "RTX A6000" --max-price 0.9 | 80 GB: --gpu "A100 SXM4" --max-price 1.5
 ```
-- Dem Nutzer Angebot, $/h und Stunden-Reichweite des Guthabens nennen, **auf OK warten**.
-- Nach OK: `python vast.py start --offer <ID> -y` (Modell: `--model 1.3b` für 24 GB, `--model 14b` ab 48 GB).
-- Danach `python remote.py wait` im Hintergrund laufen lassen (10–25 min) und Bescheid sagen, wenn es bereit ist.
-- Läuft `remote.py` in einen Netzwerkfehler (Proxy blockt den Port), dem Nutzer `python vast.py status` zeigen: dort stehen Jupyter-Link und SSH-Befehl als Ausweg.
+- Kleinste GPU wählen, die für die Aufgabe reicht (Tabelle in Schritt 3). Dem Nutzer Angebot, $/h und Stunden-Reichweite des Guthabens nennen, **auf OK warten**.
+- Nach OK: `python vast.py start --offer <ID> --model 1.3b|14b -y`.
+- Dann `python remote.py wait` **im Hintergrund** starten (10–25 min). In der Zwischenzeit Material vorbereiten und Prompts schreiben (`video-prompts`).
+- `remote.py` sucht selbst den Weg zur Instanz: direkter Port, sonst HTTPS-Tunnel aus dem Instanz-Log. Klappt beides nicht: `python vast.py logs <ID>` prüfen; Notweg ist der Jupyter-Link aus `python vast.py status` (Nutzer lädt Dateien dort hoch, Befehle im Terminal).
 
 ## 2. Dateien auf die Instanz
 
-- Vom Nutzer hochgeladene Bilder/Clips: `python remote.py up <dateien…>` → landen in `in/`
-- Links (TikTok, Reels, YouTube, direkte Bild-/Video-URLs): `python remote.py fetch "<url>" --name clip.mp4`
+- Anhänge: `python remote.py up /mnt/user-data/uploads/<datei> …` → landen in `in/` (Dateinamen ohne Leerzeichen bevorzugen)
+- Links: `python remote.py fetch "<url>" --name clip.mp4`
 - `python remote.py ls in`
 
 ## 3. Jobs (laufen nacheinander auf der GPU; lange Jobs im Hintergrund starten)
