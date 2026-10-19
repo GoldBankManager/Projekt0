@@ -1,0 +1,14 @@
+# torch + CUDA bringt das vast.ai-PyTorch-Template schon mit
+diffusers>=0.35
+transformers>=4.53
+accelerate
+ftfy
+sentencepiece
+huggingface_hub
+ultralytics
+opencv-python-headless
+scenedetect
+faster-whisper
+spandrel
+pillow
+numpy
