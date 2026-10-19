@@ -3,13 +3,13 @@
 finish.py – Nachbearbeitung & Rendern: flüssiger (FPS hoch), schärfer (Upscale bis 4K), Ton + Untertitel drauf
 
   FPS        RIFE v4.26 (KI-Zwischenbilder, 16 fps von Wan → 30/60 fps); Fallback: ffmpeg minterpolate
-  Upscale    Real-ESRGAN über spandrel (x4 auf der GPU, danach exakt auf Zielhöhe skaliert)
+  Upscale    Real-ESRGAN über spandrel (x4 auf der GPU, danach exakt auf 1080p/1440p/4K skaliert)
   Ton        Originalton aus dem Quellclip wieder drunterlegen (wie in car_swap.py)
   Untertitel .srt aus analyze.py einbrennen
 
 BEISPIELE:
-  python finish.py out/edit_swap_s123_16fps.mp4 --audio-from edit.mp4            # 30 fps, 4K, Originalton
-  python finish.py out/clip.mp4 --height 1080 --fps 60
+  python finish.py out/edit_swap_s123_16fps.mp4 --audio-from edit.mp4            # 30 fps, 1080p, Originalton
+  python finish.py out/clip.mp4 --res 2160 --fps 60                             # 4K, 60 fps
   python finish.py out/clip.mp4 --srt out/edit.srt --upscale none
 """
 import argparse
@@ -79,9 +79,17 @@ def load_upscaler(name):
     return model, torch
 
 
-def upscale(src, dst, height, name):
+def target_size(w, h, res):
+    """„1080p“ = kurze Seite 1080 – also 1920x1080 quer und 1080x1920 hochkant."""
+    for rw, rh in ((16, 9), (9, 16), (1, 1), (4, 5), (4, 3), (3, 4)):  # fast Standardformat → exakt (z. B. 832x464)
+        if abs(w / h - rw / rh) / (rw / rh) < 0.03:
+            return (round(res * rw / rh / 2) * 2, res) if rw >= rh else (res, round(res * rh / rw / 2) * 2)
+    f = res / min(w, h)
+    return round(w * f / 2) * 2, round(h * f / 2) * 2
+
+
+def upscale(src, dst, width, height, name):
     w, h, _, fps, _ = probe(src)
-    width = round(w * height / h / 2) * 2
     model, torch = load_upscaler(name)
     dtype = torch.float16 if model.supports_half else torch.float32
 
@@ -104,7 +112,8 @@ def main():
     p.add_argument("video", type=Path)
     p.add_argument("--fps", type=float, default=30, help="Ziel-FPS (0 = unverändert)")
     p.add_argument("--interp", default="rife", choices=["rife", "ffmpeg"], help="Zwischenbilder: rife = KI, ffmpeg = CPU")
-    p.add_argument("--height", type=int, default=2160, help="Zielhöhe: 1080, 1440, 2160 (4K)")
+    p.add_argument("--res", "--height", dest="res", type=int, default=1080,
+                   help="Ziel: 1080 (Standard, Social Media), 1440, 2160 (4K); kurze Seite, gilt auch hochkant; 0 = unverändert")
     p.add_argument("--upscale", default="x4plus", choices=[*WEIGHTS, "none"],
                    help="x4plus = beste Qualität, general = schneller, none = nur skalieren")
     p.add_argument("--audio-from", type=Path, help="Ton aus diesem Clip übernehmen")
@@ -116,22 +125,23 @@ def main():
     work = a.video.parent / "_work"
     work.mkdir(parents=True, exist_ok=True)
     cur = a.video
-    _, h, _, fps, _ = probe(cur)
+    w, h, _, fps, _ = probe(cur)
 
     if a.fps and abs(a.fps - fps) > 0.01:
         print(f"1/3 FPS {fps:g} → {a.fps:g} …")
         interp = interpolate_rife if a.interp == "rife" else interpolate_ffmpeg
         cur = interp(cur, work / f"{a.video.stem}_{a.fps:g}fps.mp4", a.fps)
 
-    if a.height and a.height != h:
-        print(f"2/3 Upscale auf {a.height}p …")
-        dst = work / f"{a.video.stem}_{a.height}p.mp4"
-        if a.upscale == "none" or a.height <= h:
-            sh(["ffmpeg", "-y", "-v", "error", "-i", cur, "-vf", f"scale=-2:{a.height}:flags=lanczos",
+    if a.res and a.res != min(w, h):
+        tw, th = target_size(w, h, a.res)
+        print(f"2/3 Skalieren {w}x{h} → {tw}x{th} …")
+        dst = work / f"{a.video.stem}_{a.res}p.mp4"
+        if a.upscale == "none" or a.res < min(w, h):
+            sh(["ffmpeg", "-y", "-v", "error", "-i", cur, "-vf", f"scale={tw}:{th}:flags=lanczos",
                 "-c:v", "libx264", "-crf", "14", "-preset", "slow", "-pix_fmt", "yuv420p", dst])
             cur = dst
         else:
-            cur = upscale(cur, dst, a.height, a.upscale)
+            cur = upscale(cur, dst, tw, th, a.upscale)
 
     print("3/3 Ton / Untertitel …")
     out = a.out or a.video.parent / f"{re.sub(r'_\d+fps$', '', a.video.stem)}_final.mp4"

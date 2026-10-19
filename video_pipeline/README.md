@@ -9,7 +9,7 @@ Lokaler Ersatz für `car_swap.py` (Seedance über fal.ai): keine Kosten pro Seku
  Text/Bild ─► generate.py ─► Video mit Ton (LTX-2) oder beste Bewegung (Wan2.2)
  Referenzen ─► studio.py ──► Wan2GP: Phantom, LTX-2.5 MSR, Stand-In, Lynx, Animate 2, Uni3C, SkyReels …
               │
-              └──► finish.py ► RIFE 30/60 fps, Real-ESRGAN bis 4K, Ton, Untertitel ──► *_final.mp4
+              └──► finish.py ► RIFE 30/60 fps, Real-ESRGAN auf 1080p (bis 4K), Ton, Untertitel ──► *_final.mp4
 ```
 
 ## Welche Repos wofür
@@ -25,7 +25,7 @@ Lokaler Ersatz für `car_swap.py` (Seedance über fal.ai): keine Kosten pro Seku
 | **Text/Bild → Video** | [Wan2.2](https://github.com/Wan-Video/Wan2.2) TI2V-5B / A14B über diffusers (`generate.py wan22`) | beste offene Bewegungsqualität |
 | **Studio** | [Wan2GP](https://github.com/deepbeepmeep/Wan2GP) (`studio.py`) | Phantom, LTX-2.5 MSR (1–4 Referenzen + Ton), Stand-In, Lynx, VACE 2.2, Animate 2, Uni3C, SkyReels-2, HunyuanCustom, InfiniteTalk – mit wenig VRAM |
 | Zwischenbilder | [RIFE v4.26](https://github.com/hzwer/Practical-RIFE) über [ccvfi](https://github.com/EutropicAI/ccvfi) | 16/24 → 30/60 fps per KI |
-| Upscale | [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) über [spandrel](https://github.com/chaiNNer-org/spandrel) | 720p auf 4K |
+| Upscale | [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) über [spandrel](https://github.com/chaiNNer-org/spandrel) | 720p → 1080p (Standard) oder 4K, auch hochkant (1080x1920) |
 | Rendern | [FFmpeg](https://ffmpeg.org) | Ton, Untertitel, Encoding |
 | Links laden | [yt-dlp](https://github.com/yt-dlp/yt-dlp) | TikTok/Reels/YouTube-Vorbilder auf die Instanz |
 
@@ -98,7 +98,7 @@ python ref2video.py r2v --ref porsche.jpg --aspect 9:16 \
 # Auf der RTX 4090:
 python ref2video.py r2v --ref car.jpg --prompt "..." --model Wan-AI/Wan2.1-VACE-1.3B-diffusers --res 480p
 
-# 3) Fertig machen: 30 fps, 4K, Originalton
+# 3) Fertig machen: 30 fps, 1080p, Originalton  (4K: --res 2160)
 python finish.py out/clip_swap_s123_16fps.mp4 --audio-from clip.mp4
 ```
 
