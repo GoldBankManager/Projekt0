@@ -16,13 +16,17 @@ BEISPIELE:
   python vast.py stop 1234567                    # Instanz ZERSTÖREN (stoppt alle Kosten)
 """
 import argparse
+import hashlib
 import json
 import os
 import shutil
 import subprocess
 import sys
 
-REPO_TAR = "https://github.com/GoldBankManager/Projekt0/archive/refs/heads/video-pipeline.tar.gz"
+BRANCH = "master"
+REPO_TAR = f"https://github.com/GoldBankManager/Projekt0/archive/refs/heads/{BRANCH}.tar.gz"
+LABEL = "video-pipeline"
+PORT = 8000  # Job-Server (server.py)
 IMAGE = "pytorch/pytorch:2.7.1-cuda12.8-cudnn9-devel"
 VRAM = {"1.3b": 24, "14b": 48}  # GB, die das Modell mindestens braucht
 
@@ -38,19 +42,25 @@ def vast(*args, raw=True):
     return json.loads(r.stdout) if raw else r.stdout
 
 
+def pipe_token():
+    """Token für den Job-Server – aus dem vast-Key abgeleitet, also in jedem neuen Chat gleich, ohne ihn zu speichern."""
+    return hashlib.sha256(f"video-pipeline:{os.environ['VAST_API_KEY']}".encode()).hexdigest()[:40]
+
+
 def onstart(model):
-    """Läuft beim Start auf der Instanz: Repo holen, setup_vast.sh ausführen, Ergebnis in /workspace/setup.log."""
+    """Läuft bei jedem Start der Instanz: Code holen, Job-Server starten, setup_vast.sh → /workspace/setup.log."""
     fetch = ("import urllib.request,tarfile,io;"
              f"tarfile.open(fileobj=io.BytesIO(urllib.request.urlopen('{REPO_TAR}').read())).extractall('.')")
     return (f'mkdir -p /workspace && cd /workspace && python -c "{fetch}" '
-            f"&& cd Projekt0-video-pipeline/video_pipeline "
+            f"&& cd Projekt0-{BRANCH}/video_pipeline "
+            f"&& (nohup python server.py > /workspace/server.log 2>&1 &) "
             f"&& {{ bash setup_vast.sh {'1.3b' if model == '1.3b' else ''} "
             f"&& echo PIPELINE_READY || echo PIPELINE_FAILED; }} 2>&1 | tee /workspace/setup.log")
 
 
 def find_offers(gpu, vram, max_price, disk, limit=10):
     query = (f"gpu_name={gpu.replace(' ', '_')} num_gpus=1 gpu_ram>={vram} disk_space>={disk} "
-             f"reliability>0.98 inet_down>=300 cuda_vers>=12.8 dph<={max_price}")
+             f"reliability>0.98 inet_down>=300 cuda_vers>=12.8 direct_port_count>=4 dph<={max_price}")
     return vast("search", "offers", query, "-o", "dph_total", "--storage", disk, "--limit", limit)
 
 
@@ -77,7 +87,7 @@ def main():
         s.add_argument("--gpu", default="RTX 4090")
         s.add_argument("--model", default="1.3b", choices=list(VRAM), help="1.3b = Test/4090, 14b = beste Qualität")
         s.add_argument("--max-price", type=float, default=0.6, help="max. $/h")
-        s.add_argument("--disk", type=int, default=150, help="GB Speicher")
+        s.add_argument("--disk", type=int, help="GB Speicher (Standard: 80 für 1.3b, 150 für 14b)")
     sub.choices["start"].add_argument("--offer", type=int, help="bestimmtes Angebot (ID aus 'offers')")
     sub.choices["start"].add_argument("-y", "--yes", action="store_true", help="ohne Rückfrage mieten")
     sub.add_parser("status")
@@ -86,6 +96,8 @@ def main():
         sub.add_parser(name).add_argument("id", type=int)
     sub.choices["stop"].add_argument("-y", "--yes", action="store_true")
     a = p.parse_args()
+    if getattr(a, "model", None) and not a.disk:
+        a.disk = 80 if a.model == "1.3b" else 150
 
     if a.cmd == "balance":
         u = vast("show", "user")
@@ -108,11 +120,12 @@ def main():
                                                   if price else "") + f", Modell {a.model}, {a.disk} GB Disk.")
         if not a.yes and input("Mieten? (j/n) ").strip().lower() not in ("j", "y", "ja", "yes"):
             return
-        res = vast("create", "instance", offer_id, "--image", IMAGE, "--disk", a.disk,
+        res = vast("create", "instance", offer_id, "--image", IMAGE, "--disk", a.disk, "--label", LABEL,
+                   "--env", f"-e PIPE_TOKEN={pipe_token()} -p {PORT}:{PORT}",
                    "--ssh", "--jupyter", "--direct", "--onstart-cmd", onstart(a.model))
         iid = res.get("new_contract")
         print(f"✓ Instanz {iid} startet. Installation dauert ca. 15–25 min.")
-        print(f"  Fortschritt:  python vast.py logs {iid}   (fertig bei 'PIPELINE_READY')")
+        print(f"  Fortschritt:  python remote.py wait   (oder: python vast.py logs {iid})")
         print(f"  Zerstören:    python vast.py stop {iid}")
 
     elif a.cmd == "status":

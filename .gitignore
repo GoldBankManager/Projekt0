@@ -2,3 +2,7 @@ __pycache__/
 out/
 *.pt
 _work/
+video_pipeline/downloads/
+video_pipeline/in/
+video_pipeline/out/
+video_pipeline/jobs/

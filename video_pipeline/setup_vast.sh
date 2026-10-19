@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Einmal auf der gemieteten vast.ai-Maschine ausführen (Template: "PyTorch" mit CUDA 12.x):
-#   git clone -b video-pipeline https://github.com/GoldBankManager/Projekt0 && cd Projekt0/video_pipeline && bash setup_vast.sh
+#   git clone https://github.com/GoldBankManager/Projekt0 && cd Projekt0/video_pipeline && bash setup_vast.sh
 # Optional: bash setup_vast.sh 1.3b   → lädt nur das kleine Modell (RTX 4090 / 24 GB)
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -37,17 +37,30 @@ if [[ -n "$LIBS" ]] && ! grep -q "video_pipeline" ~/.bashrc; then
     echo "export LD_LIBRARY_PATH=$LIBS:\${LD_LIBRARY_PATH:-}  # video_pipeline" >> ~/.bashrc
     echo "export HF_HOME=$HF_HOME  # video_pipeline" >> ~/.bashrc
 fi
+# dieselben Variablen für die Jobs, die server.py startet
+printf 'HF_HOME=%s\nLD_LIBRARY_PATH=%s\n' "$HF_HOME" "$LIBS" > /workspace/pipeline.env
 
-echo "== Modelle vorladen (spart später bezahlte Wartezeit) =="
+echo "== Modelle vorladen: nur was für den ersten Job nötig ist =="
 python - "$MODEL" <<'EOF'
-import sys
+import sys, urllib.request
+from pathlib import Path
 from huggingface_hub import snapshot_download
-for repo in (sys.argv[1], "Qwen/Qwen2.5-VL-7B-Instruct", "Systran/faster-whisper-large-v3"):
-    print("  ", repo)
-    snapshot_download(repo)
+print("  ", sys.argv[1])
+snapshot_download(sys.argv[1])
 from ultralytics import YOLO
 YOLO("yolo11x-seg.pt")
+w = Path.home() / ".cache/video_pipeline/RealESRGAN_x4plus.pth"
+w.parent.mkdir(parents=True, exist_ok=True)
+if not w.exists():
+    urllib.request.urlretrieve("https://github.com/xinntao/Real-ESRGAN/releases/download/v0.1.0/RealESRGAN_x4plus.pth", w)
 EOF
+
+# Analyse-Modelle im Hintergrund nachladen – die Pipeline ist schon vorher benutzbar
+nohup python -c "
+from huggingface_hub import snapshot_download
+for r in ('Qwen/Qwen2.5-VL-7B-Instruct', 'Systran/faster-whisper-large-v3'):
+    snapshot_download(r)
+" > /workspace/prefetch.log 2>&1 &
 
 echo
 echo "✓ Fertig. Neues Terminal öffnen (oder: source ~/.bashrc), dann z. B.:"

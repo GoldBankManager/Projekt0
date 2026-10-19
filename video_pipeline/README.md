@@ -45,12 +45,24 @@ python vast.py status                     # Jupyter-Link und SSH-Befehl
 python vast.py stop <ID>                  # ZERSTÖREN, keine Kosten mehr
 ```
 
-Danach im Jupyter-Link Clips und Bilder nach `/workspace/Projekt0-video-pipeline/video_pipeline/` hochladen und dort im Terminal die Befehle unten ausführen.
+### Fernsteuern ohne SSH (`remote.py`, spricht mit `server.py` auf der Instanz)
+
+```bash
+python remote.py wait                                     # bis die Installation fertig ist
+python remote.py up auto.jpg clip.mp4                     # → in/
+python remote.py fetch "https://www.tiktok.com/@x/video/1" --name vorbild.mp4
+python remote.py run ref2video swap --video in/clip.mp4 --ref in/auto.jpg --prompt "..."
+python remote.py run finish out/clip_swap_s1_16fps.mp4 --audio-from in/clip.mp4
+python remote.py get-new                                  # fertige Videos → downloads/
+```
+
+Das Token für den Server wird aus `VAST_API_KEY` abgeleitet und muss nirgends gespeichert werden. In Claude Code reicht `/video`.
+Alternativ geht es über den Jupyter-Link im Ordner `/workspace/Projekt0-master/video_pipeline/` mit den Befehlen unten.
 
 ## Setup von Hand (einmal pro Instanz, ca. 10–20 min, meistens Modell-Download)
 
 ```bash
-git clone -b video-pipeline https://github.com/GoldBankManager/Projekt0
+git clone https://github.com/GoldBankManager/Projekt0
 cd Projekt0/video_pipeline
 bash setup_vast.sh          # 14B-Modell (48–80 GB GPU)
 bash setup_vast.sh 1.3b     # kleines Modell (RTX 4090)

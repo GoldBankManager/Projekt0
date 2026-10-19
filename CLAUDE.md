@@ -1,4 +1,12 @@
-# Regeln für dieses Projekt
+# Projekt0 – KI-Videoproduktion
+
+Ziel: Videos erstellen, Autos/Objekte in Clips tauschen, Clips und Hooks analysieren. Bevorzugt mit Open Source auf einer gemieteten vast.ai-GPU.
+
+- `video_pipeline/`: Open-Source-Pipeline (Wan-VACE, YOLO, Whisper, Qwen-VL, Real-ESRGAN, FFmpeg). **Bedienung: Skill `/video`** (`.claude/skills/video/SKILL.md`). Details in `video_pipeline/README.md`.
+  - `vast.py` mietet und zerstört die GPU, `remote.py` steuert die Jobs auf der Instanz, `server.py` läuft auf der Instanz.
+- `car_swap.py`: bezahlte Alternative über fal.ai (Seedance 2.0), nur mit OK.
+- Der Start-Hook installiert die vast.ai-CLI. `VAST_API_KEY` kommt aus den Umgebungs-Einstellungen. Den Key nie ausgeben oder in Dateien schreiben.
+- Mit dem Nutzer Deutsch sprechen. Videoprompts auf Englisch.
 
 ## Geld und Guthaben (gilt immer, für alle Dienste: vast.ai, fal.ai und jeden anderen bezahlten Anbieter)
 
