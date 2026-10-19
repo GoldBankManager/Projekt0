@@ -30,15 +30,24 @@ python vast.py offers          # bzw. --model 14b --gpu "A100 SXM4" --max-price 
 
 ## 3. Jobs (laufen nacheinander auf der GPU; lange Jobs im Hintergrund starten)
 
-| Ziel | Befehl |
-|---|---|
-| Clip analysieren (Schnitte, Transkript, Szenenbeschreibung, Hook der ersten Sekunden) | `python remote.py run analyze in/clip.mp4 --ask "..."` |
-| Auto/Fahrzeug im Clip ersetzen, Szene + Kamera bleiben | `python remote.py run ref2video swap --video in/clip.mp4 --ref in/a.jpg in/b.jpg --prompt "..." [--start 2 --max-seconds 6]` |
-| Neues Video aus Referenzbild(ern) | `python remote.py run ref2video r2v --ref in/a.jpg --prompt "..." [--aspect 9:16 --seconds 5]` |
-| Fertig machen: 30 fps, 4K, Originalton, Untertitel | `python remote.py run finish out/<datei>_16fps.mp4 [--audio-from in/clip.mp4 --audio-offset 2] [--srt out/clip.srt] [--height 1080]` |
+Vor jedem Prompt den Skill `video-prompts` anwenden. Für Hooks/Skripte/Copy: `marketing-os`, `social`, `youtube`, `copywriting`, `ad-creative`.
 
-Bei der 1.3B-Instanz immer `--model Wan-AI/Wan2.1-VACE-1.3B-diffusers --res 480p` an ref2video anhängen. Bei 48-GB-Karten mit 14B: `--offload model`.
-Mehrere Versionen: `--takes 3`. Reproduzieren: `--seed N`.
+| Ziel | Befehl | GPU |
+|---|---|---|
+| Clip analysieren (Schnitte, Transkript, Szenen, Hook der ersten Sekunden) | `python remote.py run analyze in/clip.mp4 --ask "..."` | 24 GB |
+| Auto im Clip ersetzen, Szene + Kamera bleiben | `python remote.py run ref2video swap --video in/clip.mp4 --ref in/a.jpg in/b.jpg --prompt "..." [--start 2 --max-seconds 6]` | 24 GB (1.3B) / 48+ (14B) |
+| Neues Video aus Referenzbild(ern), VACE | `python remote.py run ref2video r2v --ref in/a.jpg --prompt "..." [--aspect 9:16]` | wie oben |
+| Text/Bild → Video **mit Ton** (LTX-2) | `python remote.py run generate ltx2 --prompt "..." [--image in/a.jpg --enhance --seconds 8]` | 48+ GB |
+| Text/Bild → Video, beste Bewegung (Wan2.2) | `python remote.py run generate wan22 --prompt "..." [--image in/a.jpg] [--big]` | 24 GB (5B) / 48+ (`--big`) |
+| Studio (Wan2GP) einmalig installieren | `python remote.py run studio install` | – |
+| Studio: Referenzen ins Video (Phantom), Multi-Referenz mit Ton (LTX-2.5 MSR), Gesicht halten (Stand-In/Lynx), Charakter animieren (animate2), Kamerafahrt (uni3c), lange Videos (sky_df_14B), sprechender Avatar (infinitetalk) | `python remote.py run studio run --model phantom_14B --ref in/a.jpg --prompt "..."` (Liste: `run studio models`; erst `--dry-run`) | je nach Modell |
+| Fertig machen: RIFE 30/60 fps, Real-ESRGAN 4K, Ton, Untertitel | `python remote.py run finish out/<datei>.mp4 [--audio-from in/clip.mp4 --audio-offset 2] [--srt out/clip.srt] [--height 1080] [--fps 60]` | 24 GB |
+
+- Bei der 1.3B-Instanz an ref2video immer `--model Wan-AI/Wan2.1-VACE-1.3B-diffusers --res 480p` anhängen. Bei 48-GB-Karten mit 14B: `--offload model`.
+- Mehrere Versionen: `--takes 3`. Reproduzieren: `--seed N`.
+- LTX-2-Videos haben eigenen Ton – `finish` behält ihn automatisch.
+- Studio-Ergebnisse landen in `out/studio/`. Feinsteuerung: UI per SSH-Tunnel (`run studio ui`, Hinweise im Output), dort „Export Settings“ → JSON hochladen → `run studio run in/settings.json --prompt "..."`.
+- Wenn das gewünschte Modell mehr VRAM braucht als die laufende Instanz hat: dem Nutzer sagen und eine größere GPU vorschlagen (neues OK nötig).
 
 ## 4. Ergebnis zum Nutzer
 

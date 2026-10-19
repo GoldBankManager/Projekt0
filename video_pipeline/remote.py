@@ -92,7 +92,7 @@ def main():
     f.add_argument("url")
     f.add_argument("--name")
     r = sub.add_parser("run")
-    r.add_argument("script", choices=["analyze", "ref2video", "finish"])
+    r.add_argument("script", choices=["analyze", "ref2video", "generate", "studio", "finish"])
     r.add_argument("args", nargs=argparse.REMAINDER)
     r.add_argument("--no-wait", action="store_true")
     sub.add_parser("jobs")

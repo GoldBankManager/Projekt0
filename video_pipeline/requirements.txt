@@ -10,6 +10,8 @@ opencv-python-headless
 scenedetect
 faster-whisper
 spandrel
+ccvfi
+av
 yt-dlp
 pillow
 numpy

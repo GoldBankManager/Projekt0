@@ -29,7 +29,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 DIRS = {"in": ROOT / "in", "out": ROOT / "out"}
 LOGS = ROOT / "jobs"
-SCRIPTS = {"analyze", "ref2video", "finish"}
+SCRIPTS = {"analyze", "ref2video", "generate", "studio", "finish"}
 TOKEN = os.environ.get("PIPE_TOKEN", "")
 READY = Path(os.environ.get("PIPE_READY_FILE", "/workspace/setup.log"))
 ENV_FILE = Path("/workspace/pipeline.env")

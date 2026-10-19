@@ -3,11 +3,13 @@
 Lokaler Ersatz für `car_swap.py` (Seedance über fal.ai): keine Kosten pro Sekunde, nur die GPU-Miete.
 
 ```
- Clip ──► analyze.py ──────► Szenen, Untertitel (.srt), Beschreibung pro Szene (JSON)
+ Clip ──► analyze.py ─────► Szenen, Untertitel (.srt), Beschreibung pro Szene (JSON)
    │
-   └────► ref2video.py ────► neues Video, 16 fps   (Auto tauschen  oder  Referenzbild → Video)
+   ├────► ref2video.py ───► Auto tauschen / Referenzbild → Video (Wan-VACE)
+ Text/Bild ─► generate.py ─► Video mit Ton (LTX-2) oder beste Bewegung (Wan2.2)
+ Referenzen ─► studio.py ──► Wan2GP: Phantom, LTX-2.5 MSR, Stand-In, Lynx, Animate 2, Uni3C, SkyReels …
               │
-              └──► finish.py ► 30/60 fps, bis 4K, Originalton, Untertitel  ──►  *_final.mp4
+              └──► finish.py ► RIFE 30/60 fps, Real-ESRGAN bis 4K, Ton, Untertitel ──► *_final.mp4
 ```
 
 ## Welche Repos wofür
@@ -19,8 +21,15 @@ Lokaler Ersatz für `car_swap.py` (Seedance über fal.ai): keine Kosten pro Seku
 | Analyse: Bildinhalt | [Qwen2.5-VL](https://github.com/QwenLM/Qwen2.5-VL) | beschreibt jede Szene, beantwortet Fragen (`--ask`) |
 | Masken | [Ultralytics YOLO11-seg](https://github.com/ultralytics/ultralytics) | findet das Auto in jedem Frame und stellt die Referenzbilder frei |
 | **Reference-to-Video** | [Wan2.1-VACE](https://github.com/ali-vilab/VACE) über [diffusers](https://github.com/huggingface/diffusers) | malt das Referenz-Auto in die Maske (`swap`) oder baut ein neues Video aus Referenzbildern (`r2v`) |
+| **Text/Bild → Video mit Ton** | [LTX-2](https://github.com/Lightricks/LTX-2) über diffusers (`generate.py ltx2`) | Video + Geräusche/Musik/Dialog in einem Durchgang |
+| **Text/Bild → Video** | [Wan2.2](https://github.com/Wan-Video/Wan2.2) TI2V-5B / A14B über diffusers (`generate.py wan22`) | beste offene Bewegungsqualität |
+| **Studio** | [Wan2GP](https://github.com/deepbeepmeep/Wan2GP) (`studio.py`) | Phantom, LTX-2.5 MSR (1–4 Referenzen + Ton), Stand-In, Lynx, VACE 2.2, Animate 2, Uni3C, SkyReels-2, HunyuanCustom, InfiniteTalk – mit wenig VRAM |
+| Zwischenbilder | [RIFE v4.26](https://github.com/hzwer/Practical-RIFE) über [ccvfi](https://github.com/EutropicAI/ccvfi) | 16/24 → 30/60 fps per KI |
 | Upscale | [Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) über [spandrel](https://github.com/chaiNNer-org/spandrel) | 720p auf 4K |
-| FPS / Rendern | [FFmpeg](https://ffmpeg.org) | Zwischenbilder von 16 auf 30/60 fps, Ton, Untertitel, Encoding |
+| Rendern | [FFmpeg](https://ffmpeg.org) | Ton, Untertitel, Encoding |
+| Links laden | [yt-dlp](https://github.com/yt-dlp/yt-dlp) | TikTok/Reels/YouTube-Vorbilder auf die Instanz |
+
+Wissen für Claude (Skills in `.claude/skills/`): `video` (Bedienung), `video-prompts` (Prompt-Regeln je Modell), Marketing-Skills aus [marketingskills](https://github.com/coreyhaines31/marketingskills), [marketing-os](https://github.com/Yuzzyuk/marketing-os) (Hook-Engine) und [claude-youtube](https://github.com/AgriciDaniel/claude-youtube) – siehe `.claude/skills/THIRD_PARTY.md`.
 
 ## vast.ai: welche GPU?
 
@@ -104,20 +113,27 @@ Tipps:
 
 - Der **Showreel-Modus** von `car_swap.py` (nur die Kamerafahrt übernehmen, Szene komplett neu) ist mit offenen Modellen deutlich schwächer als mit Seedance und deshalb hier nicht eingebaut. `swap` (Szene bleibt) und `r2v` (komplett neu) funktionieren gut.
 - **Logos und Schriftzüge** verformen sich bei offenen Modellen öfter.
-- Wan arbeitet mit 16 fps. `finish.py` rechnet Zwischenbilder dazu, bei sehr schnellen Bewegungen gibt es leichte Artefakte. Besser wird es mit [RIFE](https://github.com/hzwer/ECCV2022-RIFE) als späterer Ausbau.
-- Die GPU-Teile sind noch **nicht auf einer echten GPU getestet**. Beim ersten Lauf auf vast.ai kann noch eine Kleinigkeit zu fixen sein.
+- Wan arbeitet mit 16 fps. `finish.py` rechnet die Zwischenbilder mit RIFE dazu (Fallback: `--interp ffmpeg`).
+- MAGREF, Kaleido und SkyReels-V3 sind (noch) nicht eingebaut – sie fehlen in diffusers und Wan2GP; Phantom und LTX-2.5 MSR decken Multi-Referenz ab.
+- Die GPU-Teile (Modelle) sind noch **nicht auf einer echten GPU getestet**. Beim ersten Lauf auf vast.ai kann noch eine Kleinigkeit zu fixen sein.
 
-## Weitere Reference-to-Video-Modelle (Open Source)
+## Studio (Wan2GP) – wann welches Modell
 
-| Repo | Stärke | Hinweis |
-|---|---|---|
-| [ali-vilab/VACE](https://github.com/ali-vilab/VACE) | **in dieser Pipeline**: Referenz, Maske, Tausch und Erweiterung in einem Modell | Apache 2.0 |
-| [Phantom-video/Phantom](https://github.com/Phantom-video/Phantom) | mehrere Subjekte (Person + Auto + Produkt) in einem Video | auf Wan-Basis |
-| [MAGREF-Video/MAGREF](https://github.com/MAGREF-Video/MAGREF) | beliebig viele Referenzen, gute Trennung der Subjekte | ICLR 2026 |
-| [zai-org/Kaleido](https://github.com/zai-org/Kaleido) | Multi-Subject, hohe Detailtreue | 14B |
-| [SkyworkAI/SkyReels-V3](https://github.com/SkyworkAI/SkyReels-V3) / [A2](https://github.com/SkyworkAI/SkyReels-A2) | 1–4 Referenzbilder, „Compose anything“ | |
-| [WeChatCV/Stand-In](https://github.com/WeChatCV/Stand-In) | **Gesichter/Personen** konsistent halten | leichtes Plug-in für Wan |
-| [Wan2.2-Animate](https://github.com/Wan-Video/Wan2.2) | Person im Video durch eine Referenzperson ersetzen | Apache 2.0 |
-| [Tencent-Hunyuan/HunyuanCustom](https://github.com/Tencent-Hunyuan/HunyuanCustom) | Referenz + Audio/Video-Steuerung | ⚠️ Lizenz schließt die EU aus |
+| Ziel | `--model` |
+|---|---|
+| Personen/Objekte aus Referenzbildern ins Video | `phantom_14B` |
+| 1–4 Referenzen, Video mit Ton | `ltx2_25_22B_msr` |
+| Gesicht/Person konsistent halten | `vace_standin_14B`, `lynx` |
+| Charakterbild mit Bewegung aus Vorlage-Video animieren | `animate2` |
+| Kamerafahrt um ein Startbild | `uni3c` |
+| Sehr lange Videos | `sky_df_14B` |
+| Person mit Identität (nur Menschen) | `hunyuan_custom` (⚠️ Tencent-Lizenz schließt die EU aus) |
+| Sprechender Avatar aus Bild + Audio | `infinitetalk` |
 
-Ohne Code zum Ausprobieren: [ComfyUI](https://github.com/comfyanonymous/ComfyUI) mit [ComfyUI-WanVideoWrapper](https://github.com/kijai/ComfyUI-WanVideoWrapper), das kann VACE, Phantom, MAGREF und Stand-In per Oberfläche. Auf vast.ai gibt es ein fertiges ComfyUI-Template.
+```bash
+python studio.py install                      # einmalig (eigene venv)
+python studio.py models phantom               # Modelle suchen
+python studio.py run --model phantom_14B --ref in/auto.jpg in/fahrer.jpg --prompt "..." --dry-run
+python studio.py run --model phantom_14B --ref in/auto.jpg in/fahrer.jpg --prompt "..."
+python studio.py ui                           # Oberfläche, per SSH-Tunnel: ssh -p <PORT> root@<IP> -L 7860:localhost:7860
+```

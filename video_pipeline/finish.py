@@ -2,7 +2,7 @@
 """
 finish.py – Nachbearbeitung & Rendern: flüssiger (FPS hoch), schärfer (Upscale bis 4K), Ton + Untertitel drauf
 
-  FPS        ffmpeg minterpolate  (16 fps von Wan → 30/60 fps)
+  FPS        RIFE v4.26 (KI-Zwischenbilder, 16 fps von Wan → 30/60 fps); Fallback: ffmpeg minterpolate
   Upscale    Real-ESRGAN über spandrel (x4 auf der GPU, danach exakt auf Zielhöhe skaliert)
   Ton        Originalton aus dem Quellclip wieder drunterlegen (wie in car_swap.py)
   Untertitel .srt aus analyze.py einbrennen
@@ -13,6 +13,7 @@ BEISPIELE:
   python finish.py out/clip.mp4 --srt out/edit.srt --upscale none
 """
 import argparse
+import re
 import urllib.request
 from pathlib import Path
 
@@ -25,12 +26,43 @@ WEIGHTS = {  # Real-ESRGAN-Gewichte (BSD-3), werden beim ersten Mal geladen
 CACHE = Path.home() / ".cache" / "video_pipeline"
 
 
-def interpolate(src, dst, fps):
-    """Bewegungskompensierte Zwischenbilder (CPU). Läuft auf der kleinen Auflösung, also vor dem Upscale."""
+def interpolate_ffmpeg(src, dst, fps):
+    """Bewegungskompensierte Zwischenbilder (CPU) – Fallback ohne GPU."""
     sh(["ffmpeg", "-y", "-v", "error", "-i", src,
         "-vf", f"minterpolate=fps={fps}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1",
         "-c:v", "libx264", "-crf", "14", "-preset", "slow", "-pix_fmt", "yuv420p", "-an", dst])
     return dst
+
+
+def interpolate_rife(src, dst, fps):
+    """RIFE v4.26: KI-Zwischenbilder für beliebige Ziel-FPS. Läuft vor dem Upscale auf der kleinen Auflösung."""
+    import numpy as np
+    import torch
+    from ccvfi import AutoModel, ConfigType
+    w, h, _, fps_in, _ = probe(src)
+    frames = read_frames(src, fps_in, w, h)
+    dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    CACHE.mkdir(parents=True, exist_ok=True)
+    model = AutoModel.from_pretrained(ConfigType.RIFE_IFNet_v426_heavy, device=dev, fp16=dev.type == "cuda",
+                                      model_dir=str(CACHE))
+    dtype = torch.float16 if dev.type == "cuda" else torch.float32
+    scale = 1.0 if h <= 1080 else 0.5  # Fluss bei großen Bildern auf halber Auflösung schätzen
+
+    def tensor(f):
+        return torch.from_numpy(np.asarray(f).copy()).permute(2, 0, 1)[None].to(dev, dtype) / 255
+
+    def frames_out():
+        for k in range(int((len(frames) - 1) * fps / fps_in) + 1):
+            t = k * fps_in / fps
+            i = min(int(t), len(frames) - 1)
+            frac = t - i
+            if frac < 1e-3 or i == len(frames) - 1:
+                yield np.asarray(frames[i])
+                continue
+            y = model.inference(torch.stack([tensor(frames[i]), tensor(frames[i + 1])], 1), timestep=frac, scale=scale)
+            yield (y[0].permute(1, 2, 0).float().clamp(0, 1).cpu().numpy() * 255).round().astype(np.uint8)
+
+    return write_video(frames_out(), dst, fps, crf=14)
 
 
 def load_upscaler(name):
@@ -71,6 +103,7 @@ def main():
     p = argparse.ArgumentParser(description="FPS hoch, Upscale, Ton + Untertitel")
     p.add_argument("video", type=Path)
     p.add_argument("--fps", type=float, default=30, help="Ziel-FPS (0 = unverändert)")
+    p.add_argument("--interp", default="rife", choices=["rife", "ffmpeg"], help="Zwischenbilder: rife = KI, ffmpeg = CPU")
     p.add_argument("--height", type=int, default=2160, help="Zielhöhe: 1080, 1440, 2160 (4K)")
     p.add_argument("--upscale", default="x4plus", choices=[*WEIGHTS, "none"],
                    help="x4plus = beste Qualität, general = schneller, none = nur skalieren")
@@ -87,7 +120,8 @@ def main():
 
     if a.fps and abs(a.fps - fps) > 0.01:
         print(f"1/3 FPS {fps:g} → {a.fps:g} …")
-        cur = interpolate(cur, work / f"{a.video.stem}_{a.fps:g}fps.mp4", a.fps)
+        interp = interpolate_rife if a.interp == "rife" else interpolate_ffmpeg
+        cur = interp(cur, work / f"{a.video.stem}_{a.fps:g}fps.mp4", a.fps)
 
     if a.height and a.height != h:
         print(f"2/3 Upscale auf {a.height}p …")
@@ -100,10 +134,11 @@ def main():
             cur = upscale(cur, dst, a.height, a.upscale)
 
     print("3/3 Ton / Untertitel …")
-    out = a.out or a.video.parent / f"{a.video.stem.removesuffix('_16fps')}_final.mp4"
+    out = a.out or a.video.parent / f"{re.sub(r'_\d+fps$', '', a.video.stem)}_final.mp4"
+    audio = a.audio_from or (a.video if probe(a.video)[4] else None)  # z. B. LTX-2: eigenen Ton behalten
     cmd = ["ffmpeg", "-y", "-v", "error", "-i", cur]
-    if a.audio_from and probe(a.audio_from)[4]:
-        cmd += ["-ss", str(a.audio_offset), "-i", a.audio_from, "-map", "0:v:0", "-map", "1:a:0",
+    if audio and probe(audio)[4]:
+        cmd += ["-ss", str(a.audio_offset), "-i", audio, "-map", "0:v:0", "-map", "1:a:0",
                 "-c:a", "aac", "-b:a", "192k", "-af", "apad", "-shortest"]
     if a.srt:
         style = "FontName=Arial,FontSize=14,Outline=2,Shadow=0,MarginV=40"
