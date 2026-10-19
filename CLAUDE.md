@@ -5,6 +5,7 @@ Ziel: Videos erstellen, Autos/Objekte in Clips tauschen, Clips und Hooks analysi
 - `video_pipeline/`: Open-Source-Pipeline (Wan-VACE, YOLO, Whisper, Qwen-VL, Real-ESRGAN, FFmpeg). **Bedienung: Skill `/video`** (`.claude/skills/video/SKILL.md`). Details in `video_pipeline/README.md`.
   - `vast.py` mietet und zerstört die GPU, `remote.py` steuert die Jobs auf der Instanz, `server.py` läuft auf der Instanz.
 - `car_swap.py`: bezahlte Alternative über fal.ai (Seedance 2.0), nur mit OK.
+- `main.py`: Seedance 2.5 über die Higgsfield-API (SDK `higgsfield-client`, `pip install -r requirements.txt`). Zugangsdaten `HF_KEY` (key-id:key-secret) aus `.env.local` (git-ignoriert) oder der Umgebung – nie lesen, ausgeben oder committen. Jeder Lauf ist kostenpflichtig → nur mit OK.
 - Der Start-Hook installiert die vast.ai-CLI. `VAST_API_KEY` kommt aus den Umgebungs-Einstellungen. Den Key nie ausgeben oder in Dateien schreiben.
 - Mit dem Nutzer Deutsch sprechen. Videoprompts auf Englisch.
 - **Format: Standard 9:16** (TikTok/Reels/Shorts), ausgeliefert als 1080x1920. 16:9 (1920x1080) nur, wenn der Nutzer es will, das Ausgangsmaterial quer ist oder die Szene klar davon profitiert (breite Fahrszenen, YouTube) – dann kurz sagen, warum.
