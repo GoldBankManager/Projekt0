@@ -33,8 +33,10 @@ SCRIPTS = {"analyze", "ref2video", "generate", "studio", "finish"}
 TOKEN = os.environ.get("PIPE_TOKEN", "")
 READY = Path(os.environ.get("PIPE_READY_FILE", "/workspace/setup.log"))
 ENV_FILE = Path("/workspace/pipeline.env")
+IDLE_MIN = float(os.environ.get("PIPE_IDLE_MIN", 30))  # 0 = nie automatisch stoppen
 
 jobs, q = {}, queue.Queue()
+last_activity = [time.time()]
 
 
 def worker():
@@ -51,6 +53,29 @@ def worker():
             p = subprocess.run([sys.executable, "-u", f"{job['script']}.py", *job["args"]],
                                cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT)
         job.update(status="done" if p.returncode == 0 else "failed", code=p.returncode, ended=time.time())
+
+
+def busy():
+    return any(j["status"] in ("queued", "running") for j in jobs.values())
+
+
+def idle_stop():
+    """Spart Geld: nach IDLE_MIN Minuten ohne Anfrage und ohne laufenden Job stoppt sich die Instanz selbst
+    (GPU-Kosten enden, Daten bleiben). Nutzt den Instanz-eigenen Schlüssel, den vast.ai als CONTAINER_API_KEY setzt."""
+    while True:
+        time.sleep(60)
+        if busy():
+            last_activity[0] = time.time()
+        if IDLE_MIN <= 0 or time.time() - last_activity[0] < IDLE_MIN * 60:
+            continue
+        cid, key = os.environ.get("CONTAINER_ID"), os.environ.get("CONTAINER_API_KEY")
+        print(f"{time.ctime()}: {IDLE_MIN:g} min untätig → stoppe Instanz {cid}", flush=True)
+        if cid and key:
+            cli = shutil.which("vastai") or str(Path(sys.executable).with_name("vastai"))
+            subprocess.run([cli, "stop", "instance", cid, "--api-key", key])
+        else:
+            print("  CONTAINER_ID/CONTAINER_API_KEY fehlen – kann mich nicht selbst stoppen", flush=True)
+        last_activity[0] = time.time()  # falls es nicht geklappt hat: nach IDLE_MIN erneut versuchen
 
 
 def safe_path(rel):
@@ -79,6 +104,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def authed(self):
         if TOKEN and self.headers.get("Authorization") == f"Bearer {TOKEN}":
+            last_activity[0] = time.time()
             return True
         self.send(401, {"error": "unauthorized"})
         return False
@@ -101,7 +127,8 @@ class Handler(BaseHTTPRequestHandler):
             tunnel = Path("/workspace/tunnel_url")
             return self.send(200, {"ready": ready, "gpu": gpu(), "busy": busy,
                                    "disk_free_gb": round(shutil.disk_usage(ROOT).free / 2**30),
-                                   "tunnel": tunnel.read_text().strip() if tunnel.exists() else None})
+                                   "tunnel": tunnel.read_text().strip() if tunnel.exists() else None,
+                                   "auto_stop_after_idle_min": IDLE_MIN})
         if path == "jobs":
             return self.send(200, [self.job_view(j, tail=3) for j in jobs.values()])
         if path.startswith("jobs/"):
@@ -206,6 +233,7 @@ def main():
     for d in (*DIRS.values(), LOGS):
         d.mkdir(exist_ok=True)
     threading.Thread(target=worker, daemon=True).start()
+    threading.Thread(target=idle_stop, daemon=True).start()
     port = int(os.environ.get("PIPE_PORT", 8000))
     print(f"Job-Server läuft auf Port {port}")
     ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()

@@ -14,5 +14,6 @@ ccvfi
 av
 yt-dlp
 gdown
+vastai
 pillow
 numpy

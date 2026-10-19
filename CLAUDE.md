@@ -16,3 +16,4 @@ Ziel: Videos erstellen, Autos/Objekte in Clips tauschen, Clips und Hooks analysi
 - Ein OK gilt nur für die genannte Aktion, nicht für spätere.
 - `vast.py start -y` und `car_swap.py -y` nie ohne dieses OK benutzen.
 - Laufende vast.ai-Instanzen nicht vergessen: nach der Arbeit den Status zeigen und das Zerstören anbieten.
+- **Auto-Stopp (Wunsch des Nutzers):** Die Instanz stoppt sich nach 30 min ohne Anfrage und ohne laufenden Job selbst (nur stoppen, nie selbst zerstören). Gestoppt = keine GPU-Kosten, nur Speicher. `vast.py resume <ID>` startet sie wieder und kostet wieder pro Stunde → vorher OK holen. Gestoppte Instanzen beim nächsten Chat erwähnen und das Zerstören anbieten.

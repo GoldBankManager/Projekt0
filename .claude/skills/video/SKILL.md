@@ -34,6 +34,8 @@ Zwischendurch kurz Bescheid geben (Instanz startet, installiert, Job läuft, fer
 
 ## 1. Instanz prüfen oder starten
 
+Auto-Stopp: Die Instanz stoppt sich nach **30 min Leerlauf** selbst (Daten bleiben, nur Speicherkosten). Steht `vast.py status` auf gestoppt (`exited`): dem Nutzer anbieten, sie mit `python vast.py resume <ID>` fortzusetzen (geht schneller als neu mieten, Modelle sind schon da; kostet wieder $/h → OK holen) oder sie zu zerstören. Lange Pausen im Chat (> 30 min) vorher ankündigen.
+
 ```bash
 cd video_pipeline
 python vast.py status          # läuft schon eine? → weiter mit Schritt 2

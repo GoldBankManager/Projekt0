@@ -93,7 +93,7 @@ def main():
     sub.choices["start"].add_argument("-y", "--yes", action="store_true", help="ohne Rückfrage mieten")
     sub.add_parser("status")
     sub.add_parser("balance")
-    for name in ("logs", "stop"):
+    for name in ("logs", "stop", "resume"):
         sub.add_parser(name).add_argument("id", type=int)
     sub.choices["stop"].add_argument("-y", "--yes", action="store_true")
     a = p.parse_args()
@@ -136,12 +136,20 @@ def main():
         for i in insts:
             print(f"{i['id']}  {i.get('actual_status')}  {i.get('gpu_name')}  ${i.get('dph_total', 0):.3f}/h  "
                   f"Disk {i.get('disk_space', 0):.0f} GB")
+            if i.get("actual_status") in ("exited", "stopped", "offline"):
+                print(f"   Gestoppt (z. B. nach 30 min Leerlauf): keine GPU-Kosten, nur Speicher (wenige Cent/Tag).")
+                print(f"   Weiter:  python vast.py resume {i['id']}   |   Endgültig weg: python vast.py stop {i['id']}")
             if i.get("ssh_host"):
                 print(f"   SSH:     ssh -p {i['ssh_port']} root@{i['ssh_host']}")
             print(f"   Jupyter: {jupyter_url(i)}")
 
     elif a.cmd == "logs":
         print(vast("logs", a.id, "--tail", 60, raw=False))
+
+    elif a.cmd == "resume":
+        vast("start", "instance", a.id)
+        print(f"✓ Instanz {a.id} startet wieder (Daten und Modelle sind noch da, Start dauert wenige Minuten).")
+        print("  Hinweis: Der Host muss die GPU frei haben – sonst bleibt sie im Status 'scheduling'.")
 
     elif a.cmd == "stop":
         if not a.yes and input(f"Instanz {a.id} ZERSTÖREN? Alle Dateien darauf sind dann weg. (j/n) ").strip().lower() \

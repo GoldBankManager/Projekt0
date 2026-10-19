@@ -39,6 +39,8 @@ Wissen für Claude (Skills in `.claude/skills/`): `video` (Bedienung), `video-pr
 | RTX A6000 / L40S (48 GB) | 0,40–0,90 | 14B mit `--offload model` | ca. 10–20 h |
 | A100 / H100 (80 GB) | 1,00–2,00 | 14B, 720p, schnell | ca. 5–9 h |
 
+**Auto-Stopp:** Nach 30 min ohne Anfrage und ohne Job stoppt sich die Instanz selbst (`PIPE_IDLE_MIN`). Danach fallen keine GPU-Kosten mehr an, nur Speicher (wenige Cent pro Tag), bis sie zerstört wird.
+
 Beim Mieten: Template **PyTorch (CUDA 12)**, mindestens **150 GB Disk**. Die Instanz am Ende **zerstören (Destroy)**, nicht nur stoppen, sonst kostet der Speicher weiter.
 
 ## Automatisch mieten und installieren (`vast.py`)
@@ -52,6 +54,7 @@ python vast.py start                      # mieten (mit Rückfrage), Pipeline in
 python vast.py logs <ID>                  # warten bis "PIPELINE_READY"
 python vast.py status                     # Jupyter-Link und SSH-Befehl
 python vast.py stop <ID>                  # ZERSTÖREN, keine Kosten mehr
+python vast.py resume <ID>                # gestoppte Instanz fortsetzen
 ```
 
 ### Fernsteuern ohne SSH (`remote.py`, spricht mit `server.py` auf der Instanz)
