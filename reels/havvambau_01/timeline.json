@@ -1,0 +1,12 @@
+{
+  "_info": "Beat-Map der Referenzmusik (vorlagen/referenzen/musik_havvambau_01.mp3, 166 BPM). Zeiten in Sekunden. Szene (scene.js) und SFX (sfx.py) lesen beide diese Datei.",
+  "duration": 9.8,
+  "fps": 30,
+  "beats": [0.673, 1.033, 1.405, 1.776, 2.159, 2.543, 2.914, 3.262, 3.611, 3.947, 4.272, 4.632, 5.039, 5.399, 5.759, 6.142, 6.502, 6.861, 7.221, 7.57, 7.93, 8.301, 8.661],
+  "break": 4.0,
+  "hat_roll": [4.272, 4.37, 4.455, 4.534, 4.603, 4.661, 4.72, 4.778, 4.853, 4.93],
+  "drop": 5.759,
+  "dig_impact": 2.148,
+  "dump": 7.221,
+  "end_hits": [8.661, 8.847, 9.381]
+}

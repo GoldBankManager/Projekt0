@@ -1,2 +1,8 @@
 __pycache__/
 out/
+node_modules/
+# Fremdmaterial (Referenz-Reels anderer Creator, Musik) nicht in das öffentliche Repo
+vorlagen/referenzen/*.mp4
+vorlagen/referenzen/*.mp3
+vorlagen/referenzen/*.jpg
+reels/*/final/*vorschau_mit_musik*
