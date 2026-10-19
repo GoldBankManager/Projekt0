@@ -35,7 +35,7 @@ Beim Mieten: Template **PyTorch (CUDA 12)**, mindestens **150 GB Disk**. Die Ins
 ## Setup (einmal pro Instanz, ca. 10–20 min, meistens Modell-Download)
 
 ```bash
-git clone https://github.com/GoldBankManager/Projekt0
+git clone -b video-pipeline https://github.com/GoldBankManager/Projekt0
 cd Projekt0/video_pipeline
 bash setup_vast.sh          # 14B-Modell (48–80 GB GPU)
 bash setup_vast.sh 1.3b     # kleines Modell (RTX 4090)

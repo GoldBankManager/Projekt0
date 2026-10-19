@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Einmal auf der gemieteten vast.ai-Maschine ausführen (Template: "PyTorch" mit CUDA 12.x):
-#   git clone https://github.com/GoldBankManager/Projekt0 && cd Projekt0/video_pipeline && bash setup_vast.sh
+#   git clone -b video-pipeline https://github.com/GoldBankManager/Projekt0 && cd Projekt0/video_pipeline && bash setup_vast.sh
 # Optional: bash setup_vast.sh 1.3b   → lädt nur das kleine Modell (RTX 4090 / 24 GB)
 set -euo pipefail
 cd "$(dirname "$0")"
