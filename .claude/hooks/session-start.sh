@@ -10,6 +10,11 @@ if ! command -v vastai >/dev/null 2>&1; then
   pip install -q --disable-pip-version-check vastai
 fi
 
+# Higgsfield-SDK für main.py (Seedance 2.5)
+if ! python3 -c "import higgsfield_client, dotenv" >/dev/null 2>&1; then
+  pip install -q --disable-pip-version-check -r "$CLAUDE_PROJECT_DIR/requirements.txt"
+fi
+
 if [ -z "${VAST_API_KEY:-}" ]; then
   echo "Hinweis: VAST_API_KEY ist nicht gesetzt – vast.py/remote.py brauchen ihn (Umgebungs-Einstellungen → Umgebungsvariable)."
 fi
