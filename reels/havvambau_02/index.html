@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>HavvamBau Reel 02</title>
+<script type="importmap">
+{ "imports": { "three": "/reel_engine/node_modules/three/build/three.module.js",
+               "three/addons/": "/reel_engine/node_modules/three/examples/jsm/" } }
+</script>
+<style>
+  @font-face { font-family: 'Anton'; src: url('/reel_engine/node_modules/@fontsource/anton/files/anton-latin-400-normal.woff2') format('woff2'); }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+  canvas { display: block; position: absolute; inset: 0; }
+  #ov { position: absolute; inset: 0; width: 1080px; height: 1920px; pointer-events: none; overflow: hidden; }
+  #ov div { position: absolute; white-space: nowrap; }
+  .type { font-family: 'Inter', sans-serif; font-weight: 600; color: #fff; font-size: 88px; letter-spacing: -2px;
+          left: 0; right: 0; text-align: center; text-shadow: 0 4px 30px rgba(0,0,0,.45); }
+  .cursor { display: inline-block; width: 0.5em; height: 0.95em; background: #F5B800; vertical-align: -0.12em; margin-left: 6px; }
+  .label { font-family: 'Inter', sans-serif; font-weight: 700; color: #fff; font-size: 54px; left: 0; right: 0; text-align: center;
+           text-shadow: 0 3px 14px rgba(0,0,0,.55); letter-spacing: -0.5px; }
+  .tag { font-family: 'DejaVu Sans Mono', monospace; color: rgba(255,255,255,.85); font-size: 30px; letter-spacing: 3px; }
+  .slam { font-family: 'Anton', sans-serif; color: #F5B800; left: 0; right: 0; text-align: center; letter-spacing: 4px;
+          text-shadow: 0 10px 40px rgba(0,0,0,.6), 0 0 2px rgba(0,0,0,.8); }
+  .white { color: #fff; }
+  .logo-word { font-family: 'Anton', sans-serif; color: #111; font-size: 150px; letter-spacing: 6px; }
+  .logo-sub { font-family: 'Inter', sans-serif; font-weight: 600; color: #333; font-size: 44px; letter-spacing: 0px; }
+  .logo-small { font-family: 'Inter', sans-serif; font-weight: 500; color: #777; font-size: 36px; }
+  .hl { background: #F5B800; color: #111; padding: 0 14px; border-radius: 10px; }
+</style>
+</head>
+<body>
+<div id="ov"></div>
+<script type="module" src="./scene.js"></script>
+</body>
+</html>
