@@ -32,7 +32,22 @@ Lokaler Ersatz für `car_swap.py` (Seedance über fal.ai): keine Kosten pro Seku
 
 Beim Mieten: Template **PyTorch (CUDA 12)**, mindestens **150 GB Disk**. Die Instanz am Ende **zerstören (Destroy)**, nicht nur stoppen, sonst kostet der Speicher weiter.
 
-## Setup (einmal pro Instanz, ca. 10–20 min, meistens Modell-Download)
+## Automatisch mieten und installieren (`vast.py`)
+
+```bash
+pip install vastai
+export VAST_API_KEY="..."                 # Key von https://cloud.vast.ai/manage-keys/
+python vast.py balance                    # Guthaben
+python vast.py offers                     # günstigste RTX 4090 ansehen
+python vast.py start                      # mieten (mit Rückfrage), Pipeline installiert sich selbst
+python vast.py logs <ID>                  # warten bis "PIPELINE_READY"
+python vast.py status                     # Jupyter-Link und SSH-Befehl
+python vast.py stop <ID>                  # ZERSTÖREN, keine Kosten mehr
+```
+
+Danach im Jupyter-Link Clips und Bilder nach `/workspace/Projekt0-video-pipeline/video_pipeline/` hochladen und dort im Terminal die Befehle unten ausführen.
+
+## Setup von Hand (einmal pro Instanz, ca. 10–20 min, meistens Modell-Download)
 
 ```bash
 git clone -b video-pipeline https://github.com/GoldBankManager/Projekt0
